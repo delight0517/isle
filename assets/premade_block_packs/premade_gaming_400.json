@@ -1,0 +1,2010 @@
+{
+  "packId": "premade_gaming_400",
+  "displayName": "게임 팩 400",
+  "description": "게임 YouTube 채널 200 + 게임 웹사이트 200",
+  "version": "1.0.0",
+  "generatedAt": "2026-06-13T05:36:48Z",
+  "entryCount": 400,
+  "entries": [
+    {
+      "pattern": "@pewdiepie",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@markiplier",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@jacksepticeye",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@dream",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@mrbeastgaming",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ninja",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@shroud",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@summit1g",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@xqc",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@pokimane",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@valkyrae",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@sykkuno",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@disguisedtoast",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ludwig",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@moistcr1tikal",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@hasanabi",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@asmongold",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@criticalrole",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@vanossgaming",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@h2odelirious",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@wildcat",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@smii7y",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@terroriser",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@daithidenogla",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@basicallyidowrk",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@miniminter",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@zerkaa",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@behzinga",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@tbjzl",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@vikkstar123",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@w2s",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ksi",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@loganpaul",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@jakepaul",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@dantdm",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@stampylonghead",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@popularmmos",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@gamingwithjen",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ssundee",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@bifflewiffle",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@sigils",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@nicolls",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@slogo",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@jelly",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@crainer",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@prestonplayz",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@unspeakable",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@moosecraft",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@aphmau",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@flamingo",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@albertstuff",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@konekokitten",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@denis",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@corl",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@sketch",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@russoplays",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@poke",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@thinknoodles",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@graser10",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ldshadowlady",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@smallishbeans",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@solidaritygaming",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@grian",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@mumbojumbo",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@goodtimeswithscar",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@impulsesv",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@tangotek",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ijevin",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@cubfan135",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@geminitay",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@xisumavoid",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ethoslab",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@vintagebeef",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@docm77",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@rendog",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@hypnotizd",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@wattles",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@pixlriffs",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@mythicalsausage",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@fwhip",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@keralis",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@bdoubleo100",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@zedaphplays",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@xisuma",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@captainsparklez",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@jeromeasf",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@mitch",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@bajancanadian",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@woofless",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@veecraft",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@alia",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@morealia",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@noahj456",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@bobbyplays",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@iferg",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@mystic",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@hawksnest",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@bengal",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ferg",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@nickmercs",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@timthetatman",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@drlupo",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@couragejd",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@muselk",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lazarbeam",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@fresh",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lachlan",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@losery",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@wolfeyvgc",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@poketcg",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@leonhart",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@andreamangione",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@unlistedleaf",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@deepblue",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@pokerev",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@realbreakingnate",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@tricky",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@fefe",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@blizzard",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@playoverwatch",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@playvalorant",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@leagueoflegends",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@riotgames",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@fortnite",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@minecraft",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@roblox",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@playstation",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@xbox",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@nintendo",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ign",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@gamespot",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@kotaku",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@polygon",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@eurogamer",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@rockpapershotgun",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@pcgamer",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@gamesradar",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@venturebeat",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@theverge",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamer",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamerofficial",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamer2",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamer3",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamer4",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamer5",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamer6",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamer7",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowspecgamer8",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@winterstarcraft",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@wintergamingtv",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@blizzardkorea",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@sc2hl",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@lowkotv",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@manaesports",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@elleixgaming",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@uthermal",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@uthermal2",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@warditv",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@stugames",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@onsyde_crank",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@mrshavvo",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@침착맨",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@우주하마",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@김블루",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@뷰티풀너드",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@보따",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@감스트",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@풍월량",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@잡상싱",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@대도서관",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@히밥",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@악어",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@주펄",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@김도",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@랄로",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@고세구",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@이말년",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@피식대학",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@워크맨",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@김성모",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@gamemeca",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ruliweb",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@inven",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@thisisgame",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@faker",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@showmaker",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@chovy",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@deft",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@ruler",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@keria",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@zeus",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@oner",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@gumayusi",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@doran",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@peyz",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@canyon",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@bdd",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@cuzz",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@viper",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "@kingen",
+      "kind": "channelURL",
+      "note": "gaming YT"
+    },
+    {
+      "pattern": "store.steampowered.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "steampowered.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "steamcommunity.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "epicgames.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "store.epicgames.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "battle.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "blizzard.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "riotgames.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "playvalorant.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "leagueoflegends.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "playruneterra.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "minecraft.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "minecraftforum.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "planetminecraft.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "curseforge.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "modrinth.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "mcpedl.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "roblox.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "www.roblox.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "rbxcdn.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "discord.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "discordapp.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "discord.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "twitch.tv",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "kick.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "youtube.com/gaming",
+      "kind": "urlContains",
+      "note": "gaming YT hub path only"
+    },
+    {
+      "pattern": "ign.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamespot.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "kotaku.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "polygon.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "eurogamer.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "rockpapershotgun.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "pcgamer.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamesradar.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "destructoid.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "nintendolife.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "nintendoworldreport.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gonintendo.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "nintendo.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "playstation.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "xbox.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "bethesda.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "ubisoft.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "store.ubisoft.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "ea.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "origin.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gog.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "itch.io",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "humblebundle.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "fanatical.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "greenmangaming.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "cdkeys.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "g2a.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "kinguin.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "eneba.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "instant-gaming.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "nexusmods.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "steamdb.info",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "steamcharts.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "howlongtobeat.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "opencritic.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "metacritic.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "vgchartz.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "mobygames.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "giantbomb.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "speedrun.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "speeddemosarchive.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "tasvideos.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "smashboards.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "liquipedia.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "dotabuff.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "op.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "u.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "mobalytics.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "porofessor.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "blitz.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "tracker.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "destinytracker.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "halotracker.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "rocketleague.tracker.network",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "fortnitetracker.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "apex.tracker.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "valorant.op.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "lolchess.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "tftactics.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "faceit.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "esea.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamersclub.com.br",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "challengermode.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "toornament.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "battlefy.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "start.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "smash.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "fgc.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "dotesports.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "theloadout.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "probuilds.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "champion.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "lolalytics.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "opgg.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "deeplol.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "fow.kr",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "inven.co.kr",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "ruliweb.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "thisisgame.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamemeca.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "mmorpg.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "massivelyop.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "mmobomb.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "mmos.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "wowhead.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "icy-veins.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "maxroll.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "poe.ninja",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "poeaffix.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "pathofexile.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "diablo.blizzard.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "diabloimmortal.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "lostark.game.onstove.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "maplestory.nexon.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "genshin.hoyoverse.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "honkai.hoyoverse.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "hsr.hoyoverse.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "mihoyo.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "hoyoverse.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gacha.games",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "game8.co",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamepress.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamepur.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "siliconera.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gematsu.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "dualshockers.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "thegamer.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamesindustry.biz",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamedeveloper.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamasutra.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "indiegamesplus.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "indiedb.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamejolt.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "kongregate.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "newgrounds.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "armorgames.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "miniclip.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "poki.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "crazygames.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "y8.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "addictinggames.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "coolmathgames.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "chess.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "lichess.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "boardgamearena.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "tabletopia.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "roll20.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "foundryvtt.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "fightcade.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "retroarch.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "emulation.gametechwiki.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "romsmania.cc",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "vimm.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "cdromance.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "ps2-homebrew.aldostools.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "wiiubrew.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "switchbrew.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gbatemp.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "wololo.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "psxhax.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "psx-place.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "rpcs3.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "pcsx2.net",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "dolphin-emu.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "citra-emu.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "yuzu-emu.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "ryujinx.org",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "steamdeck.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "playdate.date",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "anbernic.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "ayaneo.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gpd.hk",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "onexplayer.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "rogally.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "lenovo.com/legion-go",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "asus.com/rog-ally",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "frame.work",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "logitechg.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "razer.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "steelseries.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "hyperx.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "corsair.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "elgato.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "secretlab.co",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "noblechairs.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "dxracer.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "akracing.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gfuel.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "rogueenergy.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "sneakenergy.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "gamersupps.gg",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "advancedgg.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "ghostlifestyle.com",
+      "kind": "host",
+      "note": "gaming site"
+    },
+    {
+      "pattern": "monsterenergy.com",
+      "kind": "host",
+      "note": "gaming site"
+    }
+  ]
+}

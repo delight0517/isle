@@ -1,0 +1,34 @@
+---
+description: Isle — Blueprint Architect, version visibility, trace logs, agent response footer
+alwaysApply: true
+---
+
+# Isle — Blueprint Architect & Release Discipline
+
+## Blueprint Architect (CORE)
+
+1. **Architecture Snapshot**: Before major changes, list files to touch and core functions inside them.
+2. **Deletion Ban**: Do not delete entire files or large logic blocks unless the user says `REPLACE_ENTIRE_FILE`.
+3. **Trace Log**: After significant work, update `isle/.cursor_trace/LATEST_CHANGES.md` (added / removed / why / revert hint).
+4. **User feedback**: Log recurring UX/product feedback in `isle/.cursor_trace/USER_FEEDBACK_LOG.md` with date and version.
+
+## App name & version (ALWAYS)
+
+- Single source: `lib/core/constants/app_release_info.dart` + `pubspec.yaml` `version:` — **both must match** on every release.
+- **On screen**: `AppVersionBadge` stays visible (corner); tap copies `Isle vX.Y.Z+N`.
+- **On every update**: bump `buildNumber` (and `version` when needed) in both files.
+- **App logs**: Every line via `IsleAppLogService` includes app name, `vX.Y.Z+N`, and UTC timestamp (never message-only).
+- **Agent chat footer** (required at end of every assistant reply for this project):
+
+```
+---
+**Isle v{version}+{build}** · Rebuild: `cd ".../isle" && flutter pub get && flutter run`
+```
+
+Use actual values from `AppReleaseInfo.label` and `AppReleaseInfo.rebuildCommand`.
+
+## Incremental integration
+
+- No "start from scratch" unless the directory is empty.
+- Preserve existing names, UI patterns, and comments unless broken.
+- Ask before resolving architectural conflicts by deleting one side.

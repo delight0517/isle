@@ -1,0 +1,59 @@
+{
+  "blueprint_id": "flutter-ios-devicectl-sig11-v1",
+  "framework": "flutter",
+  "platform": "ios",
+  "min_ios_version": 16,
+  "detection": {
+    "project_markers": ["pubspec.yaml", "ios/Runner"],
+    "failure_patterns": [
+      "Cannot create a FlutterEngine instance in debug mode",
+      "App terminated due to signal 11",
+      "signal 11"
+    ],
+    "forbidden_launch": {
+      "tool": "devicectl",
+      "subcommand": "device process launch",
+      "when_build_configuration": "Debug",
+      "when_flutter_attached": false
+    }
+  },
+  "resolution": {
+    "standalone_launch": {
+      "build_command": ["flutter", "pub", "get"],
+      "build_command_2": ["flutter", "build", "ios", "--profile"],
+      "artifact_glob": "build/ios/iphoneos/Runner.app",
+      "install_command": [
+        "xcrun",
+        "devicectl",
+        "device",
+        "install",
+        "app",
+        "--device",
+        "{device_udid}",
+        "{artifact_path}"
+      ],
+      "launch_command": [
+        "xcrun",
+        "devicectl",
+        "device",
+        "process",
+        "launch",
+        "--console",
+        "--device",
+        "{device_udid}",
+        "{bundle_id}"
+      ]
+    },
+    "debug_attach_launch": {
+      "build_command": ["flutter", "run", "-d", "{device_udid}"]
+    },
+    "preferred_wrapper": "tool/deletefix_launch.sh"
+  },
+  "isle": {
+    "flutter_root_relative": "isle",
+    "bundle_id_standalone": "com.isle.app.isle.dev",
+    "bundle_id_release": "com.isle.app.isle",
+    "xcode_scheme_standalone": "Runner-Profile-Dev",
+    "profile_xcode_configuration": "Profile"
+  }
+}

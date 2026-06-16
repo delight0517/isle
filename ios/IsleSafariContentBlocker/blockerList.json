@@ -1,0 +1,9 @@
+[
+  {
+    "action": { "type": "block" },
+    "trigger": {
+      "url-filter": ".*",
+      "if-domain": ["*youtube.com", "*youtu.be", "*m.youtube.com"]
+    }
+  }
+]

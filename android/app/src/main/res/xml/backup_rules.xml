@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 앱 업데이트·기기 백업 시 Hive·설정 유지 (Google 계정 백업 켜진 경우) -->
+<full-backup-content>
+    <include domain="sharedpref" path="." />
+    <include domain="database" path="." />
+    <include domain="file" path="." />
+</full-backup-content>

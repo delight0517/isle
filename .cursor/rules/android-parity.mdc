@@ -1,0 +1,36 @@
+---
+description: Isle — iOS→Android 완전 기능 패리티 [Bridge] 규칙 + 차단 추상화 seam
+alwaysApply: true
+---
+
+# [Bridge] Cross-Platform Parity (iOS → Android)
+
+> 정본 플랜: `ANDROID_PARITY_PLAN.md` (repo 루트). 큰 결정·진척은 거기 + `CLAUDE.md §7` 갱신.
+
+## 핵심 전제
+- 이 앱은 **Flutter** → `isle/lib/` Dart 전부(피드·랭킹·차단 필터·Hive·AI·WebView·UI) 이미 안드로이드에서 돈다. ~80% 변환 불필요.
+- 안드로이드 전용으로 새로 짤 것 = **네이티브 OS 차단 레이어**뿐.
+  - `com.isle.app/app_limits` (앱 사용 한도) → ✅ 이미 이식됨 (`AppLimitPlugin.kt`).
+  - `com.isle.app/screen_time` (앱·웹 차단, 763줄) → ❌ Android 미구현 = 작업 대상.
+  - `com.isle.app/blocking` (신규 중립 채널) → 🟡 Dart 계약 완성, Kotlin 미구현.
+
+## [Bridge] 규칙 (반드시 지킬 것)
+1. **차단 로직은 `BlockingController` 인터페이스로만 호출한다.** 상위 코드는
+   `ref.read(blockingControllerProvider)` 만 쓰고 `if (Platform.isIOS)` 분기를 새로 만들지 않는다.
+   (구현: `isle/lib/core/blocking/blocking_controller.dart` + ios/android/unsupported 3종)
+2. **새 차단 기능 = 인터페이스에 메서드 추가 → iOS·Android 구현 둘 다 채운다.**
+   한쪽만 가능하면 다른 쪽은 명시적 `unsupported`/no-op 반환 (누락을 구조적으로 노출).
+3. **강제력 격차는 정직하게.** iOS=OS 강제(FamilyControls), Android=접근성·VPN 보조(우회 가능).
+   같은 기능도 `BlockingCapabilities`(appBlock/webBlock/scheduleLock/canPreventUninstall + note)로 UI 에 표기.
+4. iOS 네이티브 메서드를 새로 추가하면 → `ANDROID_PARITY_PLAN.md §3` 표와
+   `AndroidBlockingController` 의 TODO 를 같이 갱신한다.
+
+## Android 등가 매핑 (요약)
+- 앱 차단 → `AccessibilityService` 포그라운드 감지 + `SYSTEM_ALERT_WINDOW` 오버레이.
+- 웹 차단 → `VpnService` 로컬 DNS sinkhole (전 브라우저, 루트 불필요).
+- 앱 선택 → `getInstalledApplications()` + Flutter 앱 그리드 (FamilyActivityPicker 대체).
+- 스케줄 강제 → 포그라운드 서비스 + WorkManager.
+- 진짜 "잠금"(삭제 방지)은 Device Owner 없이는 불가 → 의지력 보조로 degrade.
+
+## 로드맵 상태 (상세는 플랜 §3)
+Phase 0 seam ✅ / Phase 1 앱차단 ⬜ / Phase 2 웹차단(VPN) ⬜ / Phase 3 스케줄·권한 ⬜ / Phase 4 degrade UX ⬜
