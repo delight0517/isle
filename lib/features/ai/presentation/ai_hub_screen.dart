@@ -11,6 +11,7 @@ import '../../../core/ai/ai_usage_log_store.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_typography.dart';
+import '../../../core/qa/device_qa_item_panel.dart';
 import '../../../core/services/isle_user_defaults.dart';
 import '../../../shared/widgets/isle_app_bar.dart';
 import '../../youtube/presentation/widgets/isle_youtube_schedule_sheet.dart';
@@ -20,7 +21,10 @@ import 'widgets/ai_waiting_card.dart';
 
 /// AI 제공자·모델·키·가이드라인·예산 — 단일 허브
 class AiHubScreen extends StatefulWidget {
-  const AiHubScreen({super.key});
+  const AiHubScreen({super.key, this.qaMode = false});
+
+  /// 설정 → 실기기 확인 (TODO) 에서 진입 시 단계 배너
+  final bool qaMode;
 
   @override
   State<AiHubScreen> createState() => _AiHubScreenState();
@@ -40,6 +44,7 @@ class _AiHubScreenState extends State<AiHubScreen> {
   bool _saving = false;
   bool _testing = false;
   String? _testResult;
+  bool _qaBlockChatVisited = false;
 
   @override
   void initState() {
@@ -138,6 +143,12 @@ class _AiHubScreenState extends State<AiHubScreen> {
       temperature: 0,
     );
     if (!mounted) return;
+    final ok = r.usedAi;
+    if (ok) {
+      await IsleUserDefaults.setAiHubLastTest(ok: true);
+    } else if (r.error != null && r.error != 'budget') {
+      await IsleUserDefaults.setAiHubLastTest(ok: false);
+    }
     setState(() {
       _testing = false;
       if (r.usedAi) {
@@ -170,8 +181,53 @@ class _AiHubScreenState extends State<AiHubScreen> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          IsleSize.scrollBottomPadding(context),
+        ),
         children: [
+          if (widget.qaMode) ...[
+            DeviceQaItemPanel(
+              itemId: 'ai_schedule',
+              title: '실기기 확인 — AI·스케줄',
+              steps: [
+                DeviceQaStep(
+                  label: '① 키·연결 테스트',
+                  done: !configured || IsleUserDefaults.aiHubLastTestOk,
+                ),
+                DeviceQaStep(
+                  label: '② Isle 유튜브 스케줄 ON',
+                  done: IsleUserDefaults.youtubeScheduleLockEnabled,
+                ),
+                DeviceQaStep(
+                  label: '③ 차단 AI 챗 열기',
+                  done: _qaBlockChatVisited,
+                ),
+              ],
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    FilledButton.tonal(
+                      onPressed: () => showIsleYoutubeScheduleSheet(context),
+                      child: const Text('Isle 유튜브 스케줄'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () async {
+                        await context.push('/settings/block-chat');
+                        if (mounted) setState(() => _qaBlockChatVisited = true);
+                      },
+                      child: const Text('차단 AI 챗'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
           const _WhyApiIllustration(),
           if (hasWork) ...[
             const SizedBox(height: 16),
@@ -247,84 +303,96 @@ class _AiHubScreenState extends State<AiHubScreen> {
               onTap: () => context.push('/settings/block-chat'),
             ),
           ),
-          const Divider(height: 32),
-          Text('어떤 AI를 쓸까요?', style: IsleText.subtitle()),
-          const SizedBox(height: 8),
-          ...AiProviderCatalog.providers.map((p) {
-            final selected = p.id == _providerId;
-            return Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              color: selected ? IsleColors.ocean100 : null,
-              child: ListTile(
-                title: Text(p.displayName),
-                subtitle: Text(
-                  p.hint ?? '${p.models.length}개 모델 · ${_apiStyleLabel(p.apiStyle)}',
-                  style: IsleText.caption(color: IsleColors.muted),
+          const Divider(height: 28),
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: Text('고급 설정', style: IsleText.subtitle()),
+            subtitle: Text(
+              '공급자·모델·Base URL 직접 선택 (붙여넣기 자동 연결 후엔 보통 불필요)',
+              style: IsleText.caption(color: IsleColors.muted),
+            ),
+            children: [
+              const SizedBox(height: 8),
+              Text('어떤 AI를 쓸까요?', style: IsleText.subtitle()),
+              const SizedBox(height: 8),
+              ...AiProviderCatalog.providers.map((p) {
+                final selected = p.id == _providerId;
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  color: selected ? IsleColors.ocean100 : null,
+                  child: ListTile(
+                    title: Text(p.displayName),
+                    subtitle: Text(
+                      p.hint ?? '${p.models.length}개 모델 · ${_apiStyleLabel(p.apiStyle)}',
+                      style: IsleText.caption(color: IsleColors.muted),
+                    ),
+                    trailing: selected ? const Icon(Icons.check_circle, color: IsleColors.ocean500) : null,
+                    onTap: () => setState(() {
+                      _providerId = p.id;
+                      _modelId = p.models.first.id;
+                    }),
+                  ),
+                );
+              }),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _modelId,
+                decoration: const InputDecoration(
+                  labelText: '모델 버전',
+                  border: OutlineInputBorder(),
                 ),
-                trailing: selected ? const Icon(Icons.check_circle, color: IsleColors.ocean500) : null,
-                onTap: () => setState(() {
-                  _providerId = p.id;
-                  _modelId = p.models.first.id;
-                }),
+                items: _provider.models
+                    .map((m) => DropdownMenuItem(value: m.id, child: Text(m.label)))
+                    .toList(),
+                onChanged: (v) => setState(() => _modelId = v ?? _modelId),
               ),
-            );
-          }),
-          const SizedBox(height: 12),
-          DropdownButtonFormField<String>(
-            value: _modelId,
-            decoration: const InputDecoration(
-              labelText: '모델 버전',
-              border: OutlineInputBorder(),
-            ),
-            items: _provider.models
-                .map((m) => DropdownMenuItem(value: m.id, child: Text(m.label)))
-                .toList(),
-            onChanged: (v) => setState(() => _modelId = v ?? _modelId),
-          ),
-          if (_providerId == 'custom') ...[
-            const SizedBox(height: 12),
-            TextField(
-              controller: _customModelCtrl,
-              decoration: const InputDecoration(
-                labelText: '사용자 지정 모델 ID',
-                border: OutlineInputBorder(),
+              if (_providerId == 'custom') ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _customModelCtrl,
+                  decoration: const InputDecoration(
+                    labelText: '사용자 지정 모델 ID',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (v) => _customModel = v,
+                ),
+              ],
+              const SizedBox(height: 12),
+              TextField(
+                controller: _keyCtrl,
+                obscureText: _obscureKey,
+                decoration: InputDecoration(
+                  labelText: 'API 키 (고급 — 직접 입력)',
+                  hintText: AiConfigStore.isConfigured
+                      ? '연결됨 · ${AiConfigStore.apiKeyMasked}'
+                      : '위 붙여넣기 권장',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureKey ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () => setState(() => _obscureKey = !_obscureKey),
+                  ),
+                ),
+                onChanged: (v) {
+                  if (v.startsWith('****')) return;
+                },
               ),
-              onChanged: (v) => _customModel = v,
-            ),
-          ],
-          const SizedBox(height: 12),
-          TextField(
-            controller: _keyCtrl,
-            obscureText: _obscureKey,
-            decoration: InputDecoration(
-              labelText: 'API 키 (고급 — 직접 입력)',
-              hintText: AiConfigStore.isConfigured
-                  ? '연결됨 · ${AiConfigStore.apiKeyMasked}'
-                  : '위 「붙여넣고 연결」 권장',
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: Icon(_obscureKey ? Icons.visibility_off : Icons.visibility),
-                onPressed: () => setState(() => _obscureKey = !_obscureKey),
+              if (_provider.docsUrl != null)
+                TextButton.icon(
+                  onPressed: () => launchUrl(Uri.parse(_provider.docsUrl!)),
+                  icon: const Icon(Icons.open_in_new, size: 16),
+                  label: const Text('키 발급 페이지'),
+                ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _baseUrlCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Base URL (선택, 덮어쓰기)',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (v) => _baseUrl = v,
               ),
-            ),
-            onChanged: (v) {
-              if (v.startsWith('****')) return;
-            },
-          ),
-          if (_provider.docsUrl != null)
-            TextButton.icon(
-              onPressed: () => launchUrl(Uri.parse(_provider.docsUrl!)),
-              icon: const Icon(Icons.open_in_new, size: 16),
-              label: const Text('키 발급 페이지'),
-            ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _baseUrlCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Base URL (선택, 덮어쓰기)',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (v) => _baseUrl = v,
+              const SizedBox(height: 12),
+            ],
           ),
           const Divider(height: 28),
           _GuidelinesSection(),

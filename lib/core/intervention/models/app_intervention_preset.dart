@@ -53,7 +53,7 @@ class AppInterventionPreset {
 
   static const socialDetox = AppInterventionPreset(
     id: 'social',
-    title: 'SNS 디톡스',
+    title: 'SNS 사용 줄이기',
     detail: '인스타·틱톡·X 등만 골라 차단. 피드는 Isle에서 구독 채널만.',
     icon: Icons.self_improvement_outlined,
     tint: Color(0xFF2D6A5A),

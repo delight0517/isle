@@ -41,12 +41,35 @@ class IsleCheckpointService {
       final encoded = IsleBackupCodec.encode(map);
       final dir = await getApplicationDocumentsDirectory();
       final tmp = File('${dir.path}/$_tmpName');
-      await tmp.writeAsString(encoded);
+      await tmp.writeAsString(encoded, flush: true);
+      if (!await tmp.exists()) return;
       final target = await _checkpointFile();
-      if (await target.exists()) await target.delete();
-      await tmp.rename(target.path);
+      if (await target.exists()) {
+        try {
+          await target.delete();
+        } catch (_) {
+          // race·이미 삭제됨 — 무시
+        }
+      }
+      try {
+        await tmp.rename(target.path);
+      } on FileSystemException {
+        if (await tmp.exists()) {
+          await tmp.copy(target.path);
+          try {
+            await tmp.delete();
+          } catch (_) {
+            // best-effort
+          }
+        }
+      }
     } catch (e, st) {
-      IsleAppLogService.log('Checkpoint failed: $e', level: IsleLogLevel.warn, stack: st);
+      final low = e.toString().toLowerCase();
+      if (low.contains('pathnotfoundexception')) {
+        IsleAppLogService.log('Checkpoint noop: $e', level: IsleLogLevel.debug);
+      } else {
+        IsleAppLogService.log('Checkpoint failed: $e', level: IsleLogLevel.warn, stack: st);
+      }
     }
   }
 

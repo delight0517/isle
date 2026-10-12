@@ -40,11 +40,19 @@ class YoutubeShortsHideScript {
   function hideShorts() {
     document.querySelectorAll(SHORT_SELECTORS).forEach(function(el) {
       const card = el.closest(
-        'ytm-rich-item-renderer, ytd-rich-item-renderer, ytm-item-section-renderer, ytd-item-section-renderer, ytm-reel-shelf-renderer, ytd-reel-shelf-renderer'
+        'ytm-rich-item-renderer, ytd-rich-item-renderer, ytm-video-with-context-renderer, ytm-media-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-search-video-renderer, ytm-reel-shelf-renderer, ytd-reel-shelf-renderer'
       ) || el;
       collapse(card);
     });
     document.querySelectorAll(SHELF_SELECTORS).forEach(collapse);
+    // Mobile rich shelves retain their header/height after individual cards hide.
+    // Only collapse a dedicated shelf with Shorts links and no regular video links.
+    document.querySelectorAll('ytm-rich-shelf-renderer, ytd-rich-shelf-renderer, grid-shelf-view-model, ytm-rich-section-renderer').forEach(function(shelf) {
+      if (shelf.querySelector('a[href*="/shorts/"]') &&
+          !shelf.querySelector('a[href*="/watch"], a[href*="youtu.be/"]')) {
+        collapse(shelf);
+      }
+    });
     if (location.pathname.indexOf('/shorts') === 0) {
       location.replace('/?isle_no_shorts=1');
     }

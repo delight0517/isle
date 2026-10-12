@@ -8,7 +8,10 @@ import '../../../../core/block_schedule/models/schedule_app_target_entry.dart';
 import '../../../../core/block_schedule/schedule_app_target_catalog.dart';
 import '../../../../core/block_schedule/schedule_app_targets_service.dart';
 import '../../../../core/block_schedule/schedule_app_targets_store.dart';
-import '../../../../core/block_schedule/schedule_active_service.dart';
+import '../../../../core/block_schedule/schedule_edit_guard.dart';
+import '../../../../core/block_schedule/schedule_pending_target_service.dart';
+import '../../../../core/block_schedule/schedule_pending_target_store.dart';
+import '../../../../core/block_schedule/models/pending_schedule_target_edit.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_typography.dart';
@@ -18,24 +21,26 @@ import '../../../../core/intervention/screen_time_selection_summary.dart';
 import '../../../../core/platform/isle_apple_platform.dart';
 import '../../../../shared/widgets/screen_time_selection_preview.dart';
 
-/// 스케줄 편집 — Isle 타깃 + iPhone Screen Time + 번들 시간 한도
+/// 스케줄 편집 ③ — 접이식: Isle / iPhone 잠금 / 시간 한도
 class ScheduleAppTargetsSection extends StatefulWidget {
   const ScheduleAppTargetsSection({
     super.key,
     required this.schedule,
     required this.canEdit,
+    this.commitmentLocked = false,
   });
 
   final BlockSchedule schedule;
   final bool canEdit;
+  final bool commitmentLocked;
 
   @override
   ScheduleAppTargetsSectionState createState() => ScheduleAppTargetsSectionState();
 }
 
 class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
-  /// Hive 로드 전에도 카탈로그 전체를 표시 (firstWhere 크래시 방지)
   List<ScheduleAppTargetEntry> _entries = ScheduleAppTargetsStore.defaultEntries();
+  List<ScheduleAppTargetEntry> _persistedEntries = ScheduleAppTargetsStore.defaultEntries();
   bool _iosPickBusy = false;
   int _iosApps = 0;
   int _iosCats = 0;
@@ -49,25 +54,92 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
   @override
   void didUpdateWidget(covariant ScheduleAppTargetsSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.schedule.id != widget.schedule.id) {
+    if (oldWidget.schedule.id != widget.schedule.id ||
+        oldWidget.commitmentLocked != widget.commitmentLocked ||
+        oldWidget.canEdit != widget.canEdit) {
       unawaited(_load());
     }
+  }
+
+  bool get _canModifyTargets =>
+      widget.canEdit || (widget.commitmentLocked && ScheduleEditGuard.canQueueTargetEdits(widget.schedule));
+
+  ScheduleAppTargetEntry _persistedEntry(String targetId) {
+    for (final e in _persistedEntries) {
+      if (e.targetId == targetId) return e;
+    }
+    return ScheduleAppTargetEntry(targetId: targetId);
+  }
+
+  PendingScheduleTargetEdit? _pendingFor(String targetId) =>
+      SchedulePendingTargetService.pendingEntry(widget.schedule.id, targetId);
+
+  List<ScheduleAppTargetEntry> _displayEntries(List<ScheduleAppTargetEntry> persisted) {
+    if (!widget.commitmentLocked) return persisted;
+    final out = [...persisted];
+    for (final p in SchedulePendingTargetStore.loadForSchedule(widget.schedule.id)) {
+      if (p.kind != PendingScheduleTargetKind.entry || p.entry == null) continue;
+      final i = out.indexWhere((e) => e.targetId == p.targetId);
+      if (i >= 0) {
+        out[i] = p.entry!;
+      } else {
+        out.add(p.entry!);
+      }
+    }
+    return out;
+  }
+
+  void _showTargetOutcomeSnack(ScheduleTargetChangeOutcome outcome, String action) {
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    switch (outcome.kind) {
+      case ScheduleTargetChangeOutcomeKind.immediate:
+        messenger.showSnackBar(SnackBar(content: Text('「$action」적용했어요')));
+      case ScheduleTargetChangeOutcomeKind.scheduled:
+        final when = outcome.remaining == null
+            ? '잠금 해제 후'
+            : SchedulePendingTargetService.formatRemaining(outcome.remaining!);
+        final extra = outcome.startedCountdown ? ' · 잠금 해제 대기 시작' : '';
+        messenger.showSnackBar(
+          SnackBar(content: Text('「$action」$when 자동 적용 예약$extra')),
+        );
+      case ScheduleTargetChangeOutcomeKind.alreadyPending:
+        final when = outcome.remaining == null
+            ? '예약됨'
+            : SchedulePendingTargetService.formatRemaining(outcome.remaining!);
+        messenger.showSnackBar(SnackBar(content: Text('이미 예약됨 — $when')));
+      case ScheduleTargetChangeOutcomeKind.cancelled:
+        messenger.showSnackBar(const SnackBar(content: Text('변경 예약을 취소했어요')));
+    }
+  }
+
+  Future<void> _applyEntryChange(ScheduleAppTargetEntry desired) async {
+    final current = _persistedEntry(desired.targetId);
+    final outcome = await SchedulePendingTargetService.requestEntryChange(
+      schedule: widget.schedule,
+      desired: desired,
+      currentPersisted: current,
+    );
+    if (!mounted) return;
+    await _load();
+    if (outcome.kind == ScheduleTargetChangeOutcomeKind.immediate) return;
+    _showTargetOutcomeSnack(
+      outcome,
+      SchedulePendingTargetService.actionLabel(desired, current),
+    );
   }
 
   Future<void> _load() async {
     await ScheduleAppTargetsStore.ensureOpen();
     await ScheduleScreenTimeStore.ensureOpen();
-    var list = ScheduleAppTargetsStore.loadForSchedule(widget.schedule.id);
-    if (widget.schedule.blockIsleInApp &&
-        !list.any((e) => e.targetId == 'isle_youtube' && e.blockInSlot)) {
-      list = list
-          .map((e) => e.targetId == 'isle_youtube' ? e.copyWith(blockInSlot: true) : e)
-          .toList();
-    }
-    list = ScheduleAppTargetsStore.mergeWithCatalog(list);
+    await SchedulePendingTargetStore.ensureOpen();
+    final list = ScheduleAppTargetsStore.mergeWithCatalog(
+      ScheduleAppTargetsStore.loadForSchedule(widget.schedule.id),
+    );
     if (!mounted) return;
     setState(() {
-      _entries = list;
+      _persistedEntries = list;
+      _entries = _displayEntries(list);
       _iosApps = ScheduleScreenTimeStore.appCountFor(widget.schedule.id);
       _iosCats = ScheduleScreenTimeStore.categoryCountFor(widget.schedule.id);
     });
@@ -84,7 +156,12 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
     } else {
       await ScheduleAppTargetsStore.saveForSchedule(widget.schedule.id, merged);
     }
-    if (mounted) setState(() => _entries = merged);
+    if (mounted) {
+      setState(() {
+        _persistedEntries = merged;
+        _entries = _displayEntries(merged);
+      });
+    }
   }
 
   ScheduleAppTargetEntry _entry(String targetId) {
@@ -95,6 +172,19 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
   }
 
   void _setEntry(ScheduleAppTargetEntry e) {
+    if (widget.canEdit) {
+      setState(() {
+        final i = _entries.indexWhere((x) => x.targetId == e.targetId);
+        if (i >= 0) {
+          _entries = [..._entries]..[i] = e;
+        } else {
+          _entries = [..._entries, e];
+        }
+      });
+      unawaited(persist());
+      return;
+    }
+    if (!widget.commitmentLocked) return;
     setState(() {
       final i = _entries.indexWhere((x) => x.targetId == e.targetId);
       if (i >= 0) {
@@ -103,22 +193,29 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
         _entries = [..._entries, e];
       }
     });
-    if (widget.canEdit) unawaited(persist());
+    unawaited(_applyEntryChange(e));
   }
 
   void _setBundleLimit(String bundleId, {bool? enabled, int? minutes, int? window}) {
+    ScheduleAppTargetEntry? changed;
     setState(() {
       _entries = _entries.map((e) {
         final d = ScheduleAppTargetCatalog.defFor(e.targetId);
         if (d?.bundleId != bundleId) return e;
-        return e.copyWith(
+        final next = e.copyWith(
           limitEnabled: enabled ?? e.limitEnabled,
           limitMinutes: minutes ?? e.limitMinutes,
           windowMinutes: window ?? e.windowMinutes,
         );
+        changed = next;
+        return next;
       }).toList();
     });
-    if (widget.canEdit) unawaited(persist());
+    if (widget.canEdit) {
+      unawaited(persist());
+    } else if (widget.commitmentLocked && changed != null) {
+      unawaited(_applyEntryChange(changed!));
+    }
   }
 
   ScheduleAppTargetEntry? _bundleRef(String bundleId) {
@@ -133,6 +230,14 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
     return null;
   }
 
+  int _iosCheckedCount() {
+    final iosIds = ScheduleAppTargetCatalog.iosTargets().map((d) => d.id).toSet();
+    return _entries.where((e) => e.blockInSlot && iosIds.contains(e.targetId)).length;
+  }
+
+  int _limitEnabledCount() =>
+      _entries.where((e) => e.limitEnabled).length;
+
   Future<void> _pickIos() async {
     if (!IsleApplePlatform.isNativeBlockHost) return;
     setState(() => _iosPickBusy = true);
@@ -140,6 +245,7 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
     final ok = await ScheduleScreenTimeService.pickForSchedule(
       widget.schedule.id,
       additiveOnly: additive,
+      deferEnforcement: widget.commitmentLocked,
     );
     if (!mounted) return;
     setState(() {
@@ -151,107 +257,137 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('앱 선택이 취소되었거나 권한이 없어요.')),
       );
+      return;
+    }
+    if (widget.commitmentLocked && ok) {
+      await SchedulePendingTargetService.queueIosPickSync(widget.schedule);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('앱 선택 저장됨 — 잠금 해제 후 Screen Time에 반영돼요'),
+        ),
+      );
     }
     if (widget.canEdit) unawaited(persist());
   }
 
   @override
   Widget build(BuildContext context) {
-    final active = ScheduleActiveService.isScheduleActiveNow(widget.schedule);
+    final schedule = widget.schedule;
     final isle = ScheduleAppTargetCatalog.isleTargets();
     final ios = ScheduleAppTargetCatalog.iosTargets();
     final hasIosSel = _iosApps > 0 || _iosCats > 0;
+    final iosN = _iosCheckedCount();
+    final limitN = _limitEnabledCount();
+    final pendingCount = widget.commitmentLocked
+        ? SchedulePendingTargetStore.loadForSchedule(schedule.id).length
+        : 0;
+    final iosPickPending = SchedulePendingTargetService.pendingIosPick(schedule.id);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (active)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              '지금 적용 중',
-              style: IsleText.caption(color: Colors.red.shade700),
-            ),
-          ),
-        const SizedBox(height: 12),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Isle 안', style: IsleText.subtitle()),
-                ...isle.map((d) => _targetTile(d)),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        if (IsleApplePlatform.isScreenTimeHost || Platform.isAndroid)
+        if (pendingCount > 0)
           Card(
+            color: Colors.orange.shade50,
+            margin: const EdgeInsets.only(bottom: 8),
             child: Padding(
               padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    Platform.isAndroid ? 'Android 앱' : 'iPhone 앱',
-                    style: IsleText.subtitle(),
-                  ),
-                  if (!hasIosSel) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      '체크 후 아래 버튼으로 앱 선택',
-                      style: IsleText.caption(color: IsleColors.muted),
-                    ),
-                  ],
-                  if (hasIosSel) ...[
-                    const SizedBox(height: 8),
-                    ScreenTimeSelectionPreview(
-                      encoded: ScreenTimeSelectionSummary.encodedForSchedule(widget.schedule.id),
-                      textFallbackLabels:
-                          ScreenTimeSelectionSummary.textLabelsForSchedule(widget.schedule.id),
-                      height: 36,
-                    ),
-                  ],
-                  ...ios.map((d) => _targetTile(d)),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    height: IsleSize.minTouchTarget,
-                    child: FilledButton.icon(
-                      onPressed: !widget.canEdit || _iosPickBusy ? null : _pickIos,
-                      icon: _iosPickBusy
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.apps_outage),
-                      label: Text(hasIosSel ? '앱 다시 선택' : '앱 선택'),
-                    ),
-                  ),
-                ],
+              child: Text(
+                iosPickPending != null
+                    ? '앱 변경 $pendingCount건 예약됨 · ${SchedulePendingTargetService.formatRemaining(iosPickPending.remaining())}\n'
+                        '알림이 오면 탭해서 편집 화면으로 들어올 수 있어요.'
+                    : '앱 변경 $pendingCount건 예약됨 — 잠금 해제 후 자동 적용돼요.\n'
+                        '알림이 오면 탭해서 확인하세요.',
+                style: IsleText.caption(color: Colors.orange.shade900).copyWith(height: 1.4),
               ),
             ),
           ),
-        const SizedBox(height: 16),
-        Text('시간 한도', style: IsleText.subtitle()),
-        const SizedBox(height: 8),
-        ...ScheduleAppTargetCatalog.bundles.map(_bundleLimitCard),
+        // "지금 뭘 막고 있는지" 요약은 상위 화면의 준비 상태 스트립에서 한 번만 보여줌 —
+        // 여기서 다시 배너로 반복하지 않는다(중복 제거).
+        _TargetExpansion(
+          title: 'Isle 앱 안에서 막기',
+          subtitle: '체크 = 완전 차단',
+          initiallyExpanded: true,
+          child: Column(
+            children: isle.map((d) => _targetTile(d)).toList(),
+          ),
+        ),
+        if (IsleApplePlatform.isScreenTimeHost || Platform.isAndroid) ...[
+          const SizedBox(height: 6),
+          _TargetExpansion(
+            title: Platform.isAndroid ? 'Android 앱 잠금' : 'iPhone 앱 잠금',
+            subtitle: 'Safari·YouTube 앱 — 체크 후 Screen Time에서 선택',
+            initiallyExpanded: iosN > 0 || hasIosSel,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (hasIosSel) ...[
+                  ScreenTimeSelectionPreview(
+                    encoded: ScreenTimeSelectionSummary.encodedForSchedule(schedule.id),
+                    textFallbackLabels:
+                        ScreenTimeSelectionSummary.textLabelsForSchedule(schedule.id),
+                    height: 36,
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                ...ios.map((d) => _targetTile(d)),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  height: IsleSize.minTouchTarget,
+                  child: FilledButton.icon(
+                    onPressed: !_canModifyTargets || _iosPickBusy ? null : _pickIos,
+                    icon: _iosPickBusy
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.apps_outage),
+                    label: Text(hasIosSel ? '앱 다시 선택' : 'Screen Time에서 앱 선택'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 6),
+        _TargetExpansion(
+          title: '시간 한도만 (잠금 아님)',
+          subtitle: '완전 차단 대신 N분만 허용 — 선택 사항 · 체크박스와는 별개예요',
+          initiallyExpanded: limitN > 0,
+          child: Column(
+            children: ScheduleAppTargetCatalog.bundles.map(_bundleLimitCard).toList(),
+          ),
+        ),
       ],
     );
   }
 
   Widget _targetTile(ScheduleAppTargetDef d) {
     final e = _entry(d.id);
+    final pending = _pendingFor(d.id);
+    final persisted = _persistedEntry(d.id);
+    final hasPending = pending != null && pending.entry != null;
     return CheckboxListTile(
       contentPadding: EdgeInsets.zero,
       secondary: Icon(d.icon, color: IsleColors.ocean500, size: 22),
       title: Text(d.label, style: IsleText.body()),
-      subtitle: Text(d.subtitle, style: IsleText.caption(color: IsleColors.muted)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(ScheduleAppTargetCatalog.displaySubtitle(d), style: IsleText.caption(color: IsleColors.muted)),
+          if (hasPending)
+            Text(
+              '적용 예약 · ${SchedulePendingTargetService.formatRemaining(pending.remaining())} '
+              '(${SchedulePendingTargetService.actionLabel(pending.entry!, persisted)})',
+              style: IsleText.caption(color: Colors.orange.shade800),
+            ),
+        ],
+      ),
       value: e.blockInSlot,
-      onChanged: widget.canEdit
+      onChanged: _canModifyTargets
           ? (v) => _setEntry(e.copyWith(blockInSlot: v ?? false))
           : null,
     );
@@ -273,7 +409,7 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
               contentPadding: EdgeInsets.zero,
               title: Text(bundle.label, style: IsleText.body()),
               value: enabled,
-              onChanged: widget.canEdit
+              onChanged: _canModifyTargets
                   ? (v) => _setBundleLimit(bundle.id, enabled: v)
                   : null,
             ),
@@ -290,7 +426,7 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
                 max: (window == 5 ? 4 : 180).toDouble(),
                 divisions: window == 5 ? 3 : 35,
                 label: '${minutes}분',
-                onChanged: widget.canEdit
+                onChanged: _canModifyTargets
                     ? (v) => _setBundleLimit(bundle.id, minutes: v.round())
                     : null,
               ),
@@ -304,7 +440,7 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
                       child: ChoiceChip(
                         label: Text(p.label, style: IsleText.caption()),
                         selected: window == p.minutes,
-                        onSelected: widget.canEdit
+                        onSelected: _canModifyTargets
                             ? (_) => _setBundleLimit(bundle.id, window: p.minutes)
                             : null,
                       ),
@@ -313,6 +449,39 @@ class ScheduleAppTargetsSectionState extends State<ScheduleAppTargetsSection> {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TargetExpansion extends StatelessWidget {
+  const _TargetExpansion({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+    this.initiallyExpanded = false,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget child;
+  final bool initiallyExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: initiallyExpanded,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          title: Text(title, style: IsleText.subtitle()),
+          subtitle: Text(subtitle, style: IsleText.caption(color: IsleColors.muted)),
+          children: [child],
         ),
       ),
     );

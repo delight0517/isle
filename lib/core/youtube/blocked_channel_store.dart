@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../ai/block_chat/block_audit_log_store.dart';
 import '../services/isle_local_data_sync.dart';
 import '../services/isle_user_defaults.dart';
 import 'blocked_channels_repository.dart';
@@ -43,6 +44,16 @@ class BlockedChannelStore {
       return [];
     }
   }
+
+  /// [Volt] scheduleSave()로 아직 디스크에 flush되지 않은 변경이 있으면 그걸,
+  /// 없으면 loadAll()(디스크)을 반환한다. 400ms 배치 창 안에서 두 번째
+  /// write가 loadAll()(아직 이전 write가 반영 안 된 stale 디스크 상태)을
+  /// 기준으로 새 리스트를 만들면 첫 번째 write가 통째로 유실된다 — 피드에서
+  /// 채널을 빠르게 연속 차단하면 마지막 것만 남고 나머지는 사라지는 버그의
+  /// 근본 원인이었다(2026-07-20). 모든 write 경로는 반드시 이 메서드를
+  /// 기준으로 다음 리스트를 만들어야 한다.
+  static List<BlockedChannel> currentList() =>
+      _pending != null ? List<BlockedChannel>.from(_pending!) : loadAll();
 
   static Future<void> saveAll(List<BlockedChannel> channels) async {
     final payload = channels.map((e) => e.toJson()).toList();
@@ -115,6 +126,7 @@ class BlockedChannelsNotifier extends StateNotifier<List<BlockedChannel>> {
     if (user == null || !repo.hasRemote) return;
 
     try {
+      await BlockedChannelStore.flushPending();
       final local = BlockedChannelStore.loadAll();
       final remote = await repo.fetchAll(user.id);
       final merged = BlockedChannelStore.mergeLists(local, remote);
@@ -143,7 +155,7 @@ class BlockedChannelsNotifier extends StateNotifier<List<BlockedChannel>> {
     final name = channelName.trim();
     if (id.isEmpty && name.isEmpty) return;
 
-    final list = BlockedChannelStore.loadAll();
+    final list = BlockedChannelStore.currentList();
     final existing = list.indexWhere(
       (c) =>
           (id.isNotEmpty && c.channelId == id) ||
@@ -162,6 +174,10 @@ class BlockedChannelsNotifier extends StateNotifier<List<BlockedChannel>> {
     BlockedChannelStore.scheduleSave(list);
     state = list;
     YoutubeBlockRulesSync.scheduleExport();
+    await _logChannelChange(
+      action: 'block_channel',
+      summary: '「${entry.channelName}」 채널 차단 (${existing >= 0 ? "갱신" : "신규"})',
+    );
 
     final user = _ref.read(authStateProvider).value;
     final repo = _ref.read(blockedChannelsRepoProvider);
@@ -181,11 +197,11 @@ class BlockedChannelsNotifier extends StateNotifier<List<BlockedChannel>> {
 
   Future<void> unblock(String channelIdOrName) async {
     final key = channelIdOrName.trim().toLowerCase();
-    final removed = BlockedChannelStore.loadAll().where((c) {
+    final removed = BlockedChannelStore.currentList().where((c) {
       return c.channelId.toLowerCase() == key || c.channelName.toLowerCase() == key;
     }).toList();
 
-    final list = BlockedChannelStore.loadAll()
+    final list = BlockedChannelStore.currentList()
       ..removeWhere(
         (c) =>
             c.channelId.toLowerCase() == key ||
@@ -194,6 +210,12 @@ class BlockedChannelsNotifier extends StateNotifier<List<BlockedChannel>> {
     BlockedChannelStore.scheduleSave(list);
     state = list;
     YoutubeBlockRulesSync.scheduleExport();
+    if (removed.isNotEmpty) {
+      await _logChannelChange(
+        action: 'unblock_channel',
+        summary: '채널 차단 해제: ${removed.map((c) => c.channelName).join(" · ")}',
+      );
+    }
 
     final user = _ref.read(authStateProvider).value;
     final repo = _ref.read(blockedChannelsRepoProvider);
@@ -209,4 +231,27 @@ class BlockedChannelsNotifier extends StateNotifier<List<BlockedChannel>> {
   }
 
   bool isBlocked(FeedChannelRef ref) => state.any((c) => c.matches(ref));
+
+  /// 채팅 경로(BlockChatExecutor)는 이미 자체적으로 BlockAuditLogStore에
+  /// 기록한다 — 이건 피드 스와이프·차단 시트 등 채팅을 거치지 않는 직접
+  /// UI 경로용. "왜 이 채널이 차단/해제됐는지" AI가 진단할 때 채팅으로
+  /// 바뀐 것만 보이고 이 경로는 안 보이면 원인 분석에 구멍이 생긴다
+  /// (2026-07-20 사용자 요청).
+  Future<void> _logChannelChange({
+    required String action,
+    required String summary,
+  }) async {
+    try {
+      await BlockAuditLogStore.ensureOpen();
+      await BlockAuditLogStore.record(
+        command: '(채널 UI) $action',
+        action: action,
+        summary: summary,
+        steps: const [],
+        success: true,
+      );
+    } catch (_) {
+      // 로그 기록 실패가 실제 차단 동작을 막으면 안 됨.
+    }
+  }
 }

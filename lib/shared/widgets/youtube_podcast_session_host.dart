@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../core/youtube/youtube_podcast_audio_script.dart';
 import '../../core/youtube/youtube_podcast_listen_store.dart';

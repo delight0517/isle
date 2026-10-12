@@ -2,12 +2,13 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/services/isle_user_defaults.dart';
+import '../../../core/navigation/youtube_explorer_launch.dart';
+import '../../../core/youtube/youtube_safari_launch_guard.dart';
 import '../../../core/youtube/youtube_system_auth_service.dart';
 import '../../../core/services/isle_external_launch_guard.dart';
 import '../../../core/youtube/youtube_webview_factory.dart';
@@ -29,7 +30,7 @@ class _YoutubeLoginGuideScreenState extends State<YoutubeLoginGuideScreen> {
   Future<void> _openInAppLogin() async {
     await IsleUserDefaults.setHasSeenYoutubeGuide(true);
     if (!mounted) return;
-    context.push('/youtube/browser?autologin=1');
+    YoutubeExplorerLaunch.push(context, autoLogin: true);
   }
 
   Future<void> _openSystemGoogleLogin() async {
@@ -40,16 +41,18 @@ class _YoutubeLoginGuideScreenState extends State<YoutubeLoginGuideScreen> {
   }
 
   Future<void> _openInAppBrowserLogin() async {
-    final ok = await YoutubeSystemAuthService.openGoogleLoginInAppBrowser();
+    final ok = await YoutubeSystemAuthService.openGoogleLoginInAppBrowser(
+      context: context,
+    );
     if (!mounted) return;
     if (ok) setState(() => _step = 2);
   }
 
   Future<void> _openSafariLogin() async {
     final uri = YoutubeWebviewFactory.signInUrl();
-    await IsleExternalLaunchGuard.launchAllowed(uri);
+    final launched = await IsleExternalLaunchGuard.launch(context, uri);
     if (!mounted) return;
-    setState(() => _step = 2);
+    if (launched) setState(() => _step = 2);
   }
 
   Future<void> _openIOSSettings() async {
@@ -65,6 +68,7 @@ class _YoutubeLoginGuideScreenState extends State<YoutubeLoginGuideScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final safariBlocked = YoutubeSafariLaunchGuard.isEscapeBlocked;
     return Scaffold(
       appBar: const IsleAppBar(title: '유튜브 로그인'),
       body: SafeArea(
@@ -117,17 +121,32 @@ class _YoutubeLoginGuideScreenState extends State<YoutubeLoginGuideScreen> {
                         label: const Text('시스템 Google 로그인 (추천)'),
                       ),
                       const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        onPressed: _openInAppBrowserLogin,
-                        icon: const Icon(Icons.public),
-                        label: const Text('인앱 Safari로 로그인'),
-                      ),
-                      const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        onPressed: _openSafariLogin,
-                        icon: const Icon(Icons.open_in_browser),
-                        label: const Text('외부 Safari'),
-                      ),
+                      if (safariBlocked) ...[
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: IsleColors.ocean100,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '지금은 YouTube 차단·한도가 켜져 있어 Safari 로그인을 쓸 수 없어요. '
+                            '위 「시스템 Google 로그인」만 사용하세요 (시청 우회 없음).',
+                            style: IsleText.caption(color: IsleColors.ocean700),
+                          ),
+                        ),
+                      ] else ...[
+                        OutlinedButton.icon(
+                          onPressed: _openInAppBrowserLogin,
+                          icon: const Icon(Icons.public),
+                          label: const Text('인앱 Safari로 로그인'),
+                        ),
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          onPressed: _openSafariLogin,
+                          icon: const Icon(Icons.open_in_browser),
+                          label: const Text('외부 Safari'),
+                        ),
+                      ],
                     ],
                     if (_step == 2) ...[
                       const GuideStepIllustration(
@@ -137,7 +156,7 @@ class _YoutubeLoginGuideScreenState extends State<YoutubeLoginGuideScreen> {
                       ),
                       const SizedBox(height: 20),
                       FilledButton.icon(
-                        onPressed: () => context.push('/youtube/browser'),
+                        onPressed: () => YoutubeExplorerLaunch.push(context),
                         icon: const Icon(Icons.ondemand_video),
                         label: const Text('유튜브로 돌아가기'),
                       ),

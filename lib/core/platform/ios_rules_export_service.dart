@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
@@ -10,6 +11,8 @@ import '../block_schedule/url_rules/schedule_rule_store.dart';
 import '../intervention/website_block_store.dart';
 import '../safety/content_safety_guard.dart';
 import '../services/isle_app_log_service.dart';
+import '../platform/ios_web_content_rule_service.dart';
+import '../safe_browser/web_content_rule_compiler.dart';
 import '../youtube/blocked_channel_store.dart';
 import '../youtube/content_filter_store.dart';
 import '../youtube/models/blocked_channel.dart';
@@ -21,7 +24,21 @@ class IosRulesExportService {
 
   static const _channel = MethodChannel('com.isle.app/screen_time');
 
-  static Future<void> exportNow() async {
+  /// 동시 export 직렬화 체인.
+  /// 채팅 apply·YouTube 디바운스 등 여러 호출이 겹치면, 6개 스토어를 반쯤 읽은
+  /// 상태로 rules JSON을 서로 덮어써(last-write-wins) 규칙이 유실되던 문제를 방지.
+  /// 각 export는 반드시 직전 export가 끝난 뒤에만 스토어를 읽고 기록한다.
+  static Future<void> _exportChain = Future<void>.value();
+
+  /// 직렬화된 공개 진입점. 본문(_exportLocked)은 항상 이전 export 완료 후 실행된다.
+  static Future<void> exportNow() {
+    final next = _exportChain.then((_) => _exportLocked());
+    // 한 번의 실패가 이후 export 체인을 영구히 막지 않도록 격리.
+    _exportChain = next.catchError((Object _) {});
+    return next;
+  }
+
+  static Future<void> _exportLocked() async {
     try {
       final domains = <String>{};
       domains.addAll(ScheduleRuleEnforcement.mergedExpandedHostsNow());
@@ -70,6 +87,7 @@ class IosRulesExportService {
         'json': jsonEncode(payload),
       });
       await _writeContentBlocker(domains.toList()..sort());
+      unawaited(IosWebContentRuleService.compileAfterExport());
     } catch (e, st) {
       IsleAppLogService.log(
         'IosRulesExportService.exportNow failed: $e',
@@ -81,16 +99,11 @@ class IosRulesExportService {
 
   /// Safari Content Blocker 확장용 — `content_blocker_v1.json` (App Group).
   static Future<void> _writeContentBlocker(List<String> domains) async {
-    if (domains.isEmpty) return;
-    final rules = <Map<String, dynamic>>[
-      for (final d in domains)
-        {
-          'action': {'type': 'block'},
-          'trigger': {
-            'url-filter': '.*',
-            'if-domain': ['*${d.replaceAll(RegExp(r'^www\.'), '')}'],
-          },
-        },
+    final stems = await WebContentRuleCompiler.collectAlwaysOnStems();
+    if (domains.isEmpty && stems.isEmpty) return;
+    final rules = [
+      ...WebContentRuleCompiler.rulesFromDomains(domains),
+      ...WebContentRuleCompiler.rulesFromStems(stems),
     ];
     try {
       await _channel.invokeMethod<void>('writeContentBlockerJson', {

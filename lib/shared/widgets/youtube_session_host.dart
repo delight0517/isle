@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../../core/library/platform_watch_limit_store.dart';
+import '../../core/services/isle_app_log_service.dart';
 import '../../core/youtube/youtube_access_guard.dart';
+import '../../core/youtube/youtube_parked_block_guard.dart';
 import '../../core/youtube/youtube_session.dart';
 import '../../core/youtube/youtube_webview_energy.dart';
 
-/// 최소화된 유튜브 WebView — 1×1 오프스크린 유지 + 한도 tick·잠금 enforce
+/// 최소화된 유튜브 WebView — 1×1 오프스크린 유지 + 잠금 enforce.
+/// 백그라운드/오프스크린 재생은 시청 한도에 포함하지 않는다.
 class YoutubeSessionHost extends StatefulWidget {
   const YoutubeSessionHost({super.key});
 
@@ -45,18 +47,25 @@ class _YoutubeSessionHostState extends State<YoutubeSessionHost> {
   }
 
   void _onParkedTick() {
-    final c = YoutubeSession.instance.parkedController;
-    if (c == null || !YoutubeSession.instance.minimized) return;
+    final session = YoutubeSession.instance;
+    final c = session.parkedController;
+    if (c == null || !session.minimized) return;
+
+    final blockHit = YoutubeParkedBlockGuard.match(
+      url: session.currentUrl,
+      probe: session.probed,
+    );
+    if (blockHit != null) {
+      IsleAppLogService.log(
+        'YouTube parked block: ${blockHit.kind.name} ${blockHit.label}',
+      );
+      session.quit();
+      return;
+    }
 
     if (YoutubeAccessGuard.shouldBlockWebView) {
       unawaited(YoutubeWebviewEnergy.setPlaybackBlocked(c, true));
       return;
-    }
-    if (YoutubeAccessGuard.shouldCountWatchTime) {
-      PlatformWatchLimitStore.addSeconds(PlatformWatchId.youtube, 1);
-    }
-    if (YoutubeAccessGuard.shouldBlockWebView) {
-      unawaited(YoutubeWebviewEnergy.setPlaybackBlocked(c, true));
     }
   }
 

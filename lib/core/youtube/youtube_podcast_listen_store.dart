@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../library/usage_day.dart';
 import '../services/isle_user_defaults.dart';
 
 /// 유튜브 **음성 모드** 전용 일일 한도 (일반 영상 한도와 분리 · 데이터 절약 모드)
@@ -30,10 +31,7 @@ class YoutubePodcastListenStore {
   static int get limitSeconds =>
       IsleUserDefaults.youtubePodcastDailyLimitMinutes * 60;
 
-  static String _todayKey() {
-    final n = DateTime.now();
-    return '${n.year}-${n.month.toString().padLeft(2, '0')}-${n.day.toString().padLeft(2, '0')}';
-  }
+  static String _todayKey() => UsageDay.key();
 
   static void _ensureToday() {
     final today = _todayKey();

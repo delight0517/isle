@@ -16,12 +16,14 @@ import '../platform/mac_browser_session_service.dart';
 import '../services/isle_user_defaults.dart';
 import 'schedule_app_limit_sync_service.dart';
 import 'schedule_enforcement_policy.dart';
+
 /// 앱 resume·스케줄 변경 시 플랫폼 차단 동기화 (§4 side effects)
 class BlockScheduleEnforcementService {
   BlockScheduleEnforcementService._();
 
   static String? _lastShieldKey;
   static String? _lastAndroidKey;
+  static bool? _lastLockdownActive;
 
   /// [Volt] 동일 도메인·상태면 Screen Time 브리지 호출 생략
   static Future<void> syncPlatformEnforcement({bool force = false}) async {
@@ -36,10 +38,25 @@ class BlockScheduleEnforcementService {
     }
 
     final shieldActive = ScheduleEnforcementPolicy.shieldSchedulesNow();
-    final keepGlobalShield =
-        !ExternalAppShieldStore.syncWithBlockSchedule &&
+
+    // "올나이트 록다운" — 개별 앱 선택(shieldActive의 encoded selection)과는
+    // 독립된 네이티브 카테고리 쉴드라, 아래 shieldActive 캐시 키/early-return과
+    // 무관하게 별도로 캐시·적용한다(2026-[REDACTED]).
+    if (Platform.isIOS) {
+      final lockdownActive = shieldActive.any((s) => s.lockdownAllApps);
+      if (force || _lastLockdownActive != lockdownActive) {
+        _lastLockdownActive = lockdownActive;
+        await IosScreenTimeService.applyLockdownShield(
+          lockdownActive,
+          allowedAppsEncoded: IsleUserDefaults.lockdownAllowedAppsEncoded,
+        );
+      }
+    }
+
+    final keepGlobalShield = !ExternalAppShieldStore.syncWithBlockSchedule &&
         ExternalAppShieldStore.hasSelection;
-    final globalEncoded = keepGlobalShield ? ExternalAppShieldStore.encodedSelection! : '';
+    final globalEncoded =
+        keepGlobalShield ? ExternalAppShieldStore.encodedSelection! : '';
     if (shieldActive.isEmpty) {
       final key = keepGlobalShield ? 'global_only|$globalEncoded' : 'off';
       if (!force && _lastShieldKey == key) {
@@ -73,11 +90,20 @@ class BlockScheduleEnforcementService {
       }
       return;
     }
-    final domains = ScheduleEnforcementPolicy.mergedDomainsForShieldNow()..sort();
+    final domains = ScheduleEnforcementPolicy.mergedDomainsForShieldNow()
+      ..sort();
     final ids = shieldActive.map((e) => e.id).toList()..sort();
-    final perSel = ids.map((id) => ScheduleScreenTimeStore.encodedFor(id) ?? '').join(';');
-    final fallback = ExternalAppShieldStore.syncWithBlockSchedule &&
-            ExternalAppShieldStore.hasSelection
+    final perSel =
+        ids.map((id) => ScheduleScreenTimeStore.encodedFor(id) ?? '').join(';');
+    // "항상 차단" 섹션/설정 화면은 켤 때 syncWithBlockSchedule=false로 설정한다
+    // ("지금부터 전역 차단" — 스케줄과 무관하게 항상 켜져 있길 원함). 그런데 이
+    // 조건이 syncWithBlockSchedule==true(스케줄 시간에만 적용하는 별개 설정)일
+    // 때만 fallback을 포함시키고 있어서, 다른 스케줄이 동시에 활성화되면 항상
+    // 차단이 골라둔 앱이 네이티브 쉴드에서 조용히 빠지는 버그였음(cage에서
+    // 07-08 진단·수정 후 이식). syncWithBlockSchedule 값과 무관하게 선택이
+    // 있으면 항상 포함시켜 두 의미(스케줄 시간에만/항상) 다 스케줄 활성 중엔
+    // 적용되게 통일한다.
+    final fallback = ExternalAppShieldStore.hasSelection
         ? ExternalAppShieldStore.encodedSelection!
         : '';
     final key = '${domains.join('|')}|$perSel|$fallback';
@@ -93,7 +119,8 @@ class BlockScheduleEnforcementService {
       for (final id in ids) {
         final enc = ScheduleScreenTimeStore.encodedFor(id);
         if (enc != null && enc.isNotEmpty) {
-          await IosScreenTimeService.saveScheduleSelection(scheduleId: id, encoded: enc);
+          await IosScreenTimeService.saveScheduleSelection(
+              scheduleId: id, encoded: enc);
         }
       }
       if (fallback.isNotEmpty) {
@@ -103,8 +130,13 @@ class BlockScheduleEnforcementService {
         scheduleIds: ids,
         domains: domains,
         fallbackEncoded: fallback.isEmpty ? null : fallback,
+        lockdownActive: ids.any((id) => shieldActive.any(
+              (schedule) => schedule.id == id && schedule.lockdownAllApps,
+            )),
+        lockdownAllowedAppsEncoded: IsleUserDefaults.lockdownAllowedAppsEncoded,
       );
-      if (fallback.isNotEmpty || perSel.contains(RegExp(r'[A-Za-z0-9+/=]{8,}'))) {
+      if (fallback.isNotEmpty ||
+          perSel.contains(RegExp(r'[A-Za-z0-9+/=]{8,}'))) {
         await ExternalAppShieldStore.setShieldMarkedActive(true);
       }
     } else {
@@ -118,9 +150,10 @@ class BlockScheduleEnforcementService {
     }
 
     if (Platform.isMacOS) {
-      final scheduleOn =
-          IsleUserDefaults.youtubeScheduleLockEnabled && shieldActive.isNotEmpty;
-      await MacAppBlockService.syncFromPolicy(scheduleBlockingActive: scheduleOn);
+      final scheduleOn = IsleUserDefaults.youtubeScheduleLockEnabled &&
+          shieldActive.isNotEmpty;
+      await MacAppBlockService.syncFromPolicy(
+          scheduleBlockingActive: scheduleOn);
       if (scheduleOn) {
         await MacBrowserSessionService.startMonitoring();
       }
@@ -179,9 +212,12 @@ class BlockScheduleEnforcementService {
       return;
     }
 
-    if (shieldActive.isNotEmpty && ExternalAppShieldStore.syncWithBlockSchedule) {
+    if (shieldActive.isNotEmpty &&
+        ExternalAppShieldStore.syncWithBlockSchedule) {
       final csv = scheduleAppCsv ??
-          (ExternalAppShieldStore.hasSelection ? ExternalAppShieldStore.encodedSelection : null);
+          (ExternalAppShieldStore.hasSelection
+              ? ExternalAppShieldStore.encodedSelection
+              : null);
       if (csv != null && csv.isNotEmpty) {
         final count = csv.split(',').where((p) => p.trim().isNotEmpty).length;
         await c.applyAppShield(
@@ -203,7 +239,8 @@ class BlockScheduleEnforcementService {
     await ExternalAppShieldStore.setShieldMarkedActive(false);
   }
 
-  static Future<String?> _androidActiveSchedulePackages(List<BlockSchedule> active) async {
+  static Future<String?> _androidActiveSchedulePackages(
+      List<BlockSchedule> active) async {
     if (active.isEmpty) return null;
     await ScheduleScreenTimeStore.ensureOpen();
     final packages = <String>{};

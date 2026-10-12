@@ -75,6 +75,12 @@ final class AppLimitPlugin: NSObject, FlutterPlugin {
       #else
       result(false)
       #endif
+    case "lastLimitFailureReason":
+      #if canImport(DeviceActivity)
+      result(IsleAppLimitBridge.lastFailureReason)
+      #else
+      result("")
+      #endif
     case "unregisterLimit":
       #if canImport(DeviceActivity)
       let id = (call.arguments as? [String: Any])?["id"] as? String ?? ""

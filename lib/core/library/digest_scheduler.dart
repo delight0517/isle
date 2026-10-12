@@ -1,4 +1,5 @@
 import '../services/isle_user_defaults.dart';
+import '../services/notification_service.dart';
 import 'ai_summarizer.dart';
 import 'models/library_entry.dart';
 import 'personal_library_store.dart';
@@ -72,6 +73,10 @@ class DigestScheduler {
     if (published > 0) {
       await PersonalLibraryStore.saveEntries(list);
       await IsleUserDefaults.recordDigestPublished(published);
+      await NotificationService.notifyContentReady(
+        title: '이번 주 다이제스트가 도착했어요',
+        body: '시청·저장한 콘텐츠 $published건이 읽기 카드로 만들어졌어요',
+      );
     }
     return published;
   }

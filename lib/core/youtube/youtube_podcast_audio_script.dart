@@ -254,7 +254,7 @@ class YoutubePodcastAudioScript {
   window.__islePodcastTimer = setInterval(window.__islePodcastEnforce, 200);
   window.__islePodcastEnforce();
 
-  function setupWaveAnalyser(){
+  function setu[REDACTED]
     if (window.__isleWaveReady) return;
     var v = document.querySelector('video');
     if (!v) return;
@@ -277,7 +277,7 @@ class YoutubePodcastAudioScript {
   }
 
   function tickWave(){
-    setupWaveAnalyser();
+    setu[REDACTED]
     var a = window.__isleWaveAnalyser;
     if (!a || window.__islePodcastPaused) return;
     var v = document.querySelector('video');

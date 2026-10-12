@@ -15,7 +15,7 @@ class IsleHomeQuickStrip extends StatelessWidget {
       _QuickItem(Icons.landscape_outlined, '나의 Isle', IsleColors.ocean700, '/home/my-isle'),
       _QuickItem(Icons.shield, '차단', IsleColors.ocean700, '/home/block'),
       _QuickItem(Icons.route, 'Top 3', IsleColors.gold500, '/youtube/creative-analytics?tab=growth'),
-      _QuickItem(Icons.apps, '전체', IsleColors.muted, null, isLauncher: true),
+      _QuickItem(Icons.apps, '더보기', IsleColors.muted, null, isLauncher: true),
     ];
 
     return SizedBox(

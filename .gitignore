@@ -62,3 +62,8 @@ DerivedData/
 # Secrets
 .env
 .env.*
+android/key.properties
+android/app/upload-keystore.jks
+*.jks
+*.keystore
+android/key.properties*

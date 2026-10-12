@@ -5,6 +5,7 @@ import '../../../../core/ai/ai_config_store.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_typography.dart';
+import '../../../ai/presentation/widgets/ai_key_auto_setup_card.dart';
 
 /// 설정 홈 — AI API가 왜 필요한지 한눈에
 class AiSetupPromoCard extends StatelessWidget {
@@ -21,6 +22,7 @@ class AiSetupPromoCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(IsleSize.cardRadius),
           onTap: () => context.push('/settings/ai-hub'),
+          onLongPress: () => showApiKeyPasteSheet(context),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -62,7 +64,7 @@ class AiSetupPromoCard extends StatelessWidget {
                 _guideRow(Icons.category_outlined, '유튜브 채널 장르 분류'),
                 const SizedBox(height: 8),
                 Text(
-                  '키는 이 기기 Keychain에만 저장됩니다. 붙여넣기만 하면 OpenAI·Gemini·OpenRouter 등 자동 연결.',
+                  '키는 이 기기 Keychain에만 저장됩니다. 붙여넣기만 하면 OpenAI·Gemini·OpenRouter 등 자동 연결. 길게 누르면 붙여넣기 시트.',
                   style: IsleText.caption(color: IsleColors.muted),
                 ),
               ],

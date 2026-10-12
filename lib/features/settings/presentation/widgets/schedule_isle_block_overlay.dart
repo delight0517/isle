@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/schedule_overlay_navigation.dart';
+import '../../../../core/block_schedule/models/block_schedule.dart';
+import '../../../../core/block_schedule/schedule_active_service.dart';
+import '../../../../core/block_schedule/schedule_app_targets_store.dart';
 import '../../../../core/block_schedule/schedule_target_access_guard.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/explorer/explorer_site.dart';
@@ -18,6 +22,9 @@ class ScheduleIsleBlockOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // YouTube 전용 탭 — [YoutubeWatchLimitOverlay] 단일 오버레이
+    if (site.isYoutube) return const SizedBox.shrink();
+
     return FutureBuilder<bool>(
       future: ScheduleTargetAccessGuard.isExplorerBlocked(
         site,
@@ -25,7 +32,8 @@ class ScheduleIsleBlockOverlay extends StatelessWidget {
       ),
       builder: (context, snap) {
         if (snap.data != true) return const SizedBox.shrink();
-        final (title, body) = _copy();
+        final primary = _primarySchedule();
+        final (title, body) = _copy(primary);
         return Material(
           color: Colors.black.withValues(alpha: 0.72),
           child: SafeArea(
@@ -50,8 +58,11 @@ class ScheduleIsleBlockOverlay extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     FilledButton(
-                      onPressed: () => context.push('/settings/block-schedules'),
-                      child: const Text('스케줄 설정'),
+                      onPressed: () => openBlockScheduleFromOverlay(
+                        context,
+                        scheduleId: primary?.id,
+                      ),
+                      child: Text(primary != null ? '이 스케줄 편집' : '스케줄 목록'),
                     ),
                     TextButton(
                       onPressed: () => context.pop(),
@@ -67,14 +78,23 @@ class ScheduleIsleBlockOverlay extends StatelessWidget {
     );
   }
 
-  (String, String) _copy() {
-    if (site.isYoutube) {
-      return (
-        'Isle · YouTube 차단 중',
-        '이 스케줄에서 「Isle · YouTube 시청」을 막아 두었어요.\n'
-            '스케줄 편집 → 차단·한도 대상에서 해제할 수 있어요.',
-      );
+  BlockSchedule? _primarySchedule() {
+    final active = ScheduleActiveService.activeSchedulesNow();
+    final targetId = switch (site) {
+      _ when site.isInstagram =>
+        instagramDmOnly ? 'isle_instagram_dm' : 'isle_instagram',
+      _ when site.isBrunch => 'isle_brunch',
+      _ when site.isYoutube => 'isle_youtube',
+      _ => 'isle_youtube',
+    };
+    for (final s in active) {
+      final e = ScheduleAppTargetsStore.entryFor(s.id, targetId);
+      if (e != null && e.blockInSlot) return s;
     }
+    return active.isNotEmpty ? active.first : null;
+  }
+
+  (String, String) _copy(BlockSchedule? primary) {
     if (site.isInstagram) {
       if (instagramDmOnly) {
         return (

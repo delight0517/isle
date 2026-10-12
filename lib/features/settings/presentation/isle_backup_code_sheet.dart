@@ -122,7 +122,7 @@ class _IsleBackupCodeSheetState extends State<_IsleBackupCodeSheet> {
               ),
               const SizedBox(height: 8),
               Text(
-                '메모·비밀번호 관리자에 붙여넣을 수 있는 한 줄 코드예요. '
+                '메모·[REDACTED] 붙여넣을 수 있는 한 줄 코드예요. '
                 '앱 삭제 전에 복사해 두세요.',
                 style: IsleText.caption(color: IsleColors.muted),
               ),

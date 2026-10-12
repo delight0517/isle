@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../services/isle_app_log_service.dart';
+import '../youtube/google_auth_path_policy.dart';
 import '../youtube/youtube_nav_policy.dart';
 
 /// YouTube·WebView 재생/로드 실패 자동 복구 (회색 빈 화면·「try again later」 방지)
@@ -131,7 +132,8 @@ class IslePlaybackGuard {
   }
 
   bool _isYoutubeBrowseSurface(String url) =>
-      YoutubeNavPolicy.isBrowseSurface(url);
+      YoutubeNavPolicy.isBrowseSurface(url) ||
+      GoogleAuthPathPolicy.isAuthFlowUrl(url);
 
   NavigationDelegate buildDelegate({
     required Future<void> Function() reload,
@@ -141,8 +143,15 @@ class IslePlaybackGuard {
     Future<void> Function()? switchUserAgent,
     void Function(String url)? onPageStartedExtra,
     void Function(int progress)? onLoadProgressExtra,
+    NavigationDecision Function(NavigationRequest request)? onNavigationRequest,
   }) {
     return NavigationDelegate(
+      onNavigationRequest: (req) {
+        if (onNavigationRequest != null) {
+          return onNavigationRequest(req);
+        }
+        return NavigationDecision.navigate;
+      },
       onUrlChange: (c) {
         final url = c.url;
         if (url != null && url.isNotEmpty) {

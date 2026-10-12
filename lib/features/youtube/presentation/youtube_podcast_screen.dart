@@ -12,7 +12,12 @@ import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/library/youtube_library_service.dart';
 import '../../../core/navigation/explorer_entry_guard.dart';
-import '../../../core/navigation/isle_navigation.dart';
+import '../../../core/navigation/youtube_explorer_launch.dart';
+import '../../../core/youtube/youtube_safari_launch_guard.dart';
+import '../../../core/platform/isle_web_session_persistence_service.dart';
+import '../../../core/platform/web_session_cookie_bridge.dart';
+import '../../../core/qa/device_qa_preflight_service.dart';
+import '../../../core/qa/device_qa_store.dart';
 import '../../../core/services/isle_app_log_service.dart';
 import '../../../core/services/isle_error_feedback.dart';
 import '../../../core/youtube/youtube_system_auth_service.dart';
@@ -43,10 +48,16 @@ enum _PodcastPhase { picker, playing }
 
 /// 유튜브 음성 — 듣기 전용 · 별도 한도 · 백그라운드 · 탐색 잠금
 class YoutubePodcastScreen extends StatefulWidget {
-  const YoutubePodcastScreen({super.key, this.initialUrl, this.videoId});
+  const YoutubePodcastScreen({
+    super.key,
+    this.initialUrl,
+    this.videoId,
+    this.qaMode = false,
+  });
 
   final String? initialUrl;
   final String? videoId;
+  final bool qaMode;
 
   @override
   State<YoutubePodcastScreen> createState() => _YoutubePodcastScreenState();
@@ -84,6 +95,7 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
   bool _searching = false;
   bool _loadingFeed = false;
   bool _loadingPlaylists = false;
+  bool _loginBusy = false;
   String? _feedError;
   String? _playlistError;
   String? _expandedSavedId;
@@ -139,6 +151,35 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
       final pl = UrlParser.extractYouTubePlaylistId(bootUrl);
       if (pl != null) {
         await _playFromUrl(bootUrl);
+      }
+    }
+    if (YoutubeLibraryService.currentAccount != null) {
+      unawaited(_preloadSignedInFeeds());
+    }
+  }
+
+  static const _feedLoadTimeout = Duration(seconds: 35);
+
+  Future<void> _preloadSignedInFeeds() async {
+    if (YoutubeLibraryService.currentAccount == null) return;
+    try {
+      _myChannelId = await YoutubePodcastOwnerService.myChannelId();
+      final results = await Future.wait([
+        YoutubePodcastFeedService.fetchSubscriptionFeed(maxChannels: 8, perChannel: 2),
+        YoutubePodcastFeedService.fetchMyUploads(maxResults: 24),
+      ]).timeout(_feedLoadTimeout);
+      _subFeed = results[0];
+      _myUploads = results[1];
+      _myUploadIds = _myUploads.map((v) => v.videoId).toSet();
+      if (mounted) setState(() {});
+    } on TimeoutException {
+      if (mounted) {
+        setState(() => _feedError = '구독·내 영상 불러오기가 너무 오래 걸려요. 새로고침을 눌러 주세요.');
+      }
+    } catch (e, st) {
+      IsleErrorFeedback.log('podcast_preload_feeds', e, stack: st);
+      if (mounted) {
+        setState(() => _feedError = IsleErrorFeedback.friendly(e));
       }
     }
   }
@@ -504,6 +545,7 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
     }
     await _probe();
     await _pollProgressOnce();
+    IsleWebSessionPersistenceService.scheduleSave();
     if (mounted) setState(() => _loading = false);
   }
 
@@ -709,18 +751,33 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
       await _reloadPlaylistsTab();
       return;
     }
+    if (YoutubeLibraryService.currentAccount == null) {
+      setState(() {
+        _loadingFeed = false;
+        _feedError = 'Google 로그인이 필요해요. 위 「Google 로그인」을 눌러 주세요.';
+      });
+      return;
+    }
+    if (_loginBusy) return;
     setState(() {
       _loadingFeed = true;
       _feedError = null;
     });
     try {
       if (index == 2) {
-        _subFeed = await YoutubePodcastFeedService.fetchSubscriptionFeed();
+        _subFeed = await YoutubePodcastFeedService.fetchSubscriptionFeed(
+          maxChannels: 8,
+          perChannel: 2,
+        ).timeout(_feedLoadTimeout);
       } else if (index == 3) {
         _myChannelId = await YoutubePodcastOwnerService.myChannelId();
-        _myUploads = await YoutubePodcastFeedService.fetchMyUploads();
+        _myUploads = await YoutubePodcastFeedService.fetchMyUploads(
+          maxResults: 24,
+        ).timeout(_feedLoadTimeout);
         _myUploadIds = _myUploads.map((v) => v.videoId).toSet();
       }
+    } on TimeoutException {
+      _feedError = '불러오기 시간이 초과됐어요. 네트워크를 확인하고 다시 시도해 주세요.';
     } catch (e, st) {
       IsleErrorFeedback.log('podcast_feed_$index', e, stack: st);
       _feedError = IsleErrorFeedback.friendly(e);
@@ -747,52 +804,87 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
   }
 
   Future<void> _openYoutubeLogin() async {
-    if (!mounted) return;
+    if (!mounted || _loginBusy) return;
+    setState(() {
+      _loginBusy = true;
+      _feedError = null;
+    });
     IsleAppLogService.log('YouTube podcast: login tapped');
 
-    if (YoutubeLibraryService.canAttemptSignIn) {
-      final r = await YoutubeSystemAuthService.signInForYoutubeApi();
-      IsleAppLogService.log(
-        'YouTube podcast API sign-in success=${r.success} msg=${r.message}',
-      );
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(r.message)),
-      );
-      if (r.success) {
-        YoutubePodcastOwnerService.clearCache();
-        _myChannelId = await YoutubePodcastOwnerService.myChannelId(forceRefresh: true);
-        if (_tabCtrl.index > 0) await _loadFeedTab(_tabCtrl.index);
-        setState(() {});
+    try {
+      if (YoutubeLibraryService.canAttemptSignIn) {
+        final r = await YoutubeSystemAuthService.signInForYoutubeApi();
+        IsleAppLogService.log(
+          'YouTube podcast API sign-in success=${r.success} msg=${r.message}',
+        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(r.message)),
+        );
+        if (r.success) {
+          await _refreshAfterLogin();
+          return;
+        }
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Google 로그인 설정이 필요해요. ${YoutubeLibraryService.setupHint}',
+            ),
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+
+      if (YoutubeSafariLaunchGuard.isEscapeBlocked) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              '차단·한도 중에는 WebView 로그인을 쓸 수 없어요. '
+              '위 「시스템 Google 로그인」을 사용하세요.',
+            ),
+            duration: Duration(seconds: 5),
+          ),
+        );
         return;
       }
-    } else {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Google 로그인 설정이 필요해요. ${YoutubeLibraryService.setupHint}',
-          ),
-          duration: const Duration(seconds: 5),
-        ),
-      );
-    }
 
-    // WebView 로그인 (비공개 재생) — 스케줄·한도 우회
-    final pushed = IsleNavigation.push(
-      '/youtube/browser?autologin=1&login_only=1',
-      from: context,
-    );
-    if (!pushed) {
-      IsleAppLogService.log(
-        'YouTube podcast: browser login push failed, trying login-guide',
-        level: IsleLogLevel.warn,
-      );
-      if (mounted) await context.push('/youtube/login-guide');
+      final pushed = await YoutubeExplorerLaunch.push(context, autoLogin: true);
+      if (!pushed) {
+        IsleAppLogService.log(
+          'YouTube podcast: browser login push failed, trying login-guide',
+          level: IsleLogLevel.warn,
+        );
+        if (mounted) await context.push('/youtube/login-guide');
+      }
+      await WebSessionCookieBridge.syncSafariCookiesToWebView();
+      await _refreshAfterLogin();
+    } finally {
+      if (mounted) setState(() => _loginBusy = false);
     }
-    if (!mounted) return;
-    if (_tabCtrl.index > 0) await _loadFeedTab(_tabCtrl.index);
-    setState(() {});
+  }
+
+  Future<void> _refreshAfterLogin() async {
+    YoutubePodcastOwnerService.clearCache();
+    if (YoutubeLibraryService.currentAccount == null) return;
+    await _preloadSignedInFeeds();
+    if (_tabCtrl.index == 1) {
+      await _reloadPlaylistsTab();
+    }
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _onPodcastResumed() async {
+    if (YoutubeLibraryService.currentAccount != null &&
+        (_subFeed.isEmpty || _myUploads.isEmpty)) {
+      await _preloadSignedInFeeds();
+    }
+    if (_tabCtrl.index > 0) {
+      await _loadFeedTab(_tabCtrl.index);
+    }
+    if (mounted) setState(() {});
   }
 
   void _parkForBackground() {
@@ -854,9 +946,8 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
     if (state == AppLifecycleState.resumed) {
       if (_phase == _PodcastPhase.playing) {
         unawaited(_applyAudioMode());
-      } else if (_tabCtrl.index > 0) {
-        unawaited(_loadFeedTab(_tabCtrl.index));
-        if (mounted) setState(() {});
+      } else {
+        unawaited(_onPodcastResumed());
       }
     }
   }
@@ -957,6 +1048,16 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
 
     return Column(
       children: [
+        if (widget.qaMode)
+          _PodcastQaPanel(
+            signedIn: signedIn,
+            subCount: _subFeed.length,
+            uploadsCount: _myUploads.length,
+            playlistCount: _savedPlaylists.length,
+            audioHeard: _positionSec > 1.5 && !_dartPaused && !_loading,
+            waveformActive: _waveform.any((s) => s > 0.14),
+            ownerPlayback: _ownerPlayback,
+          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
           child: Container(
@@ -974,12 +1075,37 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(limitLine, style: IsleText.caption(color: Colors.white54)),
-                if (!signedIn) ...[
+                if (signedIn) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.check_circle, size: 16, color: Color(0xFF1DB954)),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          YoutubeLibraryService.currentAccount?.email ?? '로그인됨',
+                          style: IsleText.caption(color: Colors.white70),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => unawaited(_loadFeedTab(_tabCtrl.index > 0 ? _tabCtrl.index : 2)),
+                        child: const Text('새로고침'),
+                      ),
+                    ],
+                  ),
+                ] else ...[
                   const SizedBox(height: 10),
                   OutlinedButton.icon(
-                    onPressed: _openYoutubeLogin,
-                    icon: const Icon(Icons.login, size: 18),
-                    label: const Text('YouTube 로그인 (내 영상·비공개)'),
+                    onPressed: _loginBusy ? null : _openYoutubeLogin,
+                    icon: _loginBusy
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.login, size: 18),
+                    label: Text(_loginBusy ? 'Google 로그인 중…' : 'YouTube 로그인 (내 영상·비공개)'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white70,
                       side: const BorderSide(color: Colors.white24),
@@ -1154,7 +1280,7 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
             Text('YouTube 계정', style: IsleText.body(color: Colors.white)),
             const Spacer(),
             if (YoutubeLibraryService.currentAccount == null)
-              TextButton(onPressed: _openYoutubeLogin, child: const Text('로그인')),
+              TextButton(onPressed: _loginBusy ? null : _openYoutubeLogin, child: const Text('로그인')),
           ],
         ),
         const SizedBox(height: 4),
@@ -1167,7 +1293,7 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
           Text('플레이list가 없어요', style: IsleText.caption(color: Colors.white38))
         else if (_accountPlaylists.isEmpty)
           OutlinedButton.icon(
-            onPressed: _openYoutubeLogin,
+            onPressed: _loginBusy ? null : _openYoutubeLogin,
             icon: const Icon(Icons.login),
             label: const Text('로그인 후 불러오기'),
           )
@@ -1254,8 +1380,22 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
   }
 
   Widget _buildFeedTab(List<YoutubeFocusVideo> items, {required String emptyHint}) {
-    if (_loadingFeed) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF1DB954)));
+    if (_loadingFeed || _loginBusy) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(color: Color(0xFF1DB954)),
+            if (_loginBusy) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Google 로그인 중…',
+                style: IsleText.caption(color: Colors.white54),
+              ),
+            ],
+          ],
+        ),
+      );
     }
     if (_feedError != null) {
       return Center(
@@ -1267,7 +1407,7 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
               Text(_feedError!, style: IsleText.body(color: Colors.white54), textAlign: TextAlign.center),
               const SizedBox(height: 12),
               FilledButton(
-                onPressed: _openYoutubeLogin,
+                onPressed: _loginBusy ? null : _openYoutubeLogin,
                 child: const Text('YouTube 로그인'),
               ),
               const SizedBox(height: 8),
@@ -1297,7 +1437,7 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
               if (needsLogin) ...[
                 const SizedBox(height: 16),
                 FilledButton.icon(
-                  onPressed: _openYoutubeLogin,
+                  onPressed: _loginBusy ? null : _openYoutubeLogin,
                   icon: const Icon(Icons.login),
                   label: const Text('Google 로그인'),
                 ),
@@ -1367,6 +1507,17 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
         child: Column(
           children: [
+            if (widget.qaMode)
+              _PodcastQaPanel(
+                signedIn: YoutubeLibraryService.currentAccount != null,
+                subCount: _subFeed.length,
+                uploadsCount: _myUploads.length,
+                playlistCount: _savedPlaylists.length,
+                audioHeard: _positionSec > 1.5 && !_dartPaused && !_loading,
+                waveformActive: _waveform.any((s) => s > 0.14),
+                ownerPlayback: _ownerPlayback,
+                compact: true,
+              ),
             YoutubePodcastAudioBadge(playing: playing),
             const SizedBox(height: 16),
             YoutubePodcastPlayerCard(
@@ -1539,6 +1690,201 @@ class _YoutubePodcastScreenState extends State<YoutubePodcastScreen>
         ],
       ),
       child: Icon(Icons.headphones, size: size * 0.36, color: const Color(0xFF1DB954)),
+    );
+  }
+}
+
+class _PodcastQaPanel extends StatefulWidget {
+  const _PodcastQaPanel({
+    required this.signedIn,
+    required this.subCount,
+    required this.uploadsCount,
+    required this.playlistCount,
+    required this.audioHeard,
+    required this.waveformActive,
+    required this.ownerPlayback,
+    this.compact = false,
+  });
+
+  final bool signedIn;
+  final int subCount;
+  final int uploadsCount;
+  final int playlistCount;
+  final bool audioHeard;
+  final bool waveformActive;
+  final bool ownerPlayback;
+  final bool compact;
+
+  @override
+  State<_PodcastQaPanel> createState() => _PodcastQaPanelState();
+}
+
+class _PodcastQaPanelState extends State<_PodcastQaPanel> {
+  DeviceQaPreflightResult? _preflight;
+  bool _preflightLoading = true;
+  bool _markingDone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_refreshPreflight());
+  }
+
+  @override
+  void didUpdateWidget(covariant _PodcastQaPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.signedIn != widget.signedIn ||
+        oldWidget.subCount != widget.subCount ||
+        oldWidget.uploadsCount != widget.uploadsCount ||
+        oldWidget.playlistCount != widget.playlistCount) {
+      unawaited(_refreshPreflight());
+    }
+  }
+
+  Future<void> _refreshPreflight() async {
+    if (!mounted) return;
+    setState(() => _preflightLoading = true);
+    final r = await DeviceQaPreflightService.runOne('youtube_voice');
+    if (!mounted) return;
+    setState(() {
+      _preflight = r;
+      _preflightLoading = false;
+    });
+  }
+
+  Future<void> _markDeviceQaDone() async {
+    if (_markingDone) return;
+    setState(() => _markingDone = true);
+    try {
+      await DeviceQaStore.setChecked('youtube_voice', true);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('유튜브 음성 실기기 확인을 체크했어요')),
+      );
+      if (context.canPop()) {
+        context.pop();
+      }
+    } finally {
+      if (mounted) setState(() => _markingDone = false);
+    }
+  }
+
+  Widget _stepRow(String label, bool done) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            done ? Icons.check_circle : Icons.radio_button_unchecked,
+            size: 18,
+            color: done ? const Color(0xFF2E7D32) : const Color(0xFF81C784),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: IsleText.caption(
+                color: done ? const Color(0xFF1B5E20) : const Color(0xFF2E7D32),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loginDone = widget.signedIn;
+    final feedDone = widget.subCount > 0 || widget.uploadsCount > 0;
+    final audioDone = widget.audioHeard && widget.ownerPlayback;
+    final waveformDone = widget.waveformActive;
+    final readyToComplete = loginDone && feedDone && audioDone && waveformDone;
+
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.fromLTRB(16, widget.compact ? 0 : 8, 16, widget.compact ? 10 : 0),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            widget.compact ? '실기기 확인 — 재생 중' : '실기기 확인 — 유튜브 음성',
+            style: IsleText.subtitle(color: const Color(0xFF1B5E20)),
+          ),
+          if (!widget.compact) ...[
+            const SizedBox(height: 8),
+            _stepRow('① Google 로그인', loginDone),
+            _stepRow('② 구독 (${widget.subCount}) 또는 내 영상 (${widget.uploadsCount})', feedDone),
+            _stepRow('③ 재생목록 탭 (${widget.playlistCount}개 · 선택)', widget.playlistCount > 0),
+            _stepRow('④ 오디오만 재생·소리', audioDone),
+            _stepRow('⑤ 실시간 파형', waveformDone),
+          ] else ...[
+            const SizedBox(height: 6),
+            Text(
+              readyToComplete
+                  ? '소리·파형 확인됨 · 아래에서 완료 체크'
+                  : audioDone
+                      ? '재생 중 파형이 움직이는지 확인해 주세요'
+                      : '내 영상에서 재생 후 소리가 나는지 확인해 주세요',
+              style: IsleText.caption(color: const Color(0xFF2E7D32)),
+            ),
+          ],
+          if (_preflightLoading)
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: LinearProgressIndicator(minHeight: 2),
+            )
+          else if (_preflight != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _preflight!.summary,
+              style: IsleText.caption(color: const Color(0xFF1B5E20)),
+            ),
+            if (_preflight!.hint != null && _preflight!.hint!.isNotEmpty)
+              Text(
+                _preflight!.hint!,
+                style: IsleText.caption(color: const Color(0xFF2E7D32)),
+              ),
+          ],
+          if (!widget.compact) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                TextButton.icon(
+                  onPressed: _preflightLoading ? null : _refreshPreflight,
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: const Text('자동 점검'),
+                ),
+              ],
+            ),
+          ],
+          SizedBox(
+            height: IsleSize.minTouchTarget,
+            child: FilledButton.icon(
+              onPressed: (_markingDone || !readyToComplete) ? null : _markDeviceQaDone,
+              icon: _markingDone
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.task_alt),
+              label: Text(readyToComplete ? '실기기 확인 완료' : '로그인·재생·파형 후 체크'),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF2E7D32),
+                disabledBackgroundColor: const Color(0xFFA5D6A7),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

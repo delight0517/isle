@@ -1,0 +1,46 @@
+---
+description: iOS/Android UI copy parity — 서로의 OS 용어로 덮어쓰지 않기
+alwaysApply: true
+---
+
+# Platform Copy Parity (iOS ↔ Android)
+
+> 차단 **동작**은 `android-parity.mdc` · [BlockingController].
+> 여기는 **사용자에게 보이는 문구·화면 노출** 규칙.
+
+## 단일 출처 (3층)
+
+| 층 | 파일 | 용도 |
+|---|---|---|
+| 문구 분기 (순수) | `core/platform/platform_copy_resolver.dart` | `PlatformKind`별 문자열 — **테스트 대상** |
+| 런타임 facade | `core/platform/platform_block_intent.dart` → `PlatformBlockCopy` | 위젯은 **이것만** import |
+| 기능 on/off | `core/platform/platform_feature_gate.dart` → `PlatformFeatureGate` | iOS-only 타일·버튼 |
+
+## 금지
+
+1. `features/`·`shared/` 위젯에 `Safari`·`Screen Time`·`Chrome`(OS 맥락)·`접근성 차단` **하드코딩**.
+2. Android 수정 시 iOS 문구를 `웹 브라우저` 등 **중립 문구로 통일** (iOS는 Safari 유지).
+3. iOS 수정 시 Android에 `Screen Time`·Safari 전용 안내 노출.
+4. `if (Platform.isIOS)` 로 **문구만** 분기 — copy는 resolver로.
+
+## 허용
+
+- `PlatformBlockCopy.xxx` / `PlatformFeatureGate.xxx` 호출
+- `BlockingController` + `BlockingCapabilities` (차단 동작)
+- `core/platform/`·네이티브 브리지 내부
+
+## 새 UI 문자열 체크리스트
+
+1. OS별로 다른가? → `PlatformCopyResolver`에 `PlatformKind` switch 추가
+2. `PlatformBlockCopy` getter 위임
+3. `test/core/platform/platform_copy_parity_test.dart`에 iOS·Android 각각 assertion
+4. `dart run tool/check_platform_ui_strings.dart` 통과
+
+## 검증 명령
+
+```bash
+cd isle
+flutter test test/core/platform/platform_copy_parity_test.dart
+dart run tool/check_platform_ui_strings.dart
+flutter analyze
+```

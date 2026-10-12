@@ -64,6 +64,36 @@ class PremadeBlockPack {
   }
 }
 
+/// 팩 적용 시 실제 추가된 항목 — 제거 시 역추적용
+class PremadePackProvenanceEntry {
+  const PremadePackProvenanceEntry({
+    required this.storeKind,
+    required this.value,
+  });
+
+  /// channel · keyword · url · domain
+  final String storeKind;
+  final String value;
+
+  Map<String, dynamic> toJson() => {
+        'storeKind': storeKind,
+        'value': value,
+      };
+
+  factory PremadePackProvenanceEntry.fromJson(Map<String, dynamic> j) =>
+      PremadePackProvenanceEntry(
+        storeKind: j['storeKind'] as String? ?? '',
+        value: j['value'] as String? ?? '',
+      );
+}
+
+enum PremadePackEntryStatus {
+  notApplied,
+  active,
+  excluded,
+  pending,
+}
+
 class PremadeBlockPackApplyResult {
   const PremadeBlockPackApplyResult({
     required this.packId,

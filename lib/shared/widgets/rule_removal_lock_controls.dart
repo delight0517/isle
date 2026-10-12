@@ -148,7 +148,7 @@ class _RuleRemovalLockControlsState extends State<RuleRemovalLockControls> {
       builder: (ctx) => AlertDialog(
         title: const Text('타이머를 취소할까요?'),
         content: const Text(
-          '카운트다운을 중단하고 제거 잠금을 다시 유지합니다.\n'
+          '카운트다운을 중단하고 삭제 대기를 다시 유지합니다.\n'
           '목록은 그대로입니다.',
         ),
         actions: [
@@ -275,11 +275,11 @@ class _RuleRemovalLockControlsState extends State<RuleRemovalLockControls> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '제거 타임락',
+                        '제거 대기 시간',
                         style: IsleText.body().copyWith(fontWeight: FontWeight.w600),
                       ),
                       Text(
-                        '추가는 즉시 · 삭제·해제는 타이머 후',
+                        '실수로 규칙을 지우지 않게 대기 시간을 둡니다',
                         style: IsleText.caption(color: IsleColors.muted),
                       ),
                     ],
@@ -482,7 +482,9 @@ void showRuleRemovalOutcomeSnackBar(
       message = '$itemLabel 삭제했어요';
     case RuleRemovalOutcomeKind.scheduled:
       final min = outcome.remaining?.inMinutes ?? freezeMinutes;
-      message = '$min분 후 자동으로 제거됩니다 · 그동안 차단은 유지';
+      message = itemLabel.contains('팩')
+          ? '$min분 후 자동으로 연결 해제됩니다 · 그동안 차단은 유지'
+          : '$min분 후 자동으로 제거됩니다 · 그동안 차단은 유지';
     case RuleRemovalOutcomeKind.alreadyPending:
       message =
           '이미 삭제 예약됨 — ${RulePendingRemovalService.formatRemaining(outcome.remaining!)}';

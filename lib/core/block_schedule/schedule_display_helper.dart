@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../intervention/schedule_screen_time_store.dart';
 import 'models/block_schedule.dart';
+import 'models/schedule_enforcement_mode.dart';
 import 'models/schedule_slot.dart';
 import 'schedule_active_service.dart';
 import 'schedule_app_target_catalog.dart';
 import 'schedule_app_targets_store.dart';
+import '../platform/platform_block_intent.dart';
 
 /// 스케줄 카드·히어로 — 오늘 요일·시간·차단 대상을 사람이 읽기 쉽게
 class ScheduleDisplayHelper {
@@ -106,15 +108,48 @@ class ScheduleDisplayHelper {
     }
     final times = todaySlots.map(_timeRange).toSet().join(', ');
     if (active) {
-      return '오늘(${weekdayShort[t]}) $times · 지금 잠금';
+      final reason = schedule.isSafetyBaseline ? ' (안전 라인으로 인한 활성화)' : '';
+      return '오늘(${weekdayShort[t]}) $times · 지금 잠금$reason';
     }
     return '오늘(${weekdayShort[t]}) $times · 지금은 해제';
   }
 
-  static String targetsSummary(BlockSchedule schedule) {
-    final visuals = targetVisualsForSchedule(schedule);
-    if (visuals.isEmpty) return '차단 앱 미지정';
-    return visuals.map((v) => v.label).join(' · ');
+  /// 활성 슬롯 종료 시각 — "오전 7:00까지 풀려요"
+  static String? activeSlotEndsLabel(BlockSchedule schedule, {DateTime? at}) {
+    final now = at ?? DateTime.now();
+    if (!ScheduleActiveService.isScheduleActiveNow(schedule, now)) return null;
+    final minute = now.hour * 60 + now.minute;
+    final t = todayIndex(now);
+    for (final slot in schedule.slots) {
+      if (normalizeDay(slot.day) != t) continue;
+      if (!slot.coversMinute(minute)) continue;
+      final end = slot.endMinute;
+      final h = end ~/ 60;
+      final m = end % 60;
+      final period = h < 12 ? '오전' : '오후';
+      final h12 = h % 12 == 0 ? 12 : h % 12;
+      return '$period $h12:${m.toString().padLeft(2, '0')}까지 풀려요';
+    }
+    return null;
+  }
+
+  /// 현재 활성 스케줄을 칩/배너에 짧게 보여줄 때 쓰는 표기.
+  /// 안전 라인이면 "안전 라인"을 우선 밝히고, 끝나는 시각을 함께 붙인다.
+  static String activeScheduleChipLabel(BlockSchedule schedule, {DateTime? at}) {
+    final now = at ?? DateTime.now();
+    final ends = activeSlotEndsLabel(schedule, at: now);
+    final conciseEnds = ends?.replaceAll(' 풀려요', '');
+    if (schedule.isSafetyBaseline) {
+      return conciseEnds == null ? '안전 라인' : '안전 라인 · $conciseEnds';
+    }
+    if (conciseEnds != null) return '스케줄 · $conciseEnds';
+    return todayStatusLine(schedule, at: now);
+  }
+
+  static String targetsSummaryDetailed(BlockSchedule schedule) {
+    final line = configuredSummaryLine(schedule);
+    if (line.startsWith('③')) return line;
+    return '막는 것: $line';
   }
 
   static List<ScheduleTargetVisual> targetVisualsForSchedule(BlockSchedule schedule) {
@@ -134,6 +169,8 @@ class ScheduleDisplayHelper {
         if (d == null) continue;
         if (d.id == 'ios_youtube' || d.bundleId == 'youtube') {
           add(Icons.play_circle_filled, const Color(0xFFFF0000), 'YouTube 앱', 'yt_app');
+        } else if (d.id == 'ios_youtube_music' || d.bundleId == 'youtube_music') {
+          add(Icons.music_note, const Color(0xFFFF0000), 'YouTube Music', 'yt_music');
         } else if (d.id == 'isle_youtube') {
           add(Icons.play_circle_outline, const Color(0xFFFF0000), 'Isle 유튜브', 'yt_isle');
         } else if (d.bundleId == 'instagram_feed' ||
@@ -147,23 +184,62 @@ class ScheduleDisplayHelper {
         }
       }
     } catch (_) {
-      // Hive 미오픈(테스트) — 이름·도메인 추론으로 폴백
+      // Hive 미오픈(테스트)
     }
 
-    final name = schedule.name.toLowerCase();
-    final doms = schedule.domains.map((d) => d.toLowerCase()).join(' ');
+    if (schedule.domains.isNotEmpty && schedule.enforcementMode.appliesShieldInSlot) {
+      final yt = schedule.domains.any((d) => d.toLowerCase().contains('youtube'));
+      add(
+        Icons.public_off,
+        const Color(0xFF0A84FF),
+        yt ? 'Safari·웹 도메인' : '웹 도메인',
+        'domains',
+      );
+    }
+    if (schedule.blockIsleInApp) {
+      add(Icons.phonelink_lock, IsleColors.ocean700, 'Isle 웹 전체', 'isle_inapp');
+    }
 
-    if (out.isEmpty || name.contains('safari') || doms.contains('apple.com')) {
-      add(Icons.explore, const Color(0xFF0A84FF), 'Safari·웹', 'safari');
-    }
-    if (out.isEmpty ||
-        name.contains('youtube') ||
-        name.contains('유튜브') ||
-        doms.contains('youtube')) {
-      add(Icons.play_circle_filled, const Color(0xFFFF0000), 'YouTube', 'yt_name');
-    }
+    try {
+      final apps = ScheduleScreenTimeStore.appCountFor(schedule.id);
+      final cats = ScheduleScreenTimeStore.categoryCountFor(schedule.id);
+      if (apps > 0 || cats > 0) {
+        final n = apps + cats;
+        add(Icons.phone_iphone, IsleColors.ocean700,
+            '${PlatformBlockCopy.nativeInstalledAppLabel} $n개', 'ios_pick');
+      }
+    } catch (_) {}
 
     return out;
+  }
+
+  /// ③ 체크·도메인·Screen Time만 — 이름 추론 없음
+  static bool hasIsleYoutubeTarget(BlockSchedule schedule) {
+    try {
+      return ScheduleAppTargetsStore.loadForSchedule(schedule.id)
+          .any((e) => e.targetId == 'isle_youtube' && e.blockInSlot);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static bool hasYoutubeDomainsOnly(BlockSchedule schedule) {
+    if (schedule.domains.isEmpty) return false;
+    if (!schedule.domains.any((d) => d.toLowerCase().contains('youtube'))) {
+      return false;
+    }
+    return !hasIsleYoutubeTarget(schedule);
+  }
+
+  static String configuredSummaryLine(BlockSchedule schedule) {
+    final visuals = targetVisualsForSchedule(schedule);
+    if (visuals.isEmpty) {
+      return '③에서 아무 것도 안 고름 — 이 스케줄은 지금 막지 않아요';
+    }
+    if (hasYoutubeDomainsOnly(schedule)) {
+      return '웹 도메인만 (Isle 유튜브 시청과 별개) · ${visuals.map((v) => v.label).join(' · ')}';
+    }
+    return visuals.map((v) => v.label).join(' · ');
   }
 
   /// 스케줄마다 다른 대상(Safari / YouTube 등) — 전역 `applicationCount` 대신 사용

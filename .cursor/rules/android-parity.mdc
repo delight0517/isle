@@ -33,4 +33,4 @@ alwaysApply: true
 - 진짜 "잠금"(삭제 방지)은 Device Owner 없이는 불가 → 의지력 보조로 degrade.
 
 ## 로드맵 상태 (상세는 플랜 §3)
-Phase 0 seam ✅ / Phase 1 앱차단 ⬜ / Phase 2 웹차단(VPN) ⬜ / Phase 3 스케줄·권한 ⬜ / Phase 4 degrade UX ⬜
+Phase 0 seam ✅ / Phase 1 앱차단 ✅ / Phase 2 웹차단(VPN) ✅ / Phase 3 스케줄·권한 ✅ / Phase 4 degrade UX ✅ — UI·카피 패리티 지속

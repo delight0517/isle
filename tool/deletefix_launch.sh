@@ -6,6 +6,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# Delete Fix cached Terminal script (pub getfi / fifi corruption)
+"$(dirname "$0")/heal_deletefix_term_script.sh" 2>/dev/null || true
+
 DEVICE="${1:-}"
 LOG_TAG="[deletefix_launch]"
 
@@ -67,7 +70,7 @@ fi
 log "Bundle id: $BUNDLE_ID"
 
 log "Install → $DEVICE"
-xcrun devicectl device install app --device "$DEVICE" "$APP"
+"$(dirname "$0")/devicectl_install.sh" "$DEVICE" "$APP"
 
 log "Launch $BUNDLE_ID (console attached until app exits)"
 exec xcrun devicectl device process launch --console --device "$DEVICE" "$BUNDLE_ID"

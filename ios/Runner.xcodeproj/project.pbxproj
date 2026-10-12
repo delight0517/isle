@@ -23,6 +23,7 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A7B8C9D11ED2DC5600515813 /* ScreenTimeBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B8C9D01ED2DC5600515813 /* ScreenTimeBridge.swift */; };
+		M0A1D2E41ED2DC5600515830 /* IsleAppIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = M0A1D2E31ED2DC5600515830 /* IsleAppIdentity.swift */; };
 		A7B8C9D21ED2DC5600515814 /* IsleAppLimitBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B8C9D01ED2DC5600515814 /* IsleAppLimitBridge.swift */; };
 		A7B8C9D21ED2DC5600515815 /* AppLimitPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B8C9D01ED2DC5600515815 /* AppLimitPlugin.swift */; };
 		B1E2F3A41ED2DC5600515820 /* IsleScheduleShieldSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E2F3A31ED2DC5600515820 /* IsleScheduleShieldSync.swift */; };
@@ -119,6 +120,7 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7B8C9D01ED2DC5600515813 /* ScreenTimeBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenTimeBridge.swift; sourceTree = "<group>"; };
+		M0A1D2E31ED2DC5600515830 /* IsleAppIdentity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsleAppIdentity.swift; sourceTree = "<group>"; };
 		A7B8C9D01ED2DC5600515814 /* IsleAppLimitBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsleAppLimitBridge.swift; sourceTree = "<group>"; };
 		A7B8C9D01ED2DC5600515815 /* AppLimitPlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLimitPlugin.swift; sourceTree = "<group>"; };
 		AF611BE70D30B2DA18A959AA /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -263,6 +265,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				A7B8C9D01ED2DC5600515813 /* ScreenTimeBridge.swift */,
+				M0A1D2E31ED2DC5600515830 /* IsleAppIdentity.swift */,
 				D2ECA733AB73995507E8F64E /* IsleScreenTimeLabelsView.swift */,
 				A7B8C9D01ED2DC5600515814 /* IsleAppLimitBridge.swift */,
 				A7B8C9D01ED2DC5600515815 /* AppLimitPlugin.swift */,
@@ -631,6 +634,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				M0A1D2E41ED2DC5600515830 /* IsleAppIdentity.swift in Sources */,
 				A7B8C9D11ED2DC5600515813 /* ScreenTimeBridge.swift in Sources */,
 				D41002AF2887854A2F1FE1A0 /* IsleScreenTimeLabelsView.swift in Sources */,
 				A7B8C9D21ED2DC5600515814 /* IsleAppLimitBridge.swift in Sources */,
@@ -714,7 +718,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleDeviceActivityMonitor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleDeviceActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -787,12 +791,12 @@
 				DEVELOPMENT_TEAM = V3J8MR637G;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Isle Dev";
+				INFOPLIST_KEY_CFBundleDisplayName = "모아";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -811,7 +815,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.RunnerTests;
-				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.isle.app.isle.dev;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.isle.app.moa.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -831,7 +835,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.RunnerTests;
-				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.isle.app.isle.dev;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.isle.app.moa.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -849,7 +853,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.RunnerTests;
-				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.isle.app.isle.dev;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.isle.app.moa.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -871,7 +875,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleSafariContentBlocker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleSafariContentBlocker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -894,7 +898,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -917,7 +921,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleSafariContentBlocker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleSafariContentBlocker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -941,7 +945,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleDeviceActivityMonitor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleDeviceActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -964,7 +968,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -988,7 +992,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleDeviceActivityMonitor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleDeviceActivityMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1120,12 +1124,12 @@
 				DEVELOPMENT_TEAM = V3J8MR637G;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Isle Dev";
+				INFOPLIST_KEY_CFBundleDisplayName = "모아";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1150,7 +1154,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1173,7 +1177,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleSafariContentBlocker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleSafariContentBlocker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1197,7 +1201,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.isle.dev.IsleShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.isle.app.moa.dev.IsleShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;

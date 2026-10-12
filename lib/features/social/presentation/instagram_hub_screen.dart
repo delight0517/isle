@@ -138,35 +138,23 @@ class _FeedTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final feedChip = PlatformWatchLimitStore.formatRemainChip(PlatformWatchId.instagram);
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'DM 집중: 메시지·상대 프로필·게시물·스토리는 OK — 홈 피드·탐색·전체 릴스는 막아요.',
+            '유튜브처럼 앱 안에서 열어요 · DM은 무제한 · 피드·릴스만 시간 한도',
             style: IsleText.caption(color: IsleColors.muted),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
           _LimitRow(
-            label: '피드 한도',
-            chip: PlatformWatchLimitStore.formatRemainChip(PlatformWatchId.instagram),
+            label: '피드·릴스 한도',
+            chip: feedChip,
             onTap: () => context.push('/settings/instagram-limits?scope=feed'),
           ),
-          _LimitRow(
-            label: 'DM 한도',
-            chip: PlatformWatchLimitStore.formatRemainChip(PlatformWatchId.instagramDm),
-            onTap: () => context.push('/settings/instagram-limits?scope=dm'),
-          ),
-          const SizedBox(height: 8),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            value: dmFocus,
-            onChanged: onToggleDmFocus,
-            title: const Text('Instagram DM 집중 모드'),
-            subtitle: const Text('DM + 상대 프로필·포스트 · 탐색/홈 피드 차단'),
-          ),
-          const Spacer(),
+          const SizedBox(height: 12),
           FilledButton.icon(
             onPressed: onOpenDm,
             icon: const Icon(Icons.forum_outlined),
@@ -177,11 +165,34 @@ class _FeedTab extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
+          Text(
+            '시간 한도 없음 · 홈·탐색·릴스 탭은 자동 차단',
+            textAlign: TextAlign.center,
+            style: IsleText.caption(color: IsleColors.muted),
+          ),
+          const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: onOpenFeed,
             icon: const Icon(Icons.home_outlined),
-            label: const Text('인스타 피드 (전체)'),
+            label: Text('인스타 피드 · $feedChip'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 48),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: dmFocus,
+            onChanged: onToggleDmFocus,
+            title: const Text('DM 집중 모드'),
+            subtitle: const Text('DM + 상대 프로필·포스트 · 탐색/홈 피드 차단'),
+          ),
+          const Spacer(),
+          TextButton.icon(
+            onPressed: () => context.push('/home/my-isle/manage'),
+            icon: const Icon(Icons.tune),
+            label: const Text('릴스 숨기기 · 둠스크롤 멈춤'),
           ),
         ],
       ),

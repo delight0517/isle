@@ -45,12 +45,30 @@ class InstagramDmNavigationScript {
   }, true);
 
   var _lastPath = location.pathname;
-  setInterval(function() {
+  function onPathMaybeChanged() {
     if (location.pathname !== _lastPath) {
       _lastPath = location.pathname;
       if (isDmThreadPath(location.pathname)) rememberThread();
     }
-  }, 400);
+  }
+  window.addEventListener('popstate', onPathMaybeChanged);
+  try {
+    var _push = history.pushState;
+    history.pushState = function() {
+      var r = _push.apply(this, arguments);
+      setTimeout(onPathMaybeChanged, 0);
+      return r;
+    };
+    var _replace = history.replaceState;
+    history.replaceState = function() {
+      var r = _replace.apply(this, arguments);
+      setTimeout(onPathMaybeChanged, 0);
+      return r;
+    };
+  } catch (e) {}
+  setInterval(function() {
+    onPathMaybeChanged();
+  }, 1200);
 })();
 ''';
 
@@ -135,5 +153,4 @@ class InstagramDmNavigationScript {
   try { return sessionStorage.getItem('isle_ig_dm_thread_url') || ''; } catch (e) { return ''; }
 })();
 ''';
-
 }

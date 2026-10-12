@@ -8,6 +8,7 @@ import 'core/constants/app_build_config.dart';
 import 'core/constants/app_colors.dart';
 import 'core/constants/env.dart';
 import 'core/localization/app_strings.dart';
+import 'core/localization/app_locale_policy.dart';
 import 'core/localization/locale_controller.dart';
 import 'core/youtube/blocked_channel_sync_listener.dart';
 import 'router/app_router_light.dart';
@@ -25,7 +26,7 @@ class IsleLightApp extends ConsumerWidget {
       title: AppBuildConfig.appTitle,
       debugShowCheckedModeBanner: false,
       builder: (context, child) => AppVersionOverlay(lightMode: true, child: child),
-      locale: appLocale,
+      locale: appLocale ?? const Locale(AppLocalePolicy.defaultCode),
       supportedLocales: AppStrings.supportedLocales,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

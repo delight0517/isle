@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:isle/core/focus/kakao_shorts_addiction_analyzer.dart';
 import 'package:isle/core/focus/kakao_shorts_addiction_store.dart';
-import 'package:isle/core/focus/kakao_shorts_session.dart';
 
 void main() {
   setUpAll(() async {
@@ -23,7 +22,8 @@ void main() {
 
   test('long session elevates risk', () async {
     final now = DateTime.now();
-    final start = now.subtract(const Duration(minutes: 40)).millisecondsSinceEpoch;
+    final start =
+        now.subtract(const Duration(minutes: 40)).millisecondsSinceEpoch;
     final end = now.millisecondsSinceEpoch;
     final box = Hive.box<String>('isle_kakao_shorts');
     await box.put(

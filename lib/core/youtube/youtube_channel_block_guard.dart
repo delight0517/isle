@@ -1,4 +1,5 @@
 import '../utils/url_parser.dart';
+import 'youtube_link_canonical.dart';
 import 'block_keyword_policy.dart';
 import 'blocked_url_guard.dart';
 import 'models/blocked_channel.dart';
@@ -16,6 +17,7 @@ class YoutubeChannelBlockGuard {
     required List<String> keywords,
     List<BlockedUrl> blockedUrls = const [],
   }) {
+    url = YoutubeLinkCanonical.normalizeForBlockCheck(url);
     final urlHit = BlockedUrlGuard.match(url, blockedUrls);
     if (urlHit != null) {
       return YoutubeBlockHit(kind: YoutubeBlockKind.url, label: urlHit.label);
@@ -59,6 +61,9 @@ class YoutubeChannelBlockGuard {
     String videoTitle = '',
     String url = '',
   }) {
+    if (url.isNotEmpty) {
+      url = YoutubeLinkCanonical.normalizeForBlockCheck(url);
+    }
     if (url.isNotEmpty) {
       final urlHit = BlockedUrlGuard.match(url, blockedUrls);
       if (urlHit != null) {

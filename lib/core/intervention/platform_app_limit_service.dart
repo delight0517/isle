@@ -95,10 +95,27 @@ class PlatformAppLimitService {
         'scope': scope,
         'slots': ScheduleAppLimitSyncService.slotsToJson(slots),
       });
+      if (ok != true) {
+        final reason = await lastFailureReason();
+        IsleAppLogService.log(
+          'registerLimit FALSE ${rule.id} scope=$scope reason=$reason '
+          'win=${rule.windowMinutes}m limit=${rule.minutesPerWindow}m',
+          level: IsleLogLevel.warn,
+        );
+      }
       return ok == true;
     } catch (e, st) {
       IsleAppLogService.log('registerLimit scoped ${rule.id}: $e', level: IsleLogLevel.error, stack: st);
       return false;
+    }
+  }
+
+  /// 진단 — 네이티브 마지막 registerLimit 실패 사유
+  static Future<String> lastFailureReason() async {
+    try {
+      return await _channel.invokeMethod<String>('lastLimitFailureReason') ?? '';
+    } catch (_) {
+      return '';
     }
   }
 

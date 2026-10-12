@@ -11,7 +11,9 @@ import '../../../core/library/interest_pipeline_service.dart';
 import '../../../core/library/personal_library_store.dart';
 import '../../../core/services/isle_debug_log_service.dart';
 import '../../../core/focus/isle_product_focus.dart';
+import '../../../core/services/isle_survival_backup_service.dart';
 import '../../../core/services/isle_user_defaults.dart';
+import '../../../shared/widgets/survival_backup_guide_sheet.dart';
 import '../../ai/presentation/widgets/ai_activity_strip.dart';
 import '../../ai/presentation/widgets/ai_feed_transparency_strip.dart';
 import '../../guide/presentation/widgets/feed_setup_journey_banner.dart';
@@ -79,9 +81,18 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       await context.push('/app-tour');
     }
     if (!mounted) return;
+    await _maybeShowSurvivalBackupGuide();
+    if (!mounted) return;
     if (!IsleUserDefaults.hasSeenFeedSwipeCoach) {
       await FeedSwipeCoachOverlay.showIfNeeded(context);
     }
+  }
+
+  Future<void> _maybeShowSurvivalBackupGuide() async {
+    if (!Platform.isIOS) return;
+    if (IsleUserDefaults.survivalBackupGuideDismissed) return;
+    if (!IsleSurvivalBackupService.needsIcloudFolderPrompt()) return;
+    await showSurvivalBackupGuideSheet(context);
   }
 
   void _showCrashBannerIfNeeded() {
@@ -160,6 +171,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             await IsleUserDefaults.setInsightTypographyFeed(v);
             setState(() => _typographyFeed = v);
           })),
+          const SliverToBoxAdapter(child: _BlockChatHomeCard()),
           if (!feedEmpty) ...[
             const IsleFocusTrioBanner(),
             const SliverToBoxAdapter(child: YoutubeSetupHomeCard()),
@@ -403,6 +415,76 @@ class _KnowledgeFeedBanner extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 메인 피드 홈 — 채팅으로 차단·한도 설정 진입 카드
+class _BlockChatHomeCard extends StatelessWidget {
+  const _BlockChatHomeCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => context.push('/settings/block-chat'),
+          child: Ink(
+            padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF2E7D32).withValues(alpha: 0.24),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.chat_bubble_outline,
+                      color: Colors.white, size: 21),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('채팅으로 차단 설정',
+                          style: IsleText.subtitle(color: Colors.white)
+                              .copyWith(fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 3),
+                      Text(
+                        '"매일 9시까지 유튜브·Safari 막아줘" — 확인만 누르면 적용',
+                        style: IsleText.caption(
+                            color: Colors.white.withValues(alpha: 0.82)),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios,
+                    color: Colors.white.withValues(alpha: 0.7), size: 15),
+              ],
+            ),
+          ),
         ),
       ),
     );

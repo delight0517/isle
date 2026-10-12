@@ -38,7 +38,6 @@ class _AppUsageLimitsScreenState extends State<AppUsageLimitsScreen> {
   int _scheduleSelectionCats = 0;
   Timer? _freezeWake;
   Duration? _freezeRemaining;
-  int _freezeMinutes = 30;
 
   @override
   void initState() {
@@ -117,11 +116,8 @@ class _AppUsageLimitsScreenState extends State<AppUsageLimitsScreen> {
     return p == 'instagram' || label.contains('instagram') || pkg.contains('com.instagram');
   }
 
-  bool get _isInstagramSettingsFrozen => _freezeRemaining != null;
-
   void _syncFreezeState() {
     _freezeRemaining = IsleUserDefaults.instagramBlockSettingsUnlockRemaining;
-    _freezeMinutes = IsleUserDefaults.instagramBlockSettingsFreezeMinutes;
     if (_freezeRemaining == null &&
         IsleUserDefaults.instagramBlockSettingsUnlockStartedAtMs != null) {
       unawaited(IsleUserDefaults.clearInstagramBlockSettingsFreezeCountdown());
@@ -138,16 +134,6 @@ class _AppUsageLimitsScreenState extends State<AppUsageLimitsScreen> {
       setState(_syncFreezeState);
       _scheduleFreezeWake();
     });
-  }
-
-  Future<void> _startFreezeUnlock() async {
-    await IsleUserDefaults.startInstagramBlockSettingsFreezeCountdown();
-    if (!mounted) return;
-    setState(_syncFreezeState);
-    _scheduleFreezeWake();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('잠금 해제 대기 시작 · $_freezeMinutes분 후 편집 가능')),
-    );
   }
 
   String _formatDuration(Duration d) {

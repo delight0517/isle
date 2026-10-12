@@ -87,7 +87,7 @@ class _CompactChip extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           Text(
-            isOs ? 'OS 강제 차단' : '보조 차단',
+            isOs ? 'OS 보조 차단' : '보조 차단',
             style: IsleText.caption(
               color: isOs ? IsleColors.ocean700 : IsleColors.ocean900,
             ).copyWith(fontSize: 11),
@@ -106,7 +106,7 @@ class _EnforcementChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (text, color) = switch (level) {
-      BlockEnforcement.osEnforced => ('OS 강제', IsleColors.ocean700),
+      BlockEnforcement.osEnforced => ('시스템 수준', IsleColors.ocean700),
       BlockEnforcement.bestEffort => ('보조', IsleColors.gold500),
       BlockEnforcement.unsupported => ('미지원', IsleColors.muted),
     };

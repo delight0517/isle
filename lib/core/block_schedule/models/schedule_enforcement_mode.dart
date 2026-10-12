@@ -28,13 +28,9 @@ extension ScheduleEnforcementModeX on ScheduleEnforcementMode {
   /// Korean default — prefer [localizedLabel] with [ScheduleStrings].
   String get label => localizedLabel('ko');
 
-  String get subtitle => localizedSubtitle('ko');
-
   String get scenarioText => localizedScenario('ko');
 
   String localizedLabel(String lang) => ScheduleStrings(lang).modeLabel(this);
-
-  String localizedSubtitle(String lang) => ScheduleStrings(lang).modeSubtitle(this);
 
   String localizedScenario(String lang) => ScheduleStrings(lang).modeScenario(this);
 

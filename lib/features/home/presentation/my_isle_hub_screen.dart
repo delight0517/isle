@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../../core/localization/moa_strings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/platform/platform_block_intent.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/explorer/safari_web_config.dart';
 import '../../../core/insight/knowledge_visual_system.dart';
@@ -12,7 +14,10 @@ import '../../../core/library/my_isle_content_groups.dart';
 import '../../../core/library/models/library_entry.dart';
 import '../../../core/library/personal_library_store.dart';
 import '../../../core/navigation/center_nav_long_press.dart';
+import '../../../core/social/instagram_web_config.dart';
 import '../../../core/youtube/youtube_clipboard_watch.dart';
+import '../../../core/youtube/youtube_content_open_guard.dart';
+import '../../../core/youtube/youtube_url_redirect.dart';
 import '../../../shared/widgets/isle_app_bar.dart';
 import 'widgets/my_isle_entry_tile.dart';
 import 'widgets/my_isle_hub_extras.dart';
@@ -36,11 +41,31 @@ class _MyIsleHubScreenState extends ConsumerState<MyIsleHubScreen> {
 
   void _openEntry(LibraryEntry e) {
     if (e.url.isEmpty) return;
-    if (e.sourceType == 'youtube' || e.url.contains('youtube.com') || e.url.contains('youtu.be')) {
-      context.push('/youtube/podcast?url=${Uri.encodeComponent(e.url)}');
+    final isYoutube = e.sourceType == 'youtube' ||
+        e.url.contains('youtube.com') ||
+        e.url.contains('youtu.be');
+    if (isYoutube) {
+      if (!YoutubeContentOpenGuard.showDenialOrAllow(
+        context,
+        url: e.url,
+        channelId: e.channelId,
+        channelName: e.channelName,
+        videoTitle: e.title,
+      )) {
+        return;
+      }
+      final route = YoutubeUrlRedirect.inAppRoute(e.url) ??
+          '/youtube/podcast?url=${Uri.encodeComponent(e.url)}';
+      context.push(route);
       return;
     }
-    context.push('/viewer?url=${Uri.encodeComponent(e.url)}&title=${Uri.encodeComponent(e.title)}');
+    final q = [
+      'url=${Uri.encodeComponent(e.url)}',
+      'title=${Uri.encodeComponent(e.title)}',
+      if (e.channelId.isNotEmpty) 'channelId=${Uri.encodeComponent(e.channelId)}',
+      if (e.channelName.isNotEmpty) 'channelName=${Uri.encodeComponent(e.channelName)}',
+    ].join('&');
+    context.push('/viewer?$q');
   }
 
   @override
@@ -50,7 +75,7 @@ class _MyIsleHubScreenState extends ConsumerState<MyIsleHubScreen> {
 
     return Scaffold(
       backgroundColor: IsleColors.sand100,
-      appBar: const IsleAppBar(title: '나의 Isle'),
+      appBar: IsleAppBar(title: MoaStrings.of(context).t('my_moa')),
       body: RefreshIndicator(
         onRefresh: () => ref.read(personalLibraryProvider.notifier).reload(),
         child: ListView(
@@ -62,11 +87,13 @@ class _MyIsleHubScreenState extends ConsumerState<MyIsleHubScreen> {
             const SizedBox(height: 12),
             const MyIsleYoutubeTimeCard(),
             const SizedBox(height: 10),
+            const MyIsleInstagramTimeCard(),
+            const SizedBox(height: 10),
             const MyIsleWatchLaterCard(),
             const SizedBox(height: 10),
             const KakaoFreezePromoCard(),
             const SizedBox(height: 16),
-            Text('바로 열기', style: IsleText.subtitle(color: IsleColors.ocean900)),
+            Text(MoaStrings.of(context).t('quick_open'), style: IsleText.subtitle(color: IsleColors.ocean900)),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -74,7 +101,7 @@ class _MyIsleHubScreenState extends ConsumerState<MyIsleHubScreen> {
                   child: _QuickOpenCard(
                     icon: Icons.explore_outlined,
                     color: const Color(0xFF0A84FF),
-                    label: 'Safari',
+                    label: PlatformBlockCopy.inAppBrowserNavLabel,
                     subtitle: '앱 안 브라우저',
                     onTap: () => SafariWebConfig.open(context),
                     onLongPress: () => SafariWebConfig.showUrlSheet(context),
@@ -100,9 +127,33 @@ class _MyIsleHubScreenState extends ConsumerState<MyIsleHubScreen> {
                     icon: Icons.play_circle,
                     color: const Color(0xFFFF0000),
                     label: 'YouTube',
-                    subtitle: '길게: DM·선택',
+                    subtitle: '시청 · 한도',
                     onTap: () => openCenterNavYoutube(context),
                     onLongPress: () => handleCenterNavLongPress(context),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: _QuickOpenCard(
+                    icon: Icons.camera_alt_outlined,
+                    color: const Color(0xFFE1306C),
+                    label: '인스타 피드',
+                    subtitle: '한도 적용',
+                    onTap: () => context.push(InstagramWebConfig.dmBrowserRoute(dmOnly: false)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _QuickOpenCard(
+                    icon: Icons.forum_outlined,
+                    color: const Color(0xFFC13584),
+                    label: '인스타 DM',
+                    subtitle: '무제한',
+                    onTap: () => context.push(InstagramWebConfig.dmBrowserRoute(dmOnly: true)),
                   ),
                 ),
               ],
@@ -122,7 +173,7 @@ class _MyIsleHubScreenState extends ConsumerState<MyIsleHubScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => SafariWebConfig.showUrlSheet(context),
                     icon: const Icon(Icons.link),
-                    label: const Text('Safari 주소'),
+                    label: const Text('웹 주소 입력'),
                   ),
                 ),
               ],

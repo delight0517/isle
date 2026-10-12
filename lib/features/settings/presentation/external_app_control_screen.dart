@@ -3,7 +3,6 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/blocking/blocking_controller.dart';
 import '../../../core/blocking/blocking_controller_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
@@ -20,7 +19,8 @@ class ExternalAppControlScreen extends StatefulWidget {
   const ExternalAppControlScreen({super.key});
 
   @override
-  State<ExternalAppControlScreen> createState() => _ExternalAppControlScreenState();
+  State<ExternalAppControlScreen> createState() =>
+      _ExternalAppControlScreenState();
 }
 
 class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
@@ -117,7 +117,8 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
         onPressed: IosScreenTimeService.openScreenTimeSettings,
       );
     } else if (result.isSimulator) {
-      action = SnackBarAction(label: '확인', onPressed: messenger.hideCurrentSnackBar);
+      action =
+          SnackBarAction(label: '확인', onPressed: messenger.hideCurrentSnackBar);
     }
     messenger.showSnackBar(
       SnackBar(
@@ -185,7 +186,8 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('다른 앱 차단·한도', style: IsleText.subtitle(color: IsleColors.ocean900)),
+        title: Text('다른 앱 차단·한도',
+            style: IsleText.subtitle(color: IsleColors.ocean900)),
       ),
       body: _busy
           ? const Center(child: CircularProgressIndicator())
@@ -230,8 +232,10 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
                   ),
                   if (ExternalAppShieldStore.hasSelection)
                     ListTile(
-                      leading: const Icon(Icons.remove_circle_outline, color: IsleColors.danger),
-                      title: Text('선택 초기화', style: IsleText.body(color: IsleColors.danger)),
+                      leading: const Icon(Icons.remove_circle_outline,
+                          color: IsleColors.danger),
+                      title: Text('선택 초기화',
+                          style: IsleText.body(color: IsleColors.danger)),
                       onTap: () => _run(() async {
                         await AppInterventionService.clearAppShield();
                         await ExternalAppShieldStore.clearSelection();
@@ -242,13 +246,17 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
                     icon: Icons.track_changes,
                     title: '브라우저 유튜브 → Isle 트래킹',
                     subtitle: 'Safari·Chrome 차단 후 WebView에서 시청·시간 기록',
-                    onTap: () => context.push('/settings/browser-youtube-tracking'),
+                    onTap: () =>
+                        context.push('/settings/browser-youtube-tracking'),
                   ),
                   OutlinedButton.icon(
-                    onPressed: () => IosScreenTimeService.openScreenTimeSettings(),
+                    onPressed: () =>
+                        IosScreenTimeService.openScreenTimeSettings(),
                     icon: const Icon(Icons.open_in_new, size: 18),
                     label: Text(
-                      Platform.isMacOS ? 'macOS Screen Time 열기' : 'iOS 스크린 타임 열기',
+                      Platform.isMacOS
+                          ? 'macOS Screen Time 열기'
+                          : 'iOS 스크린 타임 열기',
                     ),
                   ),
                 ] else if (isAndroid) ...[
@@ -285,8 +293,10 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
                   ),
                   if (ExternalAppShieldStore.hasSelection)
                     ListTile(
-                      leading: const Icon(Icons.remove_circle_outline, color: IsleColors.danger),
-                      title: Text('선택 초기화', style: IsleText.body(color: IsleColors.danger)),
+                      leading: const Icon(Icons.remove_circle_outline,
+                          color: IsleColors.danger),
+                      title: Text('선택 초기화',
+                          style: IsleText.body(color: IsleColors.danger)),
                       onTap: () => _run(() async {
                         await AppInterventionService.clearAppShield();
                         await ExternalAppShieldStore.clearSelection();
@@ -337,7 +347,8 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.shield_outlined, color: Colors.white.withValues(alpha: 0.9), size: 32),
+          Icon(Icons.shield_outlined,
+              color: Colors.white.withValues(alpha: 0.9), size: 32),
           const SizedBox(height: 10),
           Text(
             'Isle 밖 앱도 통제',
@@ -365,9 +376,8 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
       ScreenTimeAuthStatus.approved => '권한 승인됨 — 아래에서 앱 선택',
       ScreenTimeAuthStatus.denied => '거부됨 — 설정 → 스크린 타임',
       ScreenTimeAuthStatus.notDetermined => '권한 필요 (6VPN과 같이 시스템 창이 뜹니다)',
-      ScreenTimeAuthStatus.unavailable => avail
-          ? '상태 확인 중…'
-          : 'Family Controls 미포함 빌드',
+      ScreenTimeAuthStatus.unavailable =>
+        avail ? '상태 확인 중…' : 'Family Controls 미포함 빌드',
     };
 
     return Card(
@@ -388,7 +398,8 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Screen Time', style: IsleText.subtitle()),
-                      Text(statusText, style: IsleText.caption(color: IsleColors.muted)),
+                      Text(statusText,
+                          style: IsleText.caption(color: IsleColors.muted)),
                     ],
                   ),
                 ),
@@ -495,7 +506,8 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
           if (p.suggestScheduleName != null && mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('「${p.suggestScheduleName}」 스케줄을 차단 스케줄에서 추가해 보세요'),
+                content:
+                    Text('「${p.suggestScheduleName}」 스케줄을 차단 스케줄에서 추가해 보세요'),
                 action: SnackBarAction(
                   label: '열기',
                   onPressed: () => context.push('/settings/block-schedules'),
@@ -519,7 +531,8 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
                   children: [
                     Text(p.title, style: IsleText.subtitle()),
                     const SizedBox(height: 4),
-                    Text(p.detail, style: IsleText.caption(color: IsleColors.muted)),
+                    Text(p.detail,
+                        style: IsleText.caption(color: IsleColors.muted)),
                   ],
                 ),
               ),
@@ -542,7 +555,8 @@ class _ExternalAppControlScreenState extends State<ExternalAppControlScreen> {
       child: ListTile(
         leading: Icon(icon, color: IsleColors.ocean500),
         title: Text(title, style: IsleText.body()),
-        subtitle: Text(subtitle, style: IsleText.caption(color: IsleColors.muted)),
+        subtitle:
+            Text(subtitle, style: IsleText.caption(color: IsleColors.muted)),
         trailing: const Icon(Icons.chevron_right, color: IsleColors.muted),
         onTap: onTap,
       ),

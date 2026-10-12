@@ -61,7 +61,8 @@ class IosScreenTimeService {
   static Future<bool?> hasFamilyControlsEntitlement() async {
     if (!isSupported) return null;
     try {
-      final v = await _channel.invokeMethod<bool>('hasFamilyControlsEntitlement');
+      final v =
+          await _channel.invokeMethod<bool>('hasFamilyControlsEntitlement');
       return v;
     } catch (_) {
       return null;
@@ -117,7 +118,8 @@ class IosScreenTimeService {
               '앱 서명에 Family Controls 권한이 빠져 있어요. Apple Developer에서 Capability를 켜고 프로비저닝 프로파일을 다시 발급한 뒤 재설치해 주세요.',
         );
       }
-      final raw = await _channel.invokeMethod<dynamic>('requestAuthorizationDetailed');
+      final raw =
+          await _channel.invokeMethod<dynamic>('requestAuthorizationDetailed');
       if (raw is Map) {
         final map = Map<String, dynamic>.from(raw);
         var ok = map['ok'] == true;
@@ -130,11 +132,13 @@ class IosScreenTimeService {
           // iOS helper(XPC) restart race: 짧게 대기 후 1회 재시도.
           await Future<void>.delayed(const Duration(milliseconds: 450));
           try {
-            final retryRaw = await _channel.invokeMethod<dynamic>('requestAuthorizationDetailed');
+            final retryRaw = await _channel
+                .invokeMethod<dynamic>('requestAuthorizationDetailed');
             if (retryRaw is Map) {
               final retryMap = Map<String, dynamic>.from(retryRaw);
               ok = retryMap['ok'] == true;
-              status = _parseStatus(retryMap['status']?.toString()) ?? await authorizationStatus();
+              status = _parseStatus(retryMap['status']?.toString()) ??
+                  await authorizationStatus();
               code = retryMap['code']?.toString();
               message = retryMap['message']?.toString();
               IsleAppLogService.log(
@@ -150,7 +154,8 @@ class IosScreenTimeService {
           }
         }
 
-        final res = ScreenTimeAuthResult(ok: ok, status: status, code: code, message: message);
+        final res = ScreenTimeAuthResult(
+            ok: ok, status: status, code: code, message: message);
         IsleAppLogService.log(
           'Screen Time auth: status=$status ok=$ok code=${res.code} msg=${res.message}',
         );
@@ -186,7 +191,8 @@ class IosScreenTimeService {
         message: e.message ?? '권한 요청에 실패했어요.',
       );
     } catch (e, st) {
-      IsleAppLogService.log('Screen Time auth failed: $e', level: IsleLogLevel.error, stack: st);
+      IsleAppLogService.log('Screen Time auth failed: $e',
+          level: IsleLogLevel.error, stack: st);
       final status = await authorizationStatus();
       return ScreenTimeAuthResult(
         ok: false,
@@ -236,19 +242,45 @@ class IosScreenTimeService {
   static Future<void> applyMergedShield(List<String> domains) async {
     if (!isSupported || domains.isEmpty) return;
     try {
-      await _channel.invokeMethod<bool>('applyScheduleWebDomains', {'domains': domains});
+      await _channel
+          .invokeMethod<bool>('applyScheduleWebDomains', {'domains': domains});
     } catch (e, st) {
-      IsleAppLogService.log('applyScheduleWebDomains: $e', level: IsleLogLevel.error, stack: st);
+      IsleAppLogService.log('applyScheduleWebDomains: $e',
+          level: IsleLogLevel.error, stack: st);
     }
   }
 
   static Future<bool> applyAppShield({required String encoded}) async {
     if (!isSupported || encoded.isEmpty) return false;
     try {
-      final v = await _channel.invokeMethod<bool>('applyAppShield', {'encoded': encoded});
+      final v = await _channel
+          .invokeMethod<bool>('applyAppShield', {'encoded': encoded});
       return v == true;
     } catch (e, st) {
-      IsleAppLogService.log('applyAppShield: $e', level: IsleLogLevel.error, stack: st);
+      IsleAppLogService.log('applyAppShield: $e',
+          level: IsleLogLevel.error, stack: st);
+      return false;
+    }
+  }
+
+  /// "올나이트 록다운" — 개별 앱 선택과 별개로 설치된 앱 전체를 카테고리
+  /// 단위로 쉴드한다. 켜져 있는 록다운 스케줄이 하나도 없으면 `enable:false`로
+  /// 호출해 반드시 꺼야 한다(2026-[REDACTED] 신설).
+  static Future<bool> applyLockdownShield(
+    bool enable, {
+    String? allowedAppsEncoded,
+  }) async {
+    if (!isSupported) return false;
+    try {
+      final v = await _channel.invokeMethod<bool>('applyLockdownShield', {
+        'enable': enable,
+        if (allowedAppsEncoded != null)
+          'allowedAppsEncoded': allowedAppsEncoded,
+      });
+      return v == true;
+    } catch (e, st) {
+      IsleAppLogService.log('applyLockdownShield: $e',
+          level: IsleLogLevel.error, stack: st);
       return false;
     }
   }
@@ -267,22 +299,26 @@ class IosScreenTimeService {
   static Future<void> saveScheduleSelection({
     required String scheduleId,
     required String encoded,
+    String? bundleId,
   }) async {
     if (!isSupported || scheduleId.isEmpty || encoded.isEmpty) return;
     try {
       await _channel.invokeMethod<bool>('saveScheduleSelection', {
         'scheduleId': scheduleId,
         'encoded': encoded,
+        if (bundleId != null && bundleId.isNotEmpty) 'bundleId': bundleId,
       });
     } catch (e, st) {
-      IsleAppLogService.log('saveScheduleSelection: $e', level: IsleLogLevel.warn, stack: st);
+      IsleAppLogService.log('saveScheduleSelection: $e',
+          level: IsleLogLevel.warn, stack: st);
     }
   }
 
   static Future<void> saveGlobalFallbackSelection(String encoded) async {
     if (!isSupported || encoded.isEmpty) return;
     try {
-      await _channel.invokeMethod<bool>('saveGlobalFallbackSelection', {'encoded': encoded});
+      await _channel.invokeMethod<bool>(
+          'saveGlobalFallbackSelection', {'encoded': encoded});
     } catch (_) {}
   }
 
@@ -290,18 +326,24 @@ class IosScreenTimeService {
     required List<String> scheduleIds,
     required List<String> domains,
     String? fallbackEncoded,
+    bool lockdownActive = false,
+    String? lockdownAllowedAppsEncoded,
   }) async {
     if (!isSupported) return false;
     try {
       final v = await _channel.invokeMethod<bool>('applyActiveScheduleShield', {
         'scheduleIds': scheduleIds,
         'domains': domains,
+        'lockdownActive': lockdownActive,
+        if (lockdownAllowedAppsEncoded != null)
+          'lockdownAllowedAppsEncoded': lockdownAllowedAppsEncoded,
         if (fallbackEncoded != null && fallbackEncoded.isNotEmpty)
           'fallbackEncoded': fallbackEncoded,
       });
       return v == true;
     } catch (e, st) {
-      IsleAppLogService.log('applyActiveScheduleShield: $e', level: IsleLogLevel.error, stack: st);
+      IsleAppLogService.log('applyActiveScheduleShield: $e',
+          level: IsleLogLevel.error, stack: st);
       return false;
     }
   }
@@ -319,7 +361,8 @@ class IosScreenTimeService {
       final v = await _channel.invokeMethod<bool>('syncShieldFromSnapshot');
       return v == true;
     } catch (e, st) {
-      IsleAppLogService.log('syncShieldFromSnapshot: $e', level: IsleLogLevel.warn, stack: st);
+      IsleAppLogService.log('syncShieldFromSnapshot: $e',
+          level: IsleLogLevel.warn, stack: st);
       return false;
     }
   }
@@ -327,6 +370,7 @@ class IosScreenTimeService {
   static Future<IosFamilyActivityPickResult?> pickFamilyActivitySelection({
     String? existingEncoded,
     bool additiveOnly = false,
+    String purpose = 'block',
   }) async {
     if (!isSupported) return null;
     try {
@@ -336,13 +380,16 @@ class IosScreenTimeService {
           if (existingEncoded != null && existingEncoded.isNotEmpty)
             'existingEncoded': existingEncoded,
           'additiveOnly': additiveOnly,
+          'purpose': purpose,
         },
       );
       if (raw == null) return null;
       if (raw is! Map) return null;
-      return IosFamilyActivityPickResult.fromMap(Map<String, dynamic>.from(raw));
+      return IosFamilyActivityPickResult.fromMap(
+          Map<String, dynamic>.from(raw));
     } catch (e, st) {
-      IsleAppLogService.log('pickFamilyActivitySelection: $e', level: IsleLogLevel.error, stack: st);
+      IsleAppLogService.log('pickFamilyActivitySelection: $e',
+          level: IsleLogLevel.error, stack: st);
       return null;
     }
   }
@@ -355,7 +402,8 @@ class IosScreenTimeService {
   }
 
   /// OS `webContent.blockedByFilter`는 Isle WKWebView까지 막음 — 적용하지 않고 해제만.
-  @Deprecated('Use clearAllWebContentFilters + app shield / Safari Content Blocker')
+  @Deprecated(
+      'Use clearAllWebContentFilters + app shield / Safari Content Blocker')
   static Future<bool> applyYoutubeWebDomainBlock() async {
     await clearAllWebContentFilters();
     return false;
@@ -371,7 +419,8 @@ class IosScreenTimeService {
     try {
       await _channel.invokeMethod<void>('clearAllWebContentFilters');
     } catch (e, st) {
-      IsleAppLogService.log('clearAllWebContentFilters: $e', level: IsleLogLevel.error, stack: st);
+      IsleAppLogService.log('clearAllWebContentFilters: $e',
+          level: IsleLogLevel.error, stack: st);
     }
   }
 

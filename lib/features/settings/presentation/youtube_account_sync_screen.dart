@@ -12,6 +12,7 @@ import '../../../core/library/models/youtube_playlist_summary.dart';
 import '../../../core/library/personal_library_store.dart';
 import '../../../core/library/youtube_account_sync_service.dart';
 import '../../../core/library/youtube_library_service.dart';
+import '../../../core/services/isle_error_feedback.dart';
 import '../../../core/services/isle_user_defaults.dart';
 import '../../feed/providers/feed_provider.dart';
 
@@ -20,22 +21,25 @@ class YoutubeAccountSyncScreen extends ConsumerStatefulWidget {
   const YoutubeAccountSyncScreen({super.key});
 
   @override
-  ConsumerState<YoutubeAccountSyncScreen> createState() => _YoutubeAccountSyncScreenState();
+  ConsumerState<YoutubeAccountSyncScreen> createState() =>
+      _YoutubeAccountSyncScreenState();
 }
 
-class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScreen> {
+class _YoutubeAccountSyncScreenState
+    extends ConsumerState<YoutubeAccountSyncScreen> {
   bool _busy = false;
   String? _status;
   bool _auto = IsleUserDefaults.youtubeAccountAutoSync;
-  bool _wlLib = IsleUserDefaults.youtubeSyncWatchLaterToLibrary;
-  bool _wlQueue = IsleUserDefaults.shareQueueSyncWatchLater;
   List<YoutubePlaylistSummary> _playlists = const [];
-  Set<String> _selectedPlaylistIds = {...IsleUserDefaults.youtubeSyncPlaylistIds};
+  Set<String> _selectedPlaylistIds = {
+    ...IsleUserDefaults.youtubeSyncPlaylistIds
+  };
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _loadPlaylistsIfSignedIn());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _loadPlaylistsIfSignedIn());
   }
 
   Future<void> _loadPlaylistsIfSignedIn() async {
@@ -44,9 +48,10 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
       final list = await YoutubeLibraryService.fetchMyPlaylists();
       if (!mounted) return;
       setState(() => _playlists = list);
-    } catch (e) {
+    } catch (e, st) {
       if (!mounted) return;
-      setState(() => _status = e.toString());
+      setState(() => _status = IsleErrorFeedback.friendly(e));
+      IsleErrorFeedback.log('youtube_account_playlists', e, stack: st);
     }
   }
 
@@ -107,12 +112,11 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
 
   String _formatSyncResult(YoutubeAccountSyncResult r, {String prefix = ''}) {
     if (r.skipped) return '$prefix${r.message ?? ''}';
-    if (r.message != null && r.totalNew == 0 && r.watchLaterCount == 0) {
+    if (r.message != null && r.totalNew == 0 && r.playlistVideosCount == 0) {
       return '$prefix${r.message}';
     }
-    return '$prefix나중에 볼 ${r.watchLaterCount}개 (새 ${r.watchLaterNew}) · '
-        '플레이리스트 ${r.playlistVideosCount}개 (새 ${r.playlistVideosNew})'
-        '${r.queueAdded > 0 ? ' · 공유 큐 +${r.queueAdded}' : ''}';
+    return '$prefix플레이리스트 ${r.playlistVideosCount}개 (새 ${r.playlistVideosNew})'
+        '${r.message == null ? '' : ' · ${r.message}'}';
   }
 
   String? _lastSyncLabel() {
@@ -124,7 +128,9 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
   }
 
   Future<void> _exportWatchLaterJson() async {
-    final entries = PersonalLibraryStore.loadEntries().where((e) => e.origin == 'watch_later').toList();
+    final entries = PersonalLibraryStore.loadEntries()
+        .where((e) => e.origin == 'watch_later')
+        .toList();
     final payload = entries.map((e) => e.toJson()).toList();
     final text = const JsonEncoder.withIndent('  ').convert(payload);
     await Clipboard.setData(ClipboardData(text: text));
@@ -145,7 +151,12 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
         title: Text('YouTube 계정 동기화', style: IsleText.subtitle()),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(IsleSize.screenPadding),
+        padding: EdgeInsets.fromLTRB(
+          IsleSize.screenPadding,
+          IsleSize.screenPadding,
+          IsleSize.screenPadding,
+          IsleSize.scrollBottomPadding(context),
+        ),
         children: [
           Card(
             color: IsleColors.ocean100.withValues(alpha: 0.4),
@@ -154,13 +165,14 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('내 계정만 연결', style: IsleText.subtitle(color: IsleColors.ocean900)),
+                  Text('내 계정의 지원 목록 연결',
+                      style: IsleText.subtitle(color: IsleColors.ocean900)),
                   const SizedBox(height: 8),
                   Text(
-                    'Google로 로그인하면 YouTube Data API로 '
-                    '「나중에 볼」과 선택한 플레이리스트가 Isle에 저장돼요. '
-                    '영상마다 제목·URL·채널·썸네일이 JSON으로 쌓입니다.',
-                    style: IsleText.body(color: IsleColors.muted).copyWith(height: 1.45),
+                    'Google로 로그인하면 선택한 일반 플레이리스트 항목을 MOA에 저장해요. '
+                    'Watch Later와 계정 전체 시청 기록은 공식 API에서 제공되지 않습니다.',
+                    style: IsleText.body(color: IsleColors.muted)
+                        .copyWith(height: 1.45),
                   ),
                 ],
               ),
@@ -172,7 +184,7 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
             title: Text(account?.email ?? '로그인 안 됨', style: IsleText.body()),
             subtitle: Text(
               account != null
-                  ? '이 계정의 나중에 볼·플레이리스트만 가져옵니다'
+                  ? '이 계정의 선택한 일반 플레이리스트를 가져옵니다'
                   : YoutubeLibraryService.setupHint,
               style: IsleText.caption(color: IsleColors.muted),
             ),
@@ -181,13 +193,15 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
                     onPressed: _busy ? null : _signIn,
                     child: const Text('Google 로그인'),
                   )
-                : TextButton(onPressed: _busy ? null : _signOut, child: const Text('로그아웃')),
+                : TextButton(
+                    onPressed: _busy ? null : _signOut,
+                    child: const Text('로그아웃')),
           ),
           if (account != null) ...[
             const SizedBox(height: 8),
             Row(
               children: [
-                _statChip('라이브러리 나중에 볼', '$wlCount개'),
+                _statChip('저장된 Watch Later 항목', '$wlCount개'),
                 const SizedBox(width: 8),
                 if (lastSync != null) _statChip('마지막 동기화', lastSync),
               ],
@@ -202,7 +216,8 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
                     ? const SizedBox(
                         width: 18,
                         height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
                       )
                     : const Icon(Icons.sync),
                 label: const Text('지금 동기화'),
@@ -211,9 +226,9 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
             const SizedBox(height: 12),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: Text('자동 동기화 (3시간)', style: IsleText.body()),
+              title: Text('자동 동기화 (앱 복귀 시, 3시간 간격)', style: IsleText.body()),
               subtitle: Text(
-                '앱을 다시 열 때 오래됐으면 한 번 가져옵니다',
+                '앱을 다시 열었을 때 마지막 동기화가 3시간 이상 지났으면 가져옵니다. iOS가 앱을 닫은 동안 실행하는 백그라운드 동기화는 아닙니다.',
                 style: IsleText.caption(color: IsleColors.muted),
               ),
               value: _auto,
@@ -224,27 +239,15 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
                       setState(() => _auto = v);
                     },
             ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text('나중에 볼 → 내 콘텐츠', style: IsleText.body()),
-              value: _wlLib,
-              onChanged: _busy
-                  ? null
-                  : (v) async {
-                      await IsleUserDefaults.setYoutubeSyncWatchLaterToLibrary(v);
-                      setState(() => _wlLib = v);
-                    },
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text('나중에 볼 → 공유 큐 (CC·기사)', style: IsleText.body()),
-              value: _wlQueue,
-              onChanged: _busy
-                  ? null
-                  : (v) async {
-                      await IsleUserDefaults.setShareQueueSyncWatchLater(v);
-                      setState(() => _wlQueue = v);
-                    },
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  'Watch Later와 YouTube 계정 전체 시청 기록은 공식 YouTube API에서 제공되지 않아 자동 가져오기를 할 수 없어요. MOA 안에서 재생한 시청 기록은 이 기기에 자동 저장됩니다.',
+                  style: IsleText.caption(color: IsleColors.muted)
+                      .copyWith(height: 1.4),
+                ),
+              ),
             ),
             const SizedBox(height: 8),
             OutlinedButton.icon(
@@ -253,10 +256,10 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
               label: const Text('나중에 볼 데이터 JSON 복사'),
             ),
             const SizedBox(height: 20),
-            Text('동기화할 플레이리스트', style: IsleText.subtitle()),
+            Text('동기화할 일반 플레이리스트', style: IsleText.subtitle()),
             const SizedBox(height: 6),
             Text(
-              '체크한 목록의 영상이 「내 콘텐츠」에 쌓입니다. 나중에 볼(WL)은 위 스위치로.',
+              '체크한 일반 목록의 영상이 「내 콘텐츠」에 쌓입니다.',
               style: IsleText.caption(color: IsleColors.muted),
             ),
             const SizedBox(height: 8),
@@ -280,7 +283,8 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
                           } else {
                             next.remove(p.id);
                           }
-                          await IsleUserDefaults.setYoutubeSyncPlaylistIds(next.toList());
+                          await IsleUserDefaults.setYoutubeSyncPlaylistIds(
+                              next.toList());
                           setState(() => _selectedPlaylistIds = next);
                         },
                   title: Text(p.title, style: IsleText.body()),
@@ -288,7 +292,8 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
                     '${p.itemCount}개 · ${p.privacyStatus ?? 'unknown'}',
                     style: IsleText.caption(color: IsleColors.muted),
                   ),
-                  secondary: const Icon(Icons.playlist_play, color: Color(0xFFFF0000)),
+                  secondary:
+                      const Icon(Icons.playlist_play, color: Color(0xFFFF0000)),
                 );
               }),
             const SizedBox(height: 12),
@@ -320,7 +325,8 @@ class _YoutubeAccountSyncScreenState extends ConsumerState<YoutubeAccountSyncScr
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label, style: IsleText.caption(color: IsleColors.muted)),
-            Text(value, style: IsleText.body().copyWith(fontWeight: FontWeight.w600)),
+            Text(value,
+                style: IsleText.body().copyWith(fontWeight: FontWeight.w600)),
           ],
         ),
       ),

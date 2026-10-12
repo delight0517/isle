@@ -15,7 +15,8 @@ class PlatformWatchLimitOverlay extends StatefulWidget {
   final PlatformWatchId platform;
 
   @override
-  State<PlatformWatchLimitOverlay> createState() => _PlatformWatchLimitOverlayState();
+  State<PlatformWatchLimitOverlay> createState() =>
+      _PlatformWatchLimitOverlayState();
 }
 
 class _PlatformWatchLimitOverlayState extends State<PlatformWatchLimitOverlay> {
@@ -65,27 +66,17 @@ class _PlatformWatchLimitOverlayState extends State<PlatformWatchLimitOverlay> {
                 ),
                 const SizedBox(height: 20),
                 FilledButton(
-                  onPressed: () => IsleNavigation.pop(null, context),
+                  onPressed: () => IsleNavigation.pop(from: context),
                   child: const Text('나가기'),
                 ),
-                if (widget.platform == PlatformWatchId.instagram &&
-                    !PlatformWatchLimitStore.isLimitReached(PlatformWatchId.instagramDm)) ...[
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    onPressed: () => context.push('/social/instagram'),
-                    icon: const Icon(Icons.forum_outlined),
-                    label: const Text('DM은 별도 한도'),
-                  ),
-                ],
-                if (widget.platform == PlatformWatchId.instagramDm &&
-                    !PlatformWatchLimitStore.isLimitReached(PlatformWatchId.instagram)) ...[
+                if (widget.platform == PlatformWatchId.instagram) ...[
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
                     onPressed: () => context.push(
-                      InstagramWebConfig.dmBrowserRoute(dmOnly: false),
+                      InstagramWebConfig.dmBrowserRoute(dmOnly: true),
                     ),
-                    icon: const Icon(Icons.camera_alt_outlined),
-                    label: const Text('피드는 별도 한도'),
+                    icon: const Icon(Icons.forum_outlined),
+                    label: const Text('DM은 한도 없음 — 열기'),
                   ),
                 ],
               ],

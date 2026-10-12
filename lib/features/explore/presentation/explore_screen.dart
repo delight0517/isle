@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_build_config.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/localization/app_strings.dart';
@@ -87,19 +88,20 @@ class _ExploreBody extends StatelessWidget {
 
     return ListView(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          child: Card(
-            color: const Color(0xFFFDF2F7),
-            child: ListTile(
-              leading: const Icon(Icons.camera_alt_outlined, color: Color(0xFFE1306C)),
-              title: Text('소셜 · 인스타 · Isle 게시', style: IsleText.subtitle()),
-              subtitle: const Text('구독 관리 · 프로필 미리보기'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/social'),
+        if (AppBuildConfig.enableSocialUgc)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: Card(
+              color: const Color(0xFFFDF2F7),
+              child: ListTile(
+                leading: const Icon(Icons.camera_alt_outlined, color: Color(0xFFE1306C)),
+                title: Text('소셜 · 인스타 · Isle 게시', style: IsleText.subtitle()),
+                subtitle: const Text('구독 관리 · 프로필 미리보기'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/social'),
+              ),
             ),
           ),
-        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Text(s.t('public_islands'), style: IsleText.subtitle()),

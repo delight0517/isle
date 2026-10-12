@@ -11,6 +11,7 @@ import '../features/light/presentation/light_blocks_hub_screen.dart';
 import '../features/light/presentation/light_settings_screen.dart';
 import '../features/settings/presentation/block_schedule_edit_screen.dart';
 import '../features/settings/presentation/block_schedules_screen.dart';
+import '../features/settings/presentation/schedule_calendar_screen.dart';
 import '../features/settings/presentation/blocked_channels_screen.dart';
 import '../features/settings/presentation/blocked_videos_screen.dart';
 import '../features/settings/presentation/data_backup_screen.dart';
@@ -80,6 +81,10 @@ final goRouterLightProvider = Provider<GoRouter>((ref) {
                   ),
                 ),
               ],
+            ),
+            GoRoute(
+              path: '/light/schedule-calendar',
+              builder: (_, __) => const ScheduleCalendarScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [

@@ -1,0 +1,210 @@
+{
+  "packId": "premade_link_aggregator_seo",
+  "displayName": "(merge-only) link aggregator SEO",
+  "description": "Merged into adult combined + illegal sites — not shown in catalog",
+  "version": "1.0.1",
+  "generatedAt": "2026-06-27T12:00:00Z",
+  "entryCount": 40,
+  "entries": [
+    {
+      "pattern": "tavuksokagi.com",
+      "kind": "host",
+      "note": "SEO spam · 주소모음·링크모음 랜딩 (무관 도메인)"
+    },
+    {
+      "pattern": "atlasbackgroundchecks.com",
+      "kind": "host",
+      "note": "SEO spam · 링크모음 2026 가이드 랜딩"
+    },
+    {
+      "pattern": "hana-digital.co.kr",
+      "kind": "host",
+      "note": "SEO spam · 여기여 주소모음 랜딩"
+    },
+    {
+      "pattern": "russian-school.ru",
+      "kind": "host",
+      "note": "SEO spam · 여기여 최신주소 랜딩"
+    },
+    {
+      "pattern": "linksmap.org",
+      "kind": "host",
+      "note": "SEO spam · 링크모음 TOP10 큐레이션"
+    },
+    {
+      "pattern": "labscribbles.com",
+      "kind": "host",
+      "note": "SEO spam · 여기여 링크모음 가이드"
+    },
+    {
+      "pattern": "popoysbatchoys.com",
+      "kind": "host",
+      "note": "SEO spam · 주소마켓·링크모음 분석"
+    },
+    {
+      "pattern": "permantis.biz",
+      "kind": "host",
+      "note": "SEO spam · 주소모음 가이드"
+    },
+    {
+      "pattern": "yeogiyeo.uriweb.kr",
+      "kind": "host",
+      "note": "SEO spam · 여기여 주소모음 허브"
+    },
+    {
+      "pattern": "yugiyu.com",
+      "kind": "host",
+      "note": "link aggregator · 여기여 계열 바로가기"
+    },
+    {
+      "pattern": "주소모음",
+      "kind": "keyword",
+      "note": "Google·Bing SERP · 검색어·결과 제목 숨김"
+    },
+    {
+      "pattern": "주소 모음",
+      "kind": "keyword",
+      "note": "Google SERP · 띄어쓰기 검색어"
+    },
+    {
+      "pattern": "링크모음",
+      "kind": "keyword",
+      "note": "Google·Bing SERP"
+    },
+    {
+      "pattern": "링크 모음",
+      "kind": "keyword",
+      "note": "Google SERP · 띄어쓰기 검색어"
+    },
+    {
+      "pattern": "여기여",
+      "kind": "keyword",
+      "note": "1세대 주소모음 브랜드 · SERP"
+    },
+    {
+      "pattern": "주소요",
+      "kind": "keyword",
+      "note": "주소모음 SEO 브랜드"
+    },
+    {
+      "pattern": "주소모아",
+      "kind": "keyword",
+      "note": "주소모음 SEO"
+    },
+    {
+      "pattern": "링크모아",
+      "kind": "keyword",
+      "note": "링크모음 SEO"
+    },
+    {
+      "pattern": "최신주소",
+      "kind": "keyword",
+      "note": "변동 주소 SEO 스팸"
+    },
+    {
+      "pattern": "최신 주소",
+      "kind": "keyword",
+      "note": "변동 주소 SEO"
+    },
+    {
+      "pattern": "실시간 주소",
+      "kind": "keyword",
+      "note": "주소모음 SEO 문구"
+    },
+    {
+      "pattern": "바로가기 주소",
+      "kind": "keyword",
+      "note": "주소모음 SEO 문구"
+    },
+    {
+      "pattern": "검증된 주소모음",
+      "kind": "keyword",
+      "note": "Google 스팸 제목 패턴"
+    },
+    {
+      "pattern": "주소몬",
+      "kind": "keyword",
+      "note": "주소모음 SEO 브랜드"
+    },
+    {
+      "pattern": "주소월드",
+      "kind": "keyword",
+      "note": "주소모음 SEO 브랜드"
+    },
+    {
+      "pattern": "주소파크",
+      "kind": "keyword",
+      "note": "주소모음 SEO 브랜드"
+    },
+    {
+      "pattern": "주소킹",
+      "kind": "keyword",
+      "note": "주소모음 SEO (juso4 수집 목록)"
+    },
+    {
+      "pattern": "링크킹",
+      "kind": "keyword",
+      "note": "링크모음 SEO"
+    },
+    {
+      "pattern": "주소랜드",
+      "kind": "keyword",
+      "note": "주소모음 SEO"
+    },
+    {
+      "pattern": "도박사이트",
+      "kind": "keyword",
+      "note": "도박 주소모음 SERP"
+    },
+    {
+      "pattern": "카지노주소",
+      "kind": "keyword",
+      "note": "도박 주소모음"
+    },
+    {
+      "pattern": "토토주소",
+      "kind": "keyword",
+      "note": "도박 주소모음"
+    },
+    {
+      "pattern": "바카라주소",
+      "kind": "keyword",
+      "note": "도박 주소모음"
+    },
+    {
+      "pattern": "카지노 주소",
+      "kind": "keyword",
+      "note": "도박 주소모음 SERP"
+    },
+    {
+      "pattern": "도박 주소",
+      "kind": "keyword",
+      "note": "도박 주소모음 SERP"
+    },
+    {
+      "pattern": "야동주소",
+      "kind": "keyword",
+      "note": "성인 주소모음 SERP"
+    },
+    {
+      "pattern": "야동 주소",
+      "kind": "keyword",
+      "note": "성인 주소모음 SERP"
+    },
+    {
+      "pattern": "성인주소",
+      "kind": "keyword",
+      "note": "성인 주소모음 SERP"
+    },
+    {
+      "pattern": "웹툰주소",
+      "kind": "keyword",
+      "note": "불법 웹툰 주소모음 SERP"
+    },
+    {
+      "pattern": "무료웹툰 주소",
+      "kind": "keyword",
+      "note": "불법 웹툰 주소모음"
+    }
+  ]
+}

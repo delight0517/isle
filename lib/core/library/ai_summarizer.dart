@@ -1,4 +1,5 @@
 import '../ai/ai_client.dart';
+import '../ai/ai_output_language.dart';
 
 /// 요약 카드 — [AiClient] 단일 경로 (제공자·로그·예산)
 class AiSummarizer {
@@ -15,14 +16,15 @@ class AiSummarizer {
     final ccBlock = transcriptExcerpt != null && transcriptExcerpt.trim().length >= 40
         ? '\n\nTranscript (CC) excerpt:\n${transcriptExcerpt.trim()}'
         : '';
+    final lang = AiOutputLanguage.name;
     final result = await AiClient.chat(
       feature: feature,
       systemPrompt:
           transcriptExcerpt != null
-              ? 'You turn YouTube CC transcripts into readable Korean article prose (3-6 short paragraphs). '
-                  'No hype. Preserve facts. User reads instead of watching.'
-              : 'You write short Korean news-style blurbs (2-3 sentences). No clickbait. '
-                  'User reads summary instead of watching full video.',
+              ? 'You turn YouTube CC transcripts into readable $lang article prose (3-6 short paragraphs). '
+                  'No hype. Preserve facts. User reads instead of watching. Write entirely in $lang.'
+              : 'You write short $lang news-style blurbs (2-3 sentences). No clickbait. '
+                  'User reads summary instead of watching full video. Write entirely in $lang.',
       userPrompt:
           'Source: $sourceType\nTitle: $title\nChannel/Author: $channelName\nURL: $url$ccBlock\n\n'
           '${transcriptExcerpt != null ? 'Write the article body.' : 'Write a concise summary.'}',

@@ -3,17 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/navigation/isle_routes.dart';
+import '../../../core/navigation/schedule_overlay_navigation.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/services/isle_user_defaults.dart';
+import '../../../core/navigation/center_nav_long_press.dart';
+import '../../../core/social/instagram_web_config.dart';
 import '../../../core/youtube/youtube_clipboard_watch.dart';
 import '../../../shared/widgets/isle_app_bar.dart';
 import '../../feed/presentation/widgets/block_from_link_sheet.dart';
 import '../../feed/presentation/widgets/keyword_filter_sheet.dart';
-import '../../youtube/presentation/widgets/premade_block_pack_section.dart';
 import '../../youtube/presentation/widgets/youtube_block_hub_section.dart';
 import '../../youtube/presentation/widgets/youtube_limit_controls.dart';
 import '../../youtube/presentation/widgets/isle_youtube_schedule_sheet.dart';
+import 'widgets/adult_protection_panel.dart';
 import '../../youtube/presentation/widgets/youtube_watch_limit_hub_card.dart';
 
 /// 나의 Isle → 유튜브·SNS 관리 센터.
@@ -36,6 +39,7 @@ class _MyIsleControlCenterScreenState
   bool _hideShorts = IsleUserDefaults.hideYoutubeShorts;
   bool _hideReels = IsleUserDefaults.hideInstagramReels;
   bool _reelsGuard = IsleUserDefaults.instagramReelsGuardEnabled;
+  bool _exploreGuard = IsleUserDefaults.instagramExploreGuardEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +60,60 @@ class _MyIsleControlCenterScreenState
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push('/settings/block-chat'),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _SectionCard(
+            title: '시간 한도 구조',
+            subtitle: '① 유튜브 시청(한도) · ② 유튜브 뮤직/음성(무한) · '
+                '③ 인스타 DM(무한) · ④ 인스타 피드(한도)',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => openCenterNavYoutube(context),
+                        icon: const Icon(Icons.play_circle, color: Color(0xFFFF0000)),
+                        label: const Text('유튜브 시청'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.push('/youtube/podcast'),
+                        icon: const Icon(Icons.headphones, color: Color(0xFF1DB954)),
+                        label: const Text('유튜브 음성'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => context.push(InstagramWebConfig.dmBrowserRoute(dmOnly: true)),
+                        icon: const Icon(Icons.forum_outlined),
+                        label: const Text('인스타 DM'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFFE1306C),
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.push(InstagramWebConfig.dmBrowserRoute(dmOnly: false)),
+                        icon: const Icon(Icons.home_outlined),
+                        label: const Text('인스타 피드'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -119,6 +177,20 @@ class _MyIsleControlCenterScreenState
                     if (mounted) setState(() => _reelsGuard = v);
                   },
                 ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('탐색(Explore) 둠스크롤 멈춤', style: IsleText.body()),
+                  subtitle: Text(
+                    '탐색 탭에서 포스트를 ${IsleUserDefaults.instagramExploreGuardThreshold}개 열람하거나 '
+                    '그만큼 스크롤하면 멈춤 화면 · 홈 피드·DM은 영향 없음',
+                    style: IsleText.caption(color: IsleColors.muted),
+                  ),
+                  value: _exploreGuard,
+                  onChanged: (v) async {
+                    await IsleUserDefaults.setInstagramExploreGuardEnabled(v);
+                    if (mounted) setState(() => _exploreGuard = v);
+                  },
+                ),
               ],
             ),
           ),
@@ -159,7 +231,7 @@ class _MyIsleControlCenterScreenState
                 ),
                 const SizedBox(height: 8),
                 TextButton.icon(
-                  onPressed: () => context.push('/settings/block-schedules'),
+                  onPressed: () => pushBlockScheduleList(context),
                   icon: const Icon(Icons.edit_calendar_outlined),
                   label: const Text('스케줄 목록·수정'),
                 ),
@@ -174,10 +246,41 @@ class _MyIsleControlCenterScreenState
             child: YoutubeBlockHubSection(),
           ),
           const SizedBox(height: 16),
-          const _SectionCard(
-            title: '프리셋 차단 팩',
-            subtitle: '성인·게임 채널/사이트 200~400개 — 한 번에 가져오기',
-            child: PremadeBlockPackSection(),
+          _SectionCard(
+            title: '성인 보호',
+            subtitle: '보호 필터와 동일 — 끔 · 기본 · 강화',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const AdultProtectionPanel(compact: true),
+                const SizedBox(height: 10),
+                FilledButton.tonalIcon(
+                  onPressed: () => context.push('/home/sns/protection-filter'),
+                  icon: const Icon(Icons.shield_outlined),
+                  label: const Text('보호 필터 열기'),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _SectionCard(
+            title: '기타 프리셋',
+            subtitle: '게임·불법 웹툰 — 스케줄에 연결',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  '성인은 위 「성인 보호」에서만 설정해요.',
+                  style: IsleText.caption(color: IsleColors.muted),
+                ),
+                const SizedBox(height: 10),
+                FilledButton.tonalIcon(
+                  onPressed: () => pushBlockScheduleList(context),
+                  icon: const Icon(Icons.edit_calendar_outlined),
+                  label: const Text('스케줄에서 프리셋 연결'),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -195,9 +298,9 @@ class _MyIsleControlCenterScreenState
                 _LinkTile(
                   icon: Icons.timelapse,
                   color: const Color(0xFFE1306C),
-                  title: 'Instagram 사용 한도',
-                  subtitle: '피드·DM 사용 시간 · 타임락',
-                  onTap: () => context.push('/settings/instagram-limits'),
+                  title: 'Instagram 피드 한도',
+                  subtitle: 'DM 무제한 · 피드·릴스만 시간 제한',
+                  onTap: () => context.push('/settings/instagram-limits?scope=feed'),
                 ),
                 const SizedBox(height: 8),
                 TextButton.icon(

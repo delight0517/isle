@@ -102,7 +102,7 @@ class _SmartRuleInputSectionState extends State<SmartRuleInputSection> {
           controller: _ctrl,
           enabled: widget.enabled && !_busy,
           decoration: InputDecoration(
-            hintText: 'gambling · 야동 · pornhub.com',
+            hintText: 'gambling · 유해 키워드 · example.com',
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
               icon: _busy

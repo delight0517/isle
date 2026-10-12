@@ -15,6 +15,7 @@ class AiChatResult {
     this.outputTokens = 0,
     this.usd = 0,
     this.error,
+    this.logId,
   });
 
   final String content;
@@ -23,6 +24,10 @@ class AiChatResult {
   final int outputTokens;
   final double usd;
   final String? error;
+  /// [AiUsageLogStore]에 남긴 이 호출의 항목 id — 호출부가 나중에(예: JSON
+  /// 파싱 실패) [AiUsageLogStore.attachParseError]로 사유를 덧붙일 때 쓴다.
+  /// AI를 실제로 안 탄 경우(스킵·budget 등)는 null.
+  final String? logId;
 }
 
 /// 모든 AI 기능의 단일 진입점 — 제공자·모델·로그 통합
@@ -112,7 +117,7 @@ class AiClient {
 
       final usd = estimateCost(inputTokens: parsed.$1, outputTokens: parsed.$2);
       await ApiBudgetStore.recordSpend(usd, feature);
-      await _log(
+      final id = await _log(
         feature: feature,
         status: 'success',
         inputTokens: parsed.$1,
@@ -122,6 +127,9 @@ class AiClient {
         dataTransferred: true,
         providerId: provider.id,
         modelId: modelId,
+        systemPrompt: systemPrompt,
+        userPrompt: userPrompt,
+        rawResponse: parsed.$3,
       );
       return AiChatResult(
         content: parsed.$3,
@@ -129,17 +137,20 @@ class AiClient {
         inputTokens: parsed.$1,
         outputTokens: parsed.$2,
         usd: usd,
+        logId: id,
       );
     } catch (e) {
-      await _log(
+      final id = await _log(
         feature: feature,
         status: 'error',
         detail: e.toString(),
         dataTransferred: true,
         providerId: provider.id,
         modelId: modelId,
+        systemPrompt: systemPrompt,
+        userPrompt: userPrompt,
       );
-      return AiChatResult(content: '', usedAi: false, error: e.toString());
+      return AiChatResult(content: '', usedAi: false, error: e.toString(), logId: id);
     }
   }
 
@@ -260,7 +271,14 @@ class AiClient {
     return (inTok, outTok, content.trim());
   }
 
-  static Future<void> _log({
+  /// 로그에 원문을 저장할 때 남길 최대 길이 — 한도 없이 통째로 쌓으면
+  /// Hive 박스가 금방 커지고, 디버깅에는 애초에 이 정도만 있어도 충분하다.
+  static const _promptLogMaxChars = 4000;
+
+  static String _truncateForLog(String s) =>
+      s.length <= _promptLogMaxChars ? s : '${s.substring(0, _promptLogMaxChars)}…(잘림)';
+
+  static Future<String> _log({
     required String feature,
     required String status,
     int inputTokens = 0,
@@ -270,10 +288,14 @@ class AiClient {
     bool dataTransferred = false,
     String? providerId,
     String? modelId,
+    String systemPrompt = '',
+    String userPrompt = '',
+    String rawResponse = '',
   }) async {
+    final id = 'ai_${DateTime.now().microsecondsSinceEpoch}';
     await AiUsageLogStore.append(
       AiUsageLogEntry(
-        id: 'ai_${DateTime.now().microsecondsSinceEpoch}',
+        id: id,
         at: DateTime.now(),
         feature: feature,
         providerId: providerId ?? AiConfigStore.providerId,
@@ -284,7 +306,11 @@ class AiClient {
         usd: usd,
         detail: detail,
         dataTransferred: dataTransferred,
+        systemPrompt: _truncateForLog(systemPrompt),
+        userPrompt: _truncateForLog(userPrompt),
+        rawResponse: _truncateForLog(rawResponse),
       ),
     );
+    return id;
   }
 }

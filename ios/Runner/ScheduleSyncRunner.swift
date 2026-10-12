@@ -3,7 +3,7 @@ import Foundation
 
 /// BGAppRefresh — 앱이 백그라운드일 때 스냅샷 기준 Screen Time 재동기화.
 enum ScheduleSyncRunner {
-  static let taskIdentifier = "com.isle.app.scheduleSync"
+  static let taskIdentifier = "com.isle.app.moa.scheduleSync"
 
   static func registerBackgroundTask() {
     BGTaskScheduler.shared.register(forTaskWithIdentifier: taskIdentifier, using: nil) { task in

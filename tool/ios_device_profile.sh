@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-echo "== Isle Profile build (com.isle.app.isle.dev) =="
+echo "== 모아 Profile build (com.isle.app.moa.dev) =="
 flutter pub get
 flutter build ios --profile
 
@@ -27,7 +27,7 @@ fi
 echo "Installing to $DEVICE ..."
 xcrun devicectl device install app --device "$DEVICE" "$APP"
 
-echo "Launching com.isle.app.isle.dev (Profile) ..."
-xcrun devicectl device process launch --device "$DEVICE" com.isle.app.isle.dev
+echo "Launching com.isle.app.moa.dev (Profile) ..."
+xcrun devicectl device process launch --device "$DEVICE" com.isle.app.moa.dev
 
 echo "Done. For hot reload use: flutter run --profile -d $DEVICE"

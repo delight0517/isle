@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// [GoRouter.navigatorKey] 및 공유 인텐트 등에서 컨텍스트 확보용
+/// [GoRouter.navigatorKey] — 셸 밖 전체 화면 라우트용
 final isleNavigatorKey = GlobalKey<NavigatorState>();
+
+/// [StatefulShellRoute] 탭 분기 전용 — `/block/schedules` 등은 [isleNavigatorKey] 사용
+final isleShellNavigatorKey = GlobalKey<NavigatorState>();

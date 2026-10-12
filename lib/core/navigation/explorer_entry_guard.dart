@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../features/home/presentation/widgets/schedule_block_detail_sheet.dart';
+import '../../features/home/presentation/widgets/schedule_block_entry_sheet.dart';
+import '../block_schedule/schedule_block_user_message.dart';
 import '../block_schedule/schedule_target_access_guard.dart';
 import '../explorer/explorer_site.dart';
 import '../explorer/isle_platform.dart';
-import '../guard/isle_content_block_guard.dart';
+import '../guard/isle_block_boundary.dart';
 import 'share_link_router.dart';
 
-/// 플랫폼 피커·공유 링크 — 스케줄·한도·웹사이트·채널 차단 진입 차단 (동기 검사)
+/// 플랫폼 피커·공유 링크 — [IsleBlockBoundary] 단일 진입
 class ExplorerEntryGuard {
   ExplorerEntryGuard._();
 
@@ -16,13 +17,12 @@ class ExplorerEntryGuard {
     String? url,
     bool inAppExplorer = true,
   }) {
-    return IsleContentBlockGuard.denyExplorerEntry(
-      isYoutubeSite: site.isYoutube,
-      isInstagramSite: site.isInstagram,
-      isBrunchSite: site.isBrunch,
-      isCustomSite: site == ExplorerSite.custom,
-      url: url ?? _defaultUrlForSite(site),
-      inAppExplorer: inAppExplorer,
+    final legacy = IsleBlockBoundary.denyEntry(site: site, url: url);
+    if (legacy == null) return null;
+    return ScheduleBlockUserMessage.shortDenial(
+      site: site,
+      url: url,
+      legacyMessage: legacy,
     );
   }
 
@@ -34,8 +34,10 @@ class ExplorerEntryGuard {
       denyMessageForSite(platform.site, url: url ?? platform.homeUrl, inAppExplorer: inAppExplorer);
 
   static String? denyMessageForShareUrl(String raw) {
-    final contentDeny = IsleContentBlockGuard.denyUrl(raw, inAppExplorer: false);
-    if (contentDeny != null) return contentDeny;
+    final contentDeny = IsleBlockBoundary.denyExternalUrl(raw);
+    if (contentDeny != null) {
+      return ScheduleBlockUserMessage.shortDenial(url: raw, legacyMessage: contentDeny);
+    }
 
     final route = ShareLinkRouter.inAppRouteForUrl(raw);
     if (route == null) return null;
@@ -45,7 +47,10 @@ class ExplorerEntryGuard {
         route.contains('/youtube/browser') ||
         route.contains('site=youtube')) {
       if (ScheduleTargetAccessGuard.isIsleYoutubeBlocked) {
-        return '스케줄로 Isle · YouTube가 차단 중이에요';
+        return ScheduleBlockUserMessage.shortDenial(
+          site: ExplorerSite.youtube,
+          url: raw,
+        );
       }
     }
     if (route.contains('site=instagram')) {
@@ -58,7 +63,28 @@ class ExplorerEntryGuard {
       return denyMessageForSite(ExplorerSite.facebook, url: raw, inAppExplorer: true);
     }
     if (route.startsWith('/explore/browser') || route.startsWith('/viewer')) {
-      return IsleContentBlockGuard.denyUrl(raw, checkYoutubeLimit: false, inAppExplorer: true);
+      final uri = Uri.tryParse(route.startsWith('/') ? 'http://local$route' : route);
+      final site = uri?.queryParameters['site'];
+      if (site == 'custom' || (raw.startsWith('http') && route.contains('site=custom'))) {
+        final legacy = IsleBlockBoundary.denyNavigation(
+          site: ExplorerSite.custom,
+          url: raw,
+          checkWatchLimit: false,
+        );
+        if (legacy == null) return null;
+        return ScheduleBlockUserMessage.shortDenial(
+          site: ExplorerSite.custom,
+          url: raw,
+          legacyMessage: legacy,
+        );
+      }
+      final legacy = IsleBlockBoundary.denyNavigation(
+        site: ExplorerSite.youtube,
+        url: raw,
+        checkWatchLimit: false,
+      );
+      if (legacy == null) return null;
+      return ScheduleBlockUserMessage.shortDenial(url: raw, legacyMessage: legacy);
     }
     return null;
   }
@@ -70,26 +96,12 @@ class ExplorerEntryGuard {
     ExplorerSite? site,
     bool inAppExplorer = true,
   }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red.shade800,
-        duration: const Duration(seconds: 9),
-        action: SnackBarAction(
-          label: '더보기',
-          textColor: Colors.white,
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            showScheduleBlockDetailSheet(
-              context,
-              url: url,
-              site: site,
-              previewMessage: message,
-              inAppExplorer: inAppExplorer,
-            );
-          },
-        ),
-      ),
+    showScheduleBlockEntrySheet(
+      context,
+      site: site,
+      url: url,
+      legacyMessage: message,
+      inAppExplorer: inAppExplorer,
     );
     return false;
   }
@@ -109,13 +121,5 @@ class ExplorerEntryGuard {
       site: site,
       inAppExplorer: inAppExplorer,
     );
-  }
-
-  static String? _defaultUrlForSite(ExplorerSite site) {
-    for (final p in PlatformCatalog.platforms) {
-      if (p.site == site) return p.homeUrl;
-    }
-    if (site == ExplorerSite.facebook) return 'https://m.facebook.com/';
-    return null;
   }
 }

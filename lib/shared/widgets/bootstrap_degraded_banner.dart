@@ -38,7 +38,7 @@ class BootstrapDegradedBanner extends StatelessWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: () => context.push('/settings/data-backup'),
+                    onPressed: () => context.push('/settings/backup'),
                     child: const Text('백업'),
                   ),
                 ],

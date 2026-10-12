@@ -1,4 +1,5 @@
 import '../services/isle_user_defaults.dart';
+import '../youtube/youtube_link_canonical.dart';
 import '../youtube/youtube_clipboard_watch.dart';
 import '../youtube/youtube_music_route.dart';
 import '../youtube/youtube_focus_clipboard.dart';
@@ -49,6 +50,7 @@ class ShareLinkRouter {
     var url = raw.trim();
     if (url.isEmpty) return null;
     if (!url.startsWith('http')) url = 'https://$url';
+    url = YoutubeLinkCanonical.normalizeForBlockCheck(url);
     final uri = Uri.tryParse(url);
     if (uri == null) return null;
 

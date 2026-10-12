@@ -2,12 +2,118 @@
 class InstagramDmFocusScript {
   InstagramDmFocusScript._();
 
-  /// 키보드 올라올 때 뷰포트가 줄어들도록 meta viewport 재설정
+  /// 키보드 올라올 때 입력창이 가리지 않도록 viewport·visualViewport·포커스 보정
+  /// (DM·로그인·계정 복구 input/textarea 공통)
   static const String keyboardFix = '''
 (function() {
-  var m = document.querySelector('meta[name=viewport]');
-  if (!m) { m = document.createElement('meta'); m.name = 'viewport'; document.head.appendChild(m); }
-  m.content = 'width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content';
+  if (window.__isleIgKeyboardFixInstalled) return;
+  window.__isleIgKeyboardFixInstalled = true;
+
+  function setViewport() {
+    var m = document.querySelector('meta[name=viewport]');
+    if (!m) { m = document.createElement('meta'); m.name = 'viewport'; document.head.appendChild(m); }
+    m.content = 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content';
+  }
+  setViewport();
+
+  function isInputLike(el) {
+    if (!el || el === document.body || el === document.documentElement) return false;
+    var tag = (el.tagName || '').toLowerCase();
+    if (tag === 'textarea' || tag === 'input') return true;
+    if (el.isContentEditable) return true;
+    return el.getAttribute('role') === 'textbox';
+  }
+
+  function findActiveInput() {
+    var ae = document.activeElement;
+    if (isInputLike(ae)) return ae;
+  return document.querySelector('textarea:focus, input:focus, [contenteditable="true"]:focus')
+      || document.querySelector('[contenteditable="true"][role="textbox"]')
+      || document.querySelector('[role="textbox"][contenteditable="true"]')
+      || document.querySelector('textarea[placeholder*="essage"]')
+      || document.querySelector('input[type="tel"], input[type="email"], input[type="password"], input[type="text"], input[type="search"]')
+      || document.querySelector('textarea');
+  }
+
+  function keyboardOverlap() {
+    var vv = window.visualViewport;
+    if (!vv) return 0;
+    return Math.max(0, window.innerHeight - vv.height - (vv.offsetTop || 0));
+  }
+
+  function scrollInputIntoView() {
+    var el = findActiveInput();
+    if (!el) return;
+    var vv = window.visualViewport;
+    var vTop = vv ? vv.offsetTop : 0;
+    var vHeight = vv ? vv.height : window.innerHeight;
+    var kb = keyboardOverlap();
+    var visibleBottom = vTop + vHeight - kb - 12;
+    var visibleTop = vTop + 56;
+    var rect = el.getBoundingClientRect();
+    if (rect.bottom > visibleBottom) {
+      var delta = rect.bottom - visibleBottom;
+      (document.scrollingElement || document.documentElement).scrollTop += delta;
+      window.scrollBy(0, delta);
+    } else if (rect.top < visibleTop) {
+      var up = rect.top - visibleTop;
+      (document.scrollingElement || document.documentElement).scrollTop += up;
+      window.scrollBy(0, up);
+    }
+    try {
+      el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+    } catch (e) {
+      try { el.scrollIntoView(false); } catch (e2) {}
+    }
+  }
+
+  function applyKeyboardPadding() {
+    var kb = keyboardOverlap();
+    document.documentElement.style.setProperty('--isle-kb-inset', kb + 'px');
+    if (kb > 32) {
+      document.body.style.setProperty('padding-bottom', Math.max(0, kb - 8) + 'px', 'important');
+    } else {
+      document.body.style.removeProperty('padding-bottom');
+    }
+    scrollInputIntoView();
+  }
+  window.__isleIgApplyKeyboardPadding = applyKeyboardPadding;
+
+  function clearKeyboardPadding() {
+    document.body.style.removeProperty('padding-bottom');
+    document.documentElement.style.removeProperty('--isle-kb-inset');
+  }
+  window.__isleIgClearKeyboardPadding = clearKeyboardPadding;
+
+  var rafPending = null;
+  function scheduleApply() {
+    if (rafPending) return;
+    rafPending = requestAnimationFrame(function() {
+      rafPending = null;
+      applyKeyboardPadding();
+    });
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', scheduleApply);
+    window.visualViewport.addEventListener('scroll', scheduleApply);
+  }
+  window.addEventListener('resize', scheduleApply);
+
+  document.addEventListener('focusin', function(ev) {
+    if (!isInputLike(ev.target)) return;
+    setViewport();
+    scheduleApply();
+    setTimeout(scheduleApply, 60);
+    setTimeout(scrollInputIntoView, 160);
+    setTimeout(scrollInputIntoView, 380);
+  }, true);
+
+  document.addEventListener('focusout', function() {
+    setTimeout(function() {
+      if (keyboardOverlap() < 32) clearKeyboardPadding();
+    }, 140);
+  }, true);
 })();
 ''';
 
@@ -89,7 +195,8 @@ class InstagramDmFocusScript {
 (function() {
   var m = document.querySelector('meta[name=viewport]');
   if (!m) { m = document.createElement('meta'); m.name = 'viewport'; document.head.appendChild(m); }
-  m.content = 'width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content';
+  m.content = 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content';
+  if (window.__isleIgApplyKeyboardPadding) window.__isleIgApplyKeyboardPadding();
   if (window.__isleIgRestoreDmScroll) window.__isleIgRestoreDmScroll();
 })();
 ''';
@@ -155,7 +262,15 @@ class InstagramDmFocusScript {
     return true;
   }
 
+  function isAuthFlow() {
+    var p = (location.pathname || '').toLowerCase();
+    return p.indexOf('/accounts') === 0 || p.indexOf('/challenge') === 0 ||
+      p.indexOf('/consent') === 0 || p.indexOf('/auth') === 0 ||
+      p.indexOf('/oauth') === 0 || p.indexOf('/session') === 0;
+  }
+
   function guard() {
+    if (isAuthFlow()) return;
     const p = location.pathname.toLowerCase();
     if (isDmThreadPath(p)) {
       if (window.__isleIgRestoreDmScroll) window.__isleIgRestoreDmScroll();

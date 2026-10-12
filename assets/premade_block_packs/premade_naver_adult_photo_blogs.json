@@ -1,0 +1,260 @@
+{
+  "packId": "premade_naver_adult_photo_blogs",
+  "displayName": "네이버 성인·포토 블로그",
+  "description": "blog.naver.com 개별 블로그 urlContains — PostView ?blogId= 포함 · naver.com 전체 차단 없음 · Firefox 확장",
+  "version": "1.0.2",
+  "generatedAt": "2026-06-25T04:05:27Z",
+  "entryCount": 50,
+  "entries": [
+    {
+      "pattern": "blog.naver.com/21publish",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/5114565",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/auto-aura-ca",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/branda75",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/ceobbh",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/chanmin69",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/chikimoong",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/cooling_49",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/customs_chowol",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/dhdjdjdjfjf",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/dnjsrb791",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/donga7411",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/erer1313",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/espy0070",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/firenan105",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/goljwi",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/heojc90",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/hwang704012",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/iidady",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/jisaeng-on-off",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/k7118909",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/kim5742103",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/kmmcc1",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/kyuhyuk3099",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/lupran",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/lw1010",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/lyy4055",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/manypackman",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/mcjang33",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/mory110",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/mth1560",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/obr114",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/office-fine",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/parkfran1",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/printingconsultant",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/prompt8",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/rhekdus79",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/rm1533",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/rockssay",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/s-sakamoto",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/shirayukihana",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/skycoco-",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/solomoncd",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/son-go",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/ssaempyo",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/ssiel5356",
+      "kind": "urlContains",
+      "note": "seed · https://blog.naver.com/ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/tearlaments",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/ty-health",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/yck30701",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    },
+    {
+      "pattern": "blog.naver.com/ydk6117",
+      "kind": "urlContains",
+      "note": "buddy of ssiel5356"
+    }
+  ]
+}

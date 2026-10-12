@@ -1,0 +1,435 @@
+{
+  "packId": "premade_juso4_adult_board",
+  "displayName": "주소나라·링크모음 성인 게시판",
+  "description": "juso4·jusoland·링크다모아·주소나라주소 등 성인 링크 게시판 + 주소 모음 도메인",
+  "version": "1.0.4",
+  "generatedAt": "2026-06-18T02:49:43Z",
+  "entryCount": 85,
+  "entries": [
+    {
+      "pattern": "1004rk.com",
+      "kind": "host",
+      "note": "adult link board · 천사티비 (existing)"
+    },
+    {
+      "pattern": "20wiki.com",
+      "kind": "host",
+      "note": "adult link board · 야동위키 (existing)"
+    },
+    {
+      "pattern": "301b.xll3.vip",
+      "kind": "host",
+      "note": "adult link board · 야볼래 (existing)"
+    },
+    {
+      "pattern": "av19link.com",
+      "kind": "host",
+      "note": "adult link board · AV19 (existing)"
+    },
+    {
+      "pattern": "avcrack.com",
+      "kind": "host",
+      "note": "adult link board · AVcrack (existing)"
+    },
+    {
+      "pattern": "avjoa75.com",
+      "kind": "host",
+      "note": "adult link board · 야통령 (existing)"
+    },
+    {
+      "pattern": "avyadong15.xyz",
+      "kind": "host",
+      "note": "adult link board · AV야동 (existing)"
+    },
+    {
+      "pattern": "banana13.com",
+      "kind": "host",
+      "note": "adult link board · 노브라 (jusoland)"
+    },
+    {
+      "pattern": "banana14.com",
+      "kind": "host",
+      "note": "adult link board · 섹스도시 (jusoland)"
+    },
+    {
+      "pattern": "buska23.com",
+      "kind": "host",
+      "note": "adult link board · 버스까 (existing)"
+    },
+    {
+      "pattern": "c54app.club",
+      "kind": "host",
+      "note": "adult link board · AV히로미 (existing)"
+    },
+    {
+      "pattern": "comein20.com",
+      "kind": "host",
+      "note": "adult link board · 들어와 (existing)"
+    },
+    {
+      "pattern": "ddaltime184.com",
+      "kind": "host",
+      "note": "adult link board · 딸타임 (existing)"
+    },
+    {
+      "pattern": "dodogirl5.com",
+      "kind": "host",
+      "note": "adult link board · 도도걸 (existing)"
+    },
+    {
+      "pattern": "dogjoa93.net",
+      "kind": "host",
+      "note": "adult link board · 개조아 (existing)"
+    },
+    {
+      "pattern": "dragonfly66.com",
+      "kind": "host",
+      "note": "adult link board · 잠자리 (existing)"
+    },
+    {
+      "pattern": "ggbam14.com",
+      "kind": "host",
+      "note": "adult link board · 꽃밤 (existing)"
+    },
+    {
+      "pattern": "ggonghub34.com",
+      "kind": "host",
+      "note": "adult link board · 꽁허브 (existing)"
+    },
+    {
+      "pattern": "go3.kogirl.co",
+      "kind": "host",
+      "note": "adult link board · AV코걸 (existing)"
+    },
+    {
+      "pattern": "hitomi.la",
+      "kind": "host",
+      "note": "adult link board · 히토미 (existing)"
+    },
+    {
+      "pattern": "hjtime108.com",
+      "kind": "host",
+      "note": "adult link board · 현자타임 (existing)"
+    },
+    {
+      "pattern": "imgkor.com",
+      "kind": "host",
+      "note": "adult link board · imgkor.com (cik_spam)"
+    },
+    {
+      "pattern": "jbgirl.cc",
+      "kind": "host",
+      "note": "adult link board · 정복걸 (existing)"
+    },
+    {
+      "pattern": "jogemoa03.com",
+      "kind": "host",
+      "note": "adult link board · 조개모아 (jusoland)"
+    },
+    {
+      "pattern": "jotker.top",
+      "kind": "host",
+      "note": "adult link board · 좆커넷 (existing)"
+    },
+    {
+      "pattern": "juso-nara.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "juso1.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "juso2.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "juso3.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "juso4.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "jusoland.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "jusoland1.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "kr13.ddal.xyz",
+      "kind": "host",
+      "note": "adult link board · 야딸두 (existing)"
+    },
+    {
+      "pattern": "kr3.redgirls.co",
+      "kind": "host",
+      "note": "adult link board · 레드걸즈 (existing)"
+    },
+    {
+      "pattern": "kr42.topgirl.co",
+      "kind": "host",
+      "note": "adult link board · AV탑걸 (existing)"
+    },
+    {
+      "pattern": "kr548.mysstv.com",
+      "kind": "host",
+      "note": "adult link board · 색색티비 (existing)"
+    },
+    {
+      "pattern": "kr8.yadong3.com",
+      "kind": "host",
+      "note": "adult link board · 야동삼국지 (existing)"
+    },
+    {
+      "pattern": "linkdamoa01.com",
+      "kind": "host",
+      "note": "adult link board · linkdamoa01.com (linkdamoa)"
+    },
+    {
+      "pattern": "mingky04.live",
+      "kind": "host",
+      "note": "adult link board · 밍키넷 (existing)"
+    },
+    {
+      "pattern": "missvod5.com",
+      "kind": "host",
+      "note": "adult link board · MISSAV (existing)"
+    },
+    {
+      "pattern": "modooav16.com",
+      "kind": "host",
+      "note": "adult link board · 모두AV (existing)"
+    },
+    {
+      "pattern": "on6.onlysex.co",
+      "kind": "host",
+      "note": "adult link board · 온리섹스 (existing)"
+    },
+    {
+      "pattern": "pigav.ws",
+      "kind": "host",
+      "note": "adult link board · PIGAV (existing)"
+    },
+    {
+      "pattern": "pinkbo47.com",
+      "kind": "host",
+      "note": "adult link board · AV핑보걸 (existing)"
+    },
+    {
+      "pattern": "redbogo4.com",
+      "kind": "host",
+      "note": "adult link board · 조개파티 (existing)"
+    },
+    {
+      "pattern": "sexzoa53.xyz",
+      "kind": "host",
+      "note": "adult link board · 섹스조아 (jusoland)"
+    },
+    {
+      "pattern": "static.cloudflareinsights.com",
+      "kind": "host",
+      "note": "adult link board · static.cloudflareinsights.com (jusonaraju)"
+    },
+    {
+      "pattern": "vmall.poomboom999.co",
+      "kind": "host",
+      "note": "adult link board · SIZE19 (existing)"
+    },
+    {
+      "pattern": "w3.org",
+      "kind": "host",
+      "note": "adult link board · w3.org (linkdamoa)"
+    },
+    {
+      "pattern": "wcs.naver.net",
+      "kind": "host",
+      "note": "adult link board · wcs.naver.net (cik_spam)"
+    },
+    {
+      "pattern": "wtv1919.com",
+      "kind": "host",
+      "note": "adult link board · 왕부랄 (existing)"
+    },
+    {
+      "pattern": "ww17.avlove29.com",
+      "kind": "host",
+      "note": "adult link board · AV러브걸 (existing)"
+    },
+    {
+      "pattern": "www.banana13.com",
+      "kind": "host",
+      "note": "adult link board · 노브라 (existing)"
+    },
+    {
+      "pattern": "www.banana14.com",
+      "kind": "host",
+      "note": "adult link board · 섹스게이트 (existing)"
+    },
+    {
+      "pattern": "www.jogemoa03.com",
+      "kind": "host",
+      "note": "adult link board · 조개모아 (existing)"
+    },
+    {
+      "pattern": "www.juso4.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "www.sexzoa53.xyz",
+      "kind": "host",
+      "note": "adult link board · 섹스조아 (existing)"
+    },
+    {
+      "pattern": "www.주소나라.com",
+      "kind": "host",
+      "note": "adult link board · juso address board (existing)"
+    },
+    {
+      "pattern": "x",
+      "kind": "host",
+      "note": "adult link board · x (linkdamoa)"
+    },
+    {
+      "pattern": "xn--2j1b43k3tao42a6rn.com",
+      "kind": "host",
+      "note": "adult link board · xn--2j1b43k3tao42a6rn.com (linkdamoa)"
+    },
+    {
+      "pattern": "xn--910bs4k0njca036gda.com",
+      "kind": "host",
+      "note": "adult link board · xn--910bs4k0njca036gda.com (jusonaraju)"
+    },
+    {
+      "pattern": "xn--hq1bobz18ezqc.org",
+      "kind": "host",
+      "note": "adult link board · 야동도시 (existing)"
+    },
+    {
+      "pattern": "xvideos-k6.com",
+      "kind": "host",
+      "note": "adult link board · 엑스비디오 KR (existing)"
+    },
+    {
+      "pattern": "yaburi65.com",
+      "kind": "host",
+      "note": "adult link board · 야부리 (existing)"
+    },
+    {
+      "pattern": "yadong8.com",
+      "kind": "host",
+      "note": "adult link board · 미니멈맥스 (existing)"
+    },
+    {
+      "pattern": "yadongtv91.com",
+      "kind": "host",
+      "note": "adult link board · 야동그라운드 (existing)"
+    },
+    {
+      "pattern": "yagong91.com",
+      "kind": "host",
+      "note": "adult link board · 야동공장 (existing)"
+    },
+    {
+      "pattern": "yako06.com",
+      "kind": "host",
+      "note": "adult link board · 야동코리아 (existing)"
+    },
+    {
+      "pattern": "yako4.net",
+      "kind": "host",
+      "note": "adult link board · yako4.net (jusonaraju)"
+    },
+    {
+      "pattern": "yamoa44.site",
+      "kind": "host",
+      "note": "adult link board · 야모아 (existing)"
+    },
+    {
+      "pattern": "yargasm.org",
+      "kind": "host",
+      "note": "adult link board · 야르가즘 (existing)"
+    },
+    {
+      "pattern": "yasome.net",
+      "kind": "host",
+      "note": "adult link board · 야썸 (existing)"
+    },
+    {
+      "pattern": "ydhub14.net",
+      "kind": "host",
+      "note": "adult link board · 야동허브 (existing)"
+    },
+    {
+      "pattern": "링크공유.com",
+      "kind": "host",
+      "note": "adult link board · 링크공유.com (jusonaraju)"
+    },
+    {
+      "pattern": "링크다모아.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "링크텐.com",
+      "kind": "host",
+      "note": "adult link board · juso address board (existing)"
+    },
+    {
+      "pattern": "주소나라.com",
+      "kind": "host",
+      "note": "adult link board · juso address board (existing)"
+    },
+    {
+      "pattern": "주소나라주소.com",
+      "kind": "host",
+      "note": "adult link board · 주소나라주소.com (jusonaraju)"
+    },
+    {
+      "pattern": "주소랜드.com",
+      "kind": "host",
+      "note": "adult link board · juso address board (existing)"
+    },
+    {
+      "pattern": "주소모아.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "주소월드.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "주소친구.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "주소콕.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "주소킹.com",
+      "kind": "host",
+      "note": "juso/link address aggregator"
+    },
+    {
+      "pattern": "토렌트랜드.com",
+      "kind": "host",
+      "note": "adult link board · juso address board (existing)"
+    }
+  ]
+}

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_build_config.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/localization/locale_controller.dart';
 import '../../../../core/services/isle_user_defaults.dart';
 import '../../../../core/utils/url_parser.dart';
 import '../../../../core/youtube/blocked_channel_store.dart';
+import '../../../../core/constants/app_build_config.dart';
 import '../../../../core/youtube/channel_genre_ai_service.dart';
 import '../../../../core/youtube/channel_genre_block_store.dart';
 import '../../../../core/youtube/content_filter_store.dart'; // blockedVideosProvider
 import '../../../../core/youtube/models/youtube_page_channel.dart';
 import '../../../feed/providers/feed_provider.dart';
-import 'feed_boost_sheet.dart';
+import 'block_channel_sheet.dart';
 
-/// 유튜브 시청 중 👍 — 피드 부스트 + 숨기기(채널·장르·영상) 한 메뉴
+/// 유튜브 시청 중 — 채널·장르·영상 숨기기
 Future<void> showYoutubeWatchPrefSheet(
   BuildContext context, {
   required YoutubePageChannel watch,
@@ -61,25 +61,27 @@ class _YoutubeWatchPrefBodyState extends ConsumerState<_YoutubeWatchPrefBody> {
     }
   }
 
-  Future<void> _boost() async {
-    if (!mounted) return;
-    Navigator.pop(context);
-    final choice = await showFeedBoostSheet(
-      context,
-      watch: widget.watch,
-      pageUrl: widget.pageUrl,
-    );
-    if (!mounted || choice == null) return;
-    final msg = choice == FeedBoostChoice.channel
-        ? '이 채널을 피드에서 더 자주 보여줄게요'
-        : '비슷한 스타일을 피드에서 더 자주 보여줄게요';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-  }
-
   Future<void> _blockChannel() async {
-    final id = widget.watch.channelId.trim();
-    final name = widget.watch.channelName.trim();
-    if (id.isEmpty && name.isEmpty) return;
+    var id = widget.watch.channelId.trim();
+    var name = widget.watch.channelName.trim();
+    if (id.isEmpty && name.isEmpty) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      final result = await showBlockChannelSheet(
+        context,
+        channelId: '',
+        channelName: '',
+        pageUrl: widget.pageUrl,
+      );
+      if (result?.channelBlocked == true) {
+        ref.invalidate(feedProvider);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('이 채널을 추천하지 않을게요')),
+        );
+      }
+      return;
+    }
 
     final ok = await showDialog<bool>(
       context: context,
@@ -124,7 +126,13 @@ class _YoutubeWatchPrefBodyState extends ConsumerState<_YoutubeWatchPrefBody> {
 
     final id = widget.watch.channelId.trim();
     final name = widget.watch.channelName.trim();
-    if (id.isEmpty && name.isEmpty) return;
+    if (id.isEmpty && name.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('채널 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요')),
+      );
+      return;
+    }
 
     await ChannelGenreBlockStore.addSample(
       channelId: id.isNotEmpty ? id : name,
@@ -181,9 +189,9 @@ class _YoutubeWatchPrefBodyState extends ConsumerState<_YoutubeWatchPrefBody> {
           children: [
             Row(
               children: [
-                Icon(Icons.thumb_up_alt_outlined, color: IsleColors.gold500, size: 26),
+                Icon(Icons.thumb_down_alt_outlined, color: IsleColors.danger, size: 26),
                 const SizedBox(width: 10),
-                Expanded(child: Text('콘텐츠 취향', style: IsleText.subtitle(color: IsleColors.ocean900))),
+                Expanded(child: Text('추천 줄이기', style: IsleText.subtitle(color: IsleColors.ocean900))),
               ],
             ),
             const SizedBox(height: 6),
@@ -194,18 +202,6 @@ class _YoutubeWatchPrefBodyState extends ConsumerState<_YoutubeWatchPrefBody> {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 16),
-            Text('더 보고 싶어요', style: IsleText.caption(color: IsleColors.ocean700)),
-            const SizedBox(height: 8),
-            _ActionTile(
-              icon: Icons.thumb_up_alt_outlined,
-              iconColor: IsleColors.gold500,
-              title: '피드에 더 보기',
-              subtitle: '채널 또는 비슷한 스타일을 피드 순위에 올려요',
-              onTap: _busy ? null : () => _run(_boost),
-            ),
-            const SizedBox(height: 14),
-            Text('덜 보고 싶어요', style: IsleText.caption(color: IsleColors.ocean700)),
-            const SizedBox(height: 8),
             _ActionTile(
               icon: Icons.block,
               iconColor: IsleColors.danger,

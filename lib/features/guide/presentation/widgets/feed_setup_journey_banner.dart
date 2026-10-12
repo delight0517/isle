@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -139,10 +141,30 @@ class _FeedSetupJourneyBannerState extends State<FeedSetupJourneyBanner> {
                   _SetupStepRow(
                     done: SetupJourneyService.stepDone('tour'),
                     icon: Icons.explore_outlined,
-                    title: '앱 둘러보기',
-                    subtitle: 'ISLE이 뭔지 1분 안에',
-                    onTap: () => context.push('/app-tour'),
+                    title: Platform.isAndroid ? 'Isle 쉬운 설명' : '앱 둘러보기',
+                    subtitle: Platform.isAndroid ? '그림으로 차단·한도 이해' : 'ISLE이 뭔지 1분 안에',
+                    onTap: () => context.push(
+                      Platform.isAndroid ? '/guide/android-visual' : '/app-tour',
+                    ),
                   ),
+                  if (Platform.isIOS)
+                    _SetupStepRow(
+                      done: SetupJourneyService.stepDone('icloud_backup'),
+                      icon: Icons.cloud_upload_outlined,
+                      title: 'iCloud 백업 설정',
+                      subtitle: '설정 → 데이터 백업 → 폴더 변경',
+                      highlight: !SetupJourneyService.stepDone('icloud_backup'),
+                      onTap: () => context.push('/settings/backup'),
+                    ),
+                  if (Platform.isAndroid)
+                    _SetupStepRow(
+                      done: SetupJourneyService.stepDone('icloud_backup'),
+                      icon: Icons.backup_outlined,
+                      title: '데이터 백업',
+                      subtitle: '설정 → 데이터 백업 · 내보내기',
+                      highlight: !SetupJourneyService.stepDone('icloud_backup'),
+                      onTap: () => context.push('/settings/backup'),
+                    ),
                   _SetupStepRow(
                     done: SetupJourneyService.stepDone('interests') ||
                         IsleUserDefaults.onboardingInterestTags.isNotEmpty,

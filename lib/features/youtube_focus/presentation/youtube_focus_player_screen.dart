@@ -1,6 +1,5 @@
-import 'dart:io' show Platform;
-
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +7,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/constants/app_typography.dart';
 import '../../../core/youtube/models/youtube_focus_video.dart';
+import '../../../core/youtube/youtube_focus_metadata_service.dart';
 import '../../../core/youtube/youtube_limit_gate.dart';
 import '../../../core/youtube/youtube_playback_access_guard.dart';
 import '../../../core/youtube/youtube_webview_factory.dart';
@@ -31,48 +31,61 @@ class YoutubeFocusPlayerScreen extends StatefulWidget {
 class _YoutubeFocusPlayerScreenState extends State<YoutubeFocusPlayerScreen> {
   WebViewController? _controller;
   bool _blocked = false;
+  bool _booting = true;
+  YoutubeFocusVideo? _activeVideo;
   DateTime? _playStarted;
 
   @override
   void initState() {
     super.initState();
+    unawaited(_boot());
+  }
+
+  Future<void> _boot() async {
+    var video = widget.video;
+    if (video.channelName.trim().isEmpty) {
+      video = await YoutubeFocusMetadataService.enrich(video);
+    }
+    final channelId = await YoutubeFocusMetadataService.channelIdFor(video.videoId);
     final deny = YoutubePlaybackAccessGuard.denyPlayback(
-      videoId: widget.video.videoId,
-      channelName: widget.video.channelName,
-      videoTitle: widget.video.title,
-      url: widget.video.watchUrl,
+      videoId: video.videoId,
+      channelId: channelId,
+      channelName: video.channelName,
+      videoTitle: video.title,
+      url: video.watchUrl,
     );
+    if (!mounted) return;
     if (deny != null) {
-      _blocked = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(deny)));
-        context.pop();
+      setState(() {
+        _blocked = true;
+        _booting = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(deny)));
+      context.pop();
       return;
     }
+    _activeVideo = video;
     _playStarted = DateTime.now();
-    final id = widget.video.videoId;
     final embed =
-        'https://www.youtube.com/embed/$id?rel=0&modestbranding=1&playsinline=1';
-    _controller = WebViewController()
+        'https://www.youtube.com/embed/${video.videoId}?rel=0&modestbranding=1&playsinline=1';
+    final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
-    final controller = _controller!;
     if (Platform.isIOS || Platform.isMacOS) {
-      // §6.8 — 순수 Safari UA 단독. 식별 토큰 추가 시 구글 봇 감지로 「try again later」 유발.
       controller.setUserAgent(kYoutubeSafariUserAgent);
     }
-    controller.loadRequest(Uri.parse(embed));
+    await controller.loadRequest(Uri.parse(embed));
+    if (!mounted) return;
+    _controller = controller;
     if (YoutubeLimitGate.isLocked) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        unawaited(YoutubeWebviewEnergy.setPlaybackBlocked(controller, true));
-      });
+      await YoutubeWebviewEnergy.setPlaybackBlocked(controller, true);
     }
+    if (!mounted) return;
+    setState(() => _booting = false);
   }
 
   @override
   void dispose() {
-    final total = widget.video.durationSeconds;
+    final total = (_activeVideo ?? widget.video).durationSeconds;
     if (total > 0 && _playStarted != null) {
       final watched = DateTime.now().difference(_playStarted!).inSeconds;
       final saved = (total - watched).clamp(0, total);
@@ -87,6 +100,7 @@ class _YoutubeFocusPlayerScreenState extends State<YoutubeFocusPlayerScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final fg = isDark ? Colors.white : Colors.black87;
+    final video = _activeVideo ?? widget.video;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -107,28 +121,32 @@ class _YoutubeFocusPlayerScreenState extends State<YoutubeFocusPlayerScreen> {
       ),
       body: Builder(
         builder: (context) {
-          if (_blocked) return const SizedBox.shrink();
+          if (_blocked || _booting) {
+            return const Center(
+              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white54),
+            );
+          }
           final controller = _controller;
           if (controller == null) return const SizedBox.shrink();
           final locked = YoutubeLimitGate.lockedBody(context);
           if (locked != null) return locked;
           return Column(
-        children: [
-          AspectRatio(
-            aspectRatio: 16 / 9,
-            child: WebViewWidget(controller: controller),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              widget.video.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: IsleText.body(color: Colors.white70),
-            ),
-          ),
-        ],
-      );
+            children: [
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: WebViewWidget(controller: controller),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  video.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: IsleText.body(color: Colors.white70),
+                ),
+              ),
+            ],
+          );
         },
       ),
     );

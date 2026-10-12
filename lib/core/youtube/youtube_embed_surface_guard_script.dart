@@ -168,6 +168,33 @@ class YoutubeEmbedSurfaceGuardScript {
       }));
     } catch(e){}
   }
+  // ── iframe을 차단 플레이스홀더로 완전 교체 ──────────────────────────────────
+  // removeAttribute('src')만으로는 이미 로드된 iframe 콘텐츠가 계속 재생됨.
+  // DOM에서 제거 후 시각적 블록 카드로 대체한다.
+  function replaceWithBlockCard(el, meta){
+    if (el.getAttribute('data-isle-blocked')==='1') return;
+    var w = el.offsetWidth || el.getAttribute('width') || 480;
+    var h = el.offsetHeight || el.getAttribute('height') || 270;
+    // 이미 로드된 iframe: about:blank로 덮어써서 콘텐츠 즉시 언로드
+    try { el.src = 'about:blank'; } catch(e){}
+    el.setAttribute('data-isle-blocked','1');
+    var card = document.createElement('div');
+    card.setAttribute('data-isle-blocked','1');
+    card.style.cssText = 'width:'+w+'px;max-width:100%;min-height:'+Math.max(100,h)+'px;'+
+      'background:#1a1a2e;display:flex;align-items:center;justify-content:center;'+
+      'flex-direction:column;gap:10px;border-radius:10px;'+
+      'pointer-events:none;user-select:none;box-sizing:border-box;padding:16px';
+    var ic = document.createElement('div');
+    ic.textContent = '\\uD83D\\uDEAB';
+    ic.style.cssText = 'font-size:28px;line-height:1';
+    var lb = document.createElement('div');
+    lb.textContent = '\\uCC28\\uB2E8\\uB41C \\uC601\\uC0C1\\uC774\\uC5D0\\uC694';
+    lb.style.cssText = 'color:rgba(255,255,255,0.85);font-size:13px;font-weight:600;'+
+      'font-family:-apple-system,sans-serif;text-align:center';
+    card.appendChild(ic); card.appendChild(lb);
+    if (el.parentNode) el.parentNode.replaceChild(card, el);
+    postEmbed({type:'blocked', videoId: meta.videoId||'', channelName: meta.channelName||''});
+  }
   function collapse(node){
     if (!node || node.getAttribute('data-isle-embed-yt')==='1') return;
     try { node.pause && node.pause(); } catch(e){}
@@ -180,7 +207,16 @@ class YoutubeEmbedSurfaceGuardScript {
   }
   function stopMedia(el, meta, blocked){
     try { if (el.pause) el.pause(); } catch(e){}
-    if (el.tagName==='IFRAME') el.removeAttribute('src');
+    if (el.tagName==='IFRAME'){
+      if (blocked){
+        replaceWithBlockCard(el, meta);
+        return;
+      }
+      // 차단 아닌 숨김(hideInlinePreview): src만 제거 후 collapse
+      try { el.src = 'about:blank'; } catch(e){}
+      collapse(el.closest('div, section, figure') || el);
+      return;
+    }
     if (blocked){
       collapse(el.closest('div, section, figure') || el);
       postEmbed({type:'blocked', videoId: meta.videoId||'', channelName: meta.channelName||''});
@@ -199,16 +235,29 @@ class YoutubeEmbedSurfaceGuardScript {
   }
   function sweep(){
     var playing = null;
-    document.querySelectorAll('iframe[src*="youtube"], iframe[src*="googlevideo"], embed[src*="youtube"]').forEach(function(el){
+    // ── iframe — 차단 대상이면 플레이스홀더로 교체 ───────────────────────────
+    // data-src 포함: Naver·Tistory 등 레이지 로드 패턴 대응
+    document.querySelectorAll(
+      'iframe[src*="youtube"], iframe[src*="googlevideo"], embed[src*="youtube"],'+
+      'iframe[data-src*="youtube"], iframe[data-lazy-src*="youtube"]'
+    ).forEach(function(el){
+      if (el.getAttribute('data-isle-blocked')==='1') return; // 이미 처리됨
+      var srcVal = el.src || el.getAttribute('data-src') || el.getAttribute('data-lazy-src') || '';
       var card = resultCard(el) || el.parentElement;
-      var meta = card ? extractMetaFromCard(card) : metaFromUrl(el.src||'');
+      var meta = card ? extractMetaFromCard(card) : metaFromUrl(srcVal);
+      // metaFromUrl으로 videoId를 못 뽑은 경우 src에서 직접 추출
+      if (!meta.videoId) meta.videoId = extractVideoId(srcVal);
       var blocked = matchesBlock(meta);
       if (blocked || cfg.playbackBlocked || cfg.hideInlinePreview){
         stopMedia(el, meta, blocked);
-        return;
       }
     });
+    // ── video 요소 ────────────────────────────────────────────────────────────
     document.querySelectorAll('video').forEach(function(v){
+      // 이미 차단 처리+보고된 video는 재처리하지 않음 — DOM에 남아있는 한
+      // sweep()이 매 tick(0.9~2.2s)마다 다시 훑어 postEmbed({type:'blocked'})를
+      // 반복 전송해 스낵바가 안 사라지는 것처럼 보이는 문제(중복 알림) 방지.
+      if (v.getAttribute('data-isle-blocked')==='1') return;
       var card = resultCard(v);
       var onGoogle = isGoogleSearch();
       if (onGoogle && !cardHasYoutube(card)) return;
@@ -219,6 +268,7 @@ class YoutubeEmbedSurfaceGuardScript {
       var meta = card ? extractMetaFromCard(card) : {videoId:'', channelName:'', videoTitle:'', url: location.href};
       var blocked = matchesBlock(meta);
       if (blocked || cfg.playbackBlocked){
+        if (blocked) v.setAttribute('data-isle-blocked','1');
         stopMedia(v, meta, blocked);
         return;
       }
@@ -241,7 +291,12 @@ class YoutubeEmbedSurfaceGuardScript {
     });
   }
   function onClick(e){
-    var a = e.target && e.target.closest ? e.target.closest('a[href*="youtube.com"], a[href*="youtu.be"]') : null;
+    // ── 차단된 iframe 영역 클릭 완전 차단 ────────────────────────────────────
+    var t = e.target;
+    if (t && t.getAttribute && t.getAttribute('data-isle-blocked')==='1'){
+      e.preventDefault(); e.stopImmediatePropagation(); return;
+    }
+    var a = t && t.closest ? t.closest('a[href*="youtube.com"], a[href*="youtu.be"]') : null;
     if (!a) return;
     var href = a.href || a.getAttribute('href') || '';
     if (!isYoutubeHint(href)) return;
@@ -261,23 +316,86 @@ class YoutubeEmbedSurfaceGuardScript {
     }
   }
   function apply(){ sweep(); }
+  // 전체화면 진입은 iOS 네이티브 플레이어 계층으로 올라가는 별도 이벤트라
+  // sweep()의 iframe 교체·video collapse 로직을 우회한다 — 특히 이미
+  // data-isle-blocked='1'로 한 번 처리된 video 요소는 sweep()이 다시
+  // 건드리지 않게 돼 있어서(중복 알림 방지), 전체화면에서 재생이 다시
+  // 시작돼도 다음 sweep이 그냥 넘어간다(2026-07-13 실사용 제보 — 외부
+  // 페이지에 박힌 유튜브 임베드도 같은 클래스의 버그). 전체화면 진입
+  // 이벤트에서 직접 다시 확인해 즉시 pause+탈출한다.
+  function onFullscreenEvent(e){
+    var video = (e.target && e.target.tagName === 'VIDEO') ? e.target : null;
+    if (!video) video = document.fullscreenElement || document.querySelector('video:-webkit-full-screen');
+    if (!video) return;
+    var card = resultCard(video) || (video.closest ? video.closest('[class*="youtube"], [data-youtube], a[href*="youtube"]') : null);
+    var onGoogle = isGoogleSearch();
+    if (onGoogle && !cardHasYoutube(card)) return;
+    if (!onGoogle && !isYoutubeHint(video.currentSrc||video.src||'') && !cardHasYoutube(card)) return;
+    var meta = card ? extractMetaFromCard(card) : {videoId:'', channelName:'', videoTitle:'', url: location.href};
+    var blocked = matchesBlock(meta);
+    if (blocked || cfg.playbackBlocked){
+      try { video.pause(); } catch(e2){}
+      try { if (typeof video.webkitExitFullscreen === 'function') video.webkitExitFullscreen(); } catch(e3){}
+      try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch(e4){}
+      if (blocked) video.setAttribute('data-isle-blocked','1');
+    }
+  }
+  function installFullscreenGuard(){
+    if (window.__isleEmbedYtFsGuard) return;
+    window.__isleEmbedYtFsGuard = true;
+    function runImmediateFullscreenCheck(){
+      var current = document.fullscreenElement || document.querySelector('video:-webkit-full-screen');
+      if (!current) return;
+      onFullscreenEvent({target: current});
+    }
+    document.addEventListener('webkitbeginfullscreen', onFullscreenEvent, true);
+    document.addEventListener('fullscreenchange', onFullscreenEvent, true);
+    document.addEventListener('webkitfullscreenchange', onFullscreenEvent, true);
+    document.addEventListener('enterfullscreen', onFullscreenEvent, true);
+    runImmediateFullscreenCheck();
+    setTimeout(runImmediateFullscreenCheck, 0);
+  }
   function pauseGuard(){
     if (window.__isleEmbedYtObserver) window.__isleEmbedYtObserver.disconnect();
+    if (window.__isleEmbedYtAttrObserver) window.__isleEmbedYtAttrObserver.disconnect();
     if (window.__isleEmbedYtTimer) clearInterval(window.__isleEmbedYtTimer);
     if (window.__isleEmbedYtClick) document.removeEventListener('click', window.__isleEmbedYtClick, true);
   }
   function resumeGuard(){
+    // 즉시 + 짧은 지연으로 한 번 더 — 레이지 로드 직후 잡기
     apply();
+    setTimeout(apply, 150);
+    setTimeout(apply, 500);
+    // ── MutationObserver 1: childList — 새 iframe 삽입 감지 ─────────────────
     if (window.__isleEmbedYtObserver) window.__isleEmbedYtObserver.disconnect();
     window.__isleEmbedYtObserver = new MutationObserver(function(){ apply(); });
     var root = document.body || document.documentElement;
     if (root) window.__isleEmbedYtObserver.observe(root, {childList:true, subtree:true});
+    // ── MutationObserver 2: attributes — src 동적 세팅 감지(레이지 로드) ────
+    if (window.__isleEmbedYtAttrObserver) window.__isleEmbedYtAttrObserver.disconnect();
+    window.__isleEmbedYtAttrObserver = new MutationObserver(function(mutations){
+      for (var i=0;i<mutations.length;i++){
+        var m = mutations[i];
+        if (m.type==='attributes' && m.target && m.target.tagName==='IFRAME'){
+          apply(); break;
+        }
+      }
+    });
+    if (root) window.__isleEmbedYtAttrObserver.observe(root, {
+      subtree:true, attributes:true, attributeFilter:['src','data-src','data-lazy-src']
+    });
+    // ── fallback 폴링 — 두 옵저버가 놓친 케이스 보완.
+    // 일반 웹페이지에서 300ms 전체 sweep은 비용이 커서, 차단/preview 강제 중에만 더 촘촘히 돈다.
     if (window.__isleEmbedYtTimer) clearInterval(window.__isleEmbedYtTimer);
-    window.__isleEmbedYtTimer = setInterval(apply, 1500);
+    window.__isleEmbedYtTimer = setInterval(
+      apply,
+      (cfg.playbackBlocked || cfg.hideInlinePreview) ? 900 : 2200
+    );
     if (!window.__isleEmbedYtClick){
       window.__isleEmbedYtClick = onClick;
       document.addEventListener('click', window.__isleEmbedYtClick, true);
     }
+    installFullscreenGuard();
   }
   window.__islePauseBlocks = pauseGuard;
   window.__isleResumeBlocks = resumeGuard;

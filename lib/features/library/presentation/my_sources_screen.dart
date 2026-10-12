@@ -8,12 +8,16 @@ import '../../../core/ai/ai_client.dart';
 import '../../../core/library/brunch_profile_fetcher.dart';
 import '../../../core/library/digest_scheduler.dart';
 import '../../../core/library/models/connected_source.dart';
+import '../../../core/library/models/library_entry.dart';
 import '../../../core/library/personal_library_store.dart';
+import '../../../core/library/vlog_post_writer_service.dart';
 import '../../../core/library/watch_later_curator_service.dart';
 import '../../../core/library/youtube_account_sync_service.dart';
 import '../../../core/library/youtube_library_service.dart';
 import '../../../core/services/isle_user_defaults.dart';
 import '../../../core/services/setup_journey_service.dart';
+import '../../../core/youtube/youtube_content_open_guard.dart';
+import '../../../core/youtube/youtube_url_redirect.dart';
 import '../../feed/presentation/widgets/youtube_channel_search_sheet.dart';
 import '../../feed/providers/feed_provider.dart';
 
@@ -26,9 +30,36 @@ class MySourcesScreen extends ConsumerStatefulWidget {
 }
 
 class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
-  final _brunchCtrl = TextEditingController(text: 'https://brunch.co.kr/@rogan2534');
+  final _brunchCtrl =
+      TextEditingController(text: 'https://brunch.co.kr/@rogan2534');
   bool _busy = false;
   String? _status;
+  final Set<String> _vlogBusy = {};
+
+  Future<void> _writeVlogPost(LibraryEntry e) async {
+    if (e.generatedPost != null) {
+      context.push('/library/vlog-post', extra: e);
+      return;
+    }
+    setState(() => _vlogBusy.add(e.id));
+    final result = await VlogPostWriterService.generate(e);
+    if (!mounted) return;
+    setState(() => _vlogBusy.remove(e.id));
+    if (!result.success || result.post == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.error ?? '글을 만들지 못했어요')),
+      );
+      return;
+    }
+    await ref
+        .read(personalLibraryProvider.notifier)
+        .updateGeneratedPost(e.url, result.post!);
+    if (!mounted) return;
+    final updated = ref.read(personalLibraryProvider).firstWhere(
+        (x) => x.url == e.url,
+        orElse: () => e.copyWith(generatedPost: result.post));
+    context.push('/library/vlog-post', extra: updated);
+  }
 
   @override
   void dispose() {
@@ -86,12 +117,13 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
           child: Text(
             '${YoutubeLibraryService.setupHint}\n\n'
             '설정 전에는 로그인 버튼을 눌러도 앱이 종료될 수 있어요. '
-            'WebView 로그인은 시청용이고, 「나중에 볼」 가져오기는 위 OAuth 설정이 필요합니다.',
+            'WebView 로그인은 시청용입니다. Watch Later와 계정 시청 기록은 공식 API로 가져올 수 없어요.',
             style: IsleText.body(color: IsleColors.muted),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('닫기')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('닫기')),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -128,7 +160,7 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: [IsleColors.ocean900, IsleColors.ocean500],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -138,7 +170,8 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('피드를 채우는 첫걸음', style: IsleText.subtitle(color: Colors.white)),
+                Text('피드를 채우는 첫걸음',
+                    style: IsleText.subtitle(color: Colors.white)),
                 const SizedBox(height: 6),
                 Text(
                   '가져온 콘텐츠만 피드·내 섬에 반영됩니다. 서버에 자동 동기화하지 않아요.',
@@ -177,7 +210,8 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
                           style: IsleText.caption(color: IsleColors.sand900),
                         ),
                       ),
-                      const Icon(Icons.chevron_right, color: IsleColors.sand900),
+                      const Icon(Icons.chevron_right,
+                          color: IsleColors.sand900),
                     ],
                   ),
                 ),
@@ -187,7 +221,9 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
           const SizedBox(height: 20),
           _sectionTitle('YouTube'),
           OutlinedButton.icon(
-            onPressed: _busy ? null : () => showYoutubeChannelSearchSheet(context, ref),
+            onPressed: _busy
+                ? null
+                : () => showYoutubeChannelSearchSheet(context, ref),
             icon: const Icon(Icons.search, color: Color(0xFFFF0000)),
             label: const Text('여러 유튜버들 검색하기! · 구독 추가'),
           ),
@@ -195,7 +231,8 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
-              ytAccount?.email ?? (googleReady ? 'Google로 로그인 (나중에 볼)' : 'Google 로그인 (설정 필요)'),
+              ytAccount?.email ??
+                  (googleReady ? 'Google YouTube 연결' : 'Google 로그인 (설정 필요)'),
             ),
             subtitle: Text(
               googleReady
@@ -203,7 +240,9 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
                   : 'OAuth clientId + Info.plist URL scheme',
               style: IsleText.caption(color: IsleColors.muted),
             ),
-            onTap: googleReady ? () => context.push('/settings/youtube-account-sync') : null,
+            onTap: googleReady
+                ? () => context.push('/settings/youtube-account-sync')
+                : null,
             trailing: ytAccount == null
                 ? FilledButton(
                     onPressed: _busy ? null : _onGoogleSignIn,
@@ -219,29 +258,28 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
                     child: const Text('로그아웃'),
                   ),
           ),
-          FilledButton.icon(
-            onPressed: _busy || ytAccount == null
-                ? null
-                : () => _setBusy(() async {
-                      final items = await YoutubeLibraryService.fetchWatchLater();
-                      final n = await ref.read(personalLibraryProvider.notifier).merge(items);
-                      await SetupJourneyService.markStepDone('import_content');
-                      setState(() => _status = '나중에 볼 ${items.length}개 중 $n개 새로 추가');
-                      ref.invalidate(feedProvider);
-                    }),
-            icon: const Icon(Icons.playlist_play),
-            label: const Text('나중에 볼 목록 가져오기'),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                'Watch Later와 YouTube 계정 전체 시청 기록은 공식 API에서 제공되지 않아요. MOA 안에서 실제 재생한 영상만 기기에 자동 기록합니다.',
+                style: IsleText.caption(color: IsleColors.muted)
+                    .copyWith(height: 1.4),
+              ),
+            ),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: _busy
                 ? null
                 : () => _setBusy(() async {
-                      final n = await WatchLaterCuratorService.buildCuratedSuggestions(
+                      final n = await WatchLaterCuratorService
+                          .buildCuratedSuggestions(
                         newestFraction: 0.3,
                       );
                       await SetupJourneyService.markStepDone('import_content');
-                      setState(() => _status = '나중에 볼 기반 추천 카드 $n개 생성 (최신 30%)');
+                      setState(
+                          () => _status = '나중에 볼 기반 추천 카드 $n개 생성 (최신 30%)');
                       ref.invalidate(feedProvider);
                     }),
             icon: const Icon(Icons.lightbulb_outline),
@@ -252,10 +290,14 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
             onPressed: _busy || ytAccount == null
                 ? null
                 : () => _setBusy(() async {
-                      final items = await YoutubeLibraryService.fetchSubscriptionFeed();
-                      final n = await ref.read(personalLibraryProvider.notifier).merge(items);
+                      final items =
+                          await YoutubeLibraryService.fetchSubscriptionFeed();
+                      final n = await ref
+                          .read(personalLibraryProvider.notifier)
+                          .merge(items);
                       await SetupJourneyService.markStepDone('import_content');
-                      setState(() => _status = '구독 채널 영상 ${items.length}개 · $n개 새로 추가');
+                      setState(() =>
+                          _status = '구독 채널 영상 ${items.length}개 · $n개 새로 추가');
                       ref.invalidate(feedProvider);
                     }),
             icon: const Icon(Icons.subscriptions_outlined),
@@ -264,8 +306,8 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
           const SizedBox(height: 8),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('앱 안에서 본 영상 → 피드에 기록'),
-            subtitle: const Text('유튜브 WebView 시청 시 자동'),
+            title: const Text('실제 재생 영상 기록'),
+            subtitle: const Text('재생 중인 영상과 시간만 기기에 저장해 추천에 반영'),
             value: IsleUserDefaults.trackYoutubeWatchHistory,
             onChanged: _busy
                 ? null
@@ -295,7 +337,8 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
             onPressed: _busy
                 ? null
                 : () => _setBusy(() async {
-                      final url = BrunchProfileFetcher.normalizeProfileUrl(_brunchCtrl.text);
+                      final url = BrunchProfileFetcher.normalizeProfileUrl(
+                          _brunchCtrl.text);
                       if (url == null) {
                         setState(() => _status = '브런치 프로필 URL을 확인하세요');
                         return;
@@ -310,16 +353,22 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
                               addedAt: DateTime.now(),
                             ),
                           );
-                      final articles = await BrunchProfileFetcher.fetchArticles(url);
-                      final n = await ref.read(personalLibraryProvider.notifier).merge(articles);
+                      final articles =
+                          await BrunchProfileFetcher.fetchArticles(url);
+                      final n = await ref
+                          .read(personalLibraryProvider.notifier)
+                          .merge(articles);
                       await SetupJourneyService.markStepDone('import_content');
                       for (final src in ref.read(connectedSourcesProvider)) {
                         if (src.profileUrl == url) {
-                          await ref.read(connectedSourcesProvider.notifier).markSynced(src.id);
+                          await ref
+                              .read(connectedSourcesProvider.notifier)
+                              .markSynced(src.id);
                           break;
                         }
                       }
-                      setState(() => _status = '브런치 ${articles.length}편 · $n개 새로 추가');
+                      setState(() =>
+                          _status = '브런치 ${articles.length}편 · $n개 새로 추가');
                       ref.invalidate(feedProvider);
                     }),
             icon: const Icon(Icons.article_outlined),
@@ -370,10 +419,27 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
                       final n = await DigestScheduler.runIfAllowed();
                       ref.invalidate(feedProvider);
                       await ref.read(personalLibraryProvider.notifier).reload();
-                      setState(() => _status = n > 0 ? '요약 카드 $n개 생성' : '이번 주 한도이거나 대상 없음');
+                      setState(() => _status =
+                          n > 0 ? '요약 카드 $n개 생성' : '이번 주 한도이거나 대상 없음');
                     }),
             icon: const Icon(Icons.auto_stories_outlined),
             label: const Text('지금 요약 만들기'),
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('리포트·기사 생성 완료 알림'),
+            subtitle: Text(
+              '새 요약 카드·모아 읽기가 만들어지면 알려드려요',
+              style: IsleText.caption(color: IsleColors.muted),
+            ),
+            value: IsleUserDefaults.contentReportNotificationsEnabled,
+            onChanged: _busy
+                ? null
+                : (v) async {
+                    await IsleUserDefaults.setContentReportNotificationsEnabled(
+                        v);
+                    setState(() {});
+                  },
           ),
           const SizedBox(height: 24),
           _sectionTitle('연결된 출처 (${sources.length})'),
@@ -382,11 +448,14 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
           else
             ...sources.map(
               (s) => ListTile(
-                title: Text(s.displayName.isEmpty ? s.profileUrl : s.displayName),
-                subtitle: Text('${s.type} · ${s.lastSyncedAt != null ? '동기화됨' : '미동기화'}'),
+                title:
+                    Text(s.displayName.isEmpty ? s.profileUrl : s.displayName),
+                subtitle: Text(
+                    '${s.type} · ${s.lastSyncedAt != null ? '동기화됨' : '미동기화'}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  onPressed: () => ref.read(connectedSourcesProvider.notifier).remove(s.id),
+                  onPressed: () =>
+                      ref.read(connectedSourcesProvider.notifier).remove(s.id),
                 ),
               ),
             ),
@@ -398,7 +467,8 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
           ),
           const SizedBox(height: 8),
           if (library.isEmpty)
-            Text('가져오기 버튼을 눌러 콘텐츠를 추가하세요.', style: IsleText.body(color: IsleColors.muted))
+            Text('가져오기 버튼을 눌러 콘텐츠를 추가하세요.',
+                style: IsleText.body(color: IsleColors.muted))
           else
             ...library.take(40).map((e) {
               final originLabel = switch (e.origin) {
@@ -408,26 +478,88 @@ class _MySourcesScreenState extends ConsumerState<MySourcesScreen> {
                 'subscription' => '구독',
                 _ => e.origin,
               };
+              final watchTime =
+                  e.origin == 'youtube_history' && e.watchSeconds > 0
+                      ? ' · 실제 재생 ${e.watchSeconds}초'
+                      : '';
               return ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: e.thumbnailUrl.isNotEmpty
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(e.thumbnailUrl, width: 56, height: 56, fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.article_outlined)),
+                        child: Image.network(e.thumbnailUrl,
+                            width: 56,
+                            height: 56,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.article_outlined)),
                       )
                     : const Icon(Icons.article_outlined),
-                title: Text(e.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: IsleText.body()),
-                subtitle: Text('$originLabel · ${e.channelName.isNotEmpty ? e.channelName : e.sourceType}',
+                title: Text(e.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: IsleText.body()),
+                subtitle: Text(
+                    '$originLabel · ${e.channelName.isNotEmpty ? e.channelName : e.sourceType}$watchTime',
                     style: IsleText.caption(color: IsleColors.muted)),
-                trailing: e.summary != null ? const Icon(Icons.auto_stories, size: 18) : null,
-                onTap: () => context.push(
-                  '/viewer?url=${Uri.encodeComponent(e.url)}&title=${Uri.encodeComponent(e.title)}',
-                ),
+                trailing: e.sourceType == 'youtube'
+                    ? IconButton(
+                        tooltip: e.generatedPost != null
+                            ? '브이로그 글 보기'
+                            : '자막으로 브이로그 글 쓰기',
+                        icon: _vlogBusy.contains(e.id)
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Icon(
+                                e.generatedPost != null
+                                    ? Icons.article
+                                    : Icons.edit_note,
+                                size: 20,
+                                color: e.generatedPost != null
+                                    ? IsleColors.ocean500
+                                    : IsleColors.ocean700,
+                              ),
+                        onPressed: _vlogBusy.contains(e.id)
+                            ? null
+                            : () => _writeVlogPost(e),
+                      )
+                    : (e.summary != null
+                        ? const Icon(Icons.auto_stories, size: 18)
+                        : null),
+                onTap: () {
+                  if (!YoutubeContentOpenGuard.showDenialOrAllow(
+                    context,
+                    url: e.url,
+                    channelId: e.channelId,
+                    channelName: e.channelName,
+                    videoTitle: e.title,
+                  )) {
+                    return;
+                  }
+                  final ytRoute = YoutubeUrlRedirect.inAppRoute(e.url);
+                  if (ytRoute != null) {
+                    context.push(ytRoute);
+                    return;
+                  }
+                  final q = [
+                    'url=${Uri.encodeComponent(e.url)}',
+                    'title=${Uri.encodeComponent(e.title)}',
+                    if (e.channelId.isNotEmpty)
+                      'channelId=${Uri.encodeComponent(e.channelId)}',
+                    if (e.channelName.isNotEmpty)
+                      'channelName=${Uri.encodeComponent(e.channelName)}',
+                  ].join('&');
+                  context.push('/viewer?$q');
+                },
               );
             }),
           if (library.length > 40)
-            Text('외 ${library.length - 40}개…', style: IsleText.caption(color: IsleColors.muted)),
+            Text('외 ${library.length - 40}개…',
+                style: IsleText.caption(color: IsleColors.muted)),
           const SizedBox(height: 12),
           OutlinedButton(
             onPressed: () => ref.invalidate(feedProvider),

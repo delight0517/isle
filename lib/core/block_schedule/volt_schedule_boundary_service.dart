@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import '../intervention/external_app_shield_store.dart';
+import '../intervention/safari_pause_service.dart';
 import '../platform/ios_screen_time_service.dart';
 import '../services/isle_app_log_service.dart';
 import '../services/volt_lifecycle_service.dart';
@@ -27,8 +28,16 @@ class VoltScheduleBoundaryService {
     await VoltLifecycleService.putScheduleSnapshot(blocked: blocked, activeIds: ids);
   }
 
+  /// 부팅 직후 — 잠금·Safari 일시해제만 (Screen Time/DeviceActivity 동기화는 지연)
+  static Future<void> reconcileLocksOnly() async {
+    await SafariPauseService.checkAndRestoreIfExpired();
+    await ScheduleLockService.finalizeExpiredLocks();
+  }
+
   /// 재개 시: 잠금 FSM 정리 + 경계 넘었으면 1회 동기화 (Device Activity 없이 가능한 최대)
   static Future<void> reconcileAfterResume() async {
+    // 잠깐 풀기 만료 여부 먼저 확인 — 만료됐으면 쉴드 복원, 유효하면 타이머 재설치.
+    await SafariPauseService.checkAndRestoreIfExpired();
     await ScheduleLockService.finalizeExpiredLocks();
 
     final pausedAt = VoltLifecycleService.lastPausedAt();
@@ -54,8 +63,10 @@ class VoltScheduleBoundaryService {
     // 항상-막기(global) 쉴드는 스케줄 경계가 없어 boundaryCrossed=false →
     // OS가 권한 변경·재시작으로 쉴드를 떨궈도 캐시 일치로 재적용 안 됨(기술부채 #2).
     // 항상-막기가 켜져 있으면 resume·부팅마다 강제 재적용해 확실히 유지한다.
+    // 단, 잠깐 풀기(SafariPauseService) 중에는 의도적 해제이므로 재적용 skip.
     // Android(Light)는 이 박스를 열지 않고 자체 enforcement 경로를 쓰므로 제외.
-    final globalShieldActive = ExternalAppShieldStore.isOpen &&
+    final globalShieldActive = !SafariPauseService.isPaused &&
+        ExternalAppShieldStore.isOpen &&
         !ExternalAppShieldStore.syncWithBlockSchedule &&
         ExternalAppShieldStore.hasSelection;
     await BlockScheduleEnforcementService.syncPlatformEnforcement(

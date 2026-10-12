@@ -72,8 +72,11 @@ class _YoutubeFocusReadFirstScreenState extends State<YoutubeFocusReadFirstScree
 
   Future<void> _play() async {
     if (!YoutubeLimitGate.guard(context)) return;
+    final channelId =
+        await YoutubeFocusMetadataService.channelIdFor(_activeVideo.videoId);
     final deny = YoutubePlaybackAccessGuard.denyPlayback(
       videoId: _activeVideo.videoId,
+      channelId: channelId,
       channelName: _activeVideo.channelName,
       videoTitle: _activeVideo.title,
       url: _activeVideo.watchUrl,

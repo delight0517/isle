@@ -1,5 +1,7 @@
 import '../intervention/app_usage_limit_store.dart';
 import '../intervention/platform_app_limit_service.dart';
+import '../platform/ios_screen_time_service.dart';
+import '../platform/isle_apple_platform.dart';
 import '../services/isle_app_log_service.dart';
 import 'block_schedule_store.dart';
 import 'models/schedule_enforcement_mode.dart';
@@ -11,6 +13,14 @@ class ScheduleAppLimitSyncService {
 
   static Future<void> syncAll() async {
     if (!await PlatformAppLimitService.isSupported()) return;
+    if (IsleApplePlatform.isScreenTimeHost &&
+        !await IosScreenTimeService.isAuthorized()) {
+      IsleAppLogService.log(
+        'schedule limit sync skipped: Screen Time not authorized',
+        level: IsleLogLevel.debug,
+      );
+      return;
+    }
 
     final rules = AppUsageLimitStore.loadRules();
     final schedules = {

@@ -16,7 +16,9 @@ import 'schedule_active_service.dart';
 import 'schedule_app_target_catalog.dart';
 import 'schedule_app_targets_store.dart';
 import 'schedule_display_helper.dart';
+import 'schedule_block_relax_service.dart';
 import 'url_rules/schedule_web_block_guard.dart';
+import '../youtube/youtube_timelock_service.dart';
 
 /// 차단 이유 한 줄 요약 + 스케줄·규칙 상세 (더보기 시트용)
 class ScheduleBlockExplainItem {
@@ -28,6 +30,8 @@ class ScheduleBlockExplainItem {
     this.scheduleName,
     this.fixHint,
     this.iconName = 'block',
+    this.relaxAction,
+    this.relaxLabel,
   });
 
   final String layer;
@@ -37,6 +41,10 @@ class ScheduleBlockExplainItem {
   final String? scheduleName;
   final String? fixHint;
   final String iconName;
+  final ScheduleBlockRelaxAction? relaxAction;
+  final String? relaxLabel;
+
+  bool get isRelaxable => relaxAction != null;
 }
 
 class ScheduleBlockExplainReport {
@@ -225,6 +233,7 @@ class ScheduleBlockExplainService {
 
     final blocking = items.where((i) {
       if (_isInfoOnly(i.layer)) return false;
+      if (inAppExplorer && isYt && isBrowserSeparateLayer(i.layer)) return false;
       if (inAppExplorer && i.layer == 'schedule_domain') return false;
       return true;
     }).toList();
@@ -248,6 +257,39 @@ class ScheduleBlockExplainService {
       layer == 'youtube_ok' ||
       layer == 'schedule_limit_only';
 
+  /// Isle `/youtube` 시청에만 해당 (Safari·도메인 쉴드 제외)
+  static bool isIsleYoutubeWatchLayer(String layer) {
+    return switch (layer) {
+      'youtube_limit' || 'youtube_rule' || 'schedule_target' || 'url' || 'safety' || 'website' => true,
+      _ => false,
+    };
+  }
+
+  static bool isBrowserSeparateLayer(String layer) =>
+      layer == 'schedule_domain' || layer == 'schedule_isle';
+
+  static List<ScheduleBlockExplainItem> watchItemsFor(
+    List<ScheduleBlockExplainItem> items, {
+    required bool inAppExplorer,
+    required bool isYoutubeUrl,
+  }) {
+    if (!inAppExplorer || !isYoutubeUrl) {
+      return items.where((i) => !_isInfoOnly(i.layer)).toList();
+    }
+    return items
+        .where((i) => isIsleYoutubeWatchLayer(i.layer) || i.layer == 'schedule_limit')
+        .toList();
+  }
+
+  static List<ScheduleBlockExplainItem> browserSeparateItemsFor(
+    List<ScheduleBlockExplainItem> items, {
+    required bool inAppExplorer,
+    required bool isYoutubeUrl,
+  }) {
+    if (!inAppExplorer || !isYoutubeUrl) return const [];
+    return items.where((i) => isBrowserSeparateLayer(i.layer)).toList();
+  }
+
   static List<ScheduleBlockExplainItem> _scheduleItems(
     BlockSchedule schedule,
     DateTime now, {
@@ -265,6 +307,7 @@ class ScheduleBlockExplainService {
 
     if (active && mode.appliesShieldInSlot && schedule.domains.isNotEmpty) {
       final hostNote = schedule.domains.take(5).join(', ');
+      final isTimelock = schedule.id == YoutubeTimelockService.timelockScheduleId;
       out.add(ScheduleBlockExplainItem(
         layer: 'schedule_domain',
         title: '「${schedule.name}」도메인 쉴드',
@@ -273,8 +316,12 @@ class ScheduleBlockExplainService {
             '${inAppExplorer ? '\n(인앱은 Isle 타깃 체크 시에만 막혀요)' : ''}',
         scheduleId: schedule.id,
         scheduleName: schedule.name,
-        fixHint: '스케줄 편집 → 차단 방식을 「한도만」으로 바꾸거나 도메인 비우기',
+        fixHint: '왼쪽 스와이프 또는 탭 → 끄기 · 잠금이면 대기 후 자동 적용',
         iconName: 'public_off',
+        relaxAction: isTimelock
+            ? ScheduleBlockRelaxAction.timelockOff
+            : ScheduleBlockRelaxAction.domainsOff,
+        relaxLabel: '도메인 쉴드 끄기',
       ));
     }
 
@@ -288,8 +335,10 @@ class ScheduleBlockExplainService {
         detail: '$timeLine\n막는 대상: $labels',
         scheduleId: schedule.id,
         scheduleName: schedule.name,
-        fixHint: '스케줄 편집 → ③ 차단 대상 체크 해제',
+        fixHint: '왼쪽 스와이프 → 유튜브 타깃만 끄기',
         iconName: 'apps',
+        relaxAction: ScheduleBlockRelaxAction.youtubeOff,
+        relaxLabel: '유튜브 타깃 끄기',
       ));
     }
 
@@ -310,14 +359,19 @@ class ScheduleBlockExplainService {
     }
 
     if (active && schedule.blockIsleInApp) {
+      final isTimelock = schedule.id == YoutubeTimelockService.timelockScheduleId;
       out.add(ScheduleBlockExplainItem(
         layer: 'schedule_isle',
         title: '「${schedule.name}」Isle 인앱 차단 ON',
         detail: '$timeLine · WebView 전체 잠금',
         scheduleId: schedule.id,
         scheduleName: schedule.name,
-        fixHint: '스케줄 편집 → Isle 인앱 차단 스위치',
+        fixHint: 'Safari 오버레이 우회 막기와 별개 · 스와이프로 끄기',
         iconName: 'phone_iphone',
+        relaxAction: isTimelock
+            ? ScheduleBlockRelaxAction.timelockOff
+            : ScheduleBlockRelaxAction.isleInAppOff,
+        relaxLabel: 'Isle 인앱 차단 끄기',
       ));
     }
 

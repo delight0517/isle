@@ -1,10 +1,10 @@
 {
   "packId": "premade_adult_sites_200",
   "displayName": "성인 (Porn) 사이트 200",
-  "description": "성인·캠·스트리밍 도메인 200 — Safari·검색·피드",
-  "version": "1.0.0",
-  "generatedAt": "2026-06-13T05:36:48Z",
-  "entryCount": 200,
+  "description": "DNS·확장으로 차단하는 성인/캠/스트리밍 도메인 200개",
+  "version": "1.0.2",
+  "generatedAt": "2026-06-13T16:00:00Z",
+  "entryCount": 203,
   "entries": [
     {
       "pattern": "pornhub.com",
@@ -1005,6 +1005,21 @@
       "pattern": "camhub.com",
       "kind": "host",
       "note": "adult site"
+    },
+    {
+      "pattern": "mingky04.live",
+      "kind": "host",
+      "note": "adult numeric-evasion (mingky04)"
+    },
+    {
+      "pattern": "mingky01.live",
+      "kind": "host",
+      "note": "adult numeric-evasion (mingky01)"
+    },
+    {
+      "pattern": "mingky",
+      "kind": "urlContains",
+      "note": "adult numeric-evasion stem (mingky01-99)"
     }
   ]
 }

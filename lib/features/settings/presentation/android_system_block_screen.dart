@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/blocking/blocking_controller_provider.dart';
 import '../../../shared/widgets/android_blocking_setup_checklist.dart';
 import '../../../shared/widgets/blocking_capabilities_banner.dart';
+import '../../../core/constants/app_legal_info.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/intervention/app_intervention_service.dart';
@@ -313,8 +314,9 @@ youtu.be
           ),
           const SizedBox(height: 10),
           Text(
-            '선택한 앱이 열리면 Isle가 차단 화면을 띄웁니다. iOS Screen Time과 달리 '
-            'OS가 강제하지 않는 접근성 기반이라, 설정에서 접근성을 끄면 우회될 수 있어요.',
+            '선택한 앱이 열릴 때 차단 화면을 띄우는 보조 기능입니다. '
+            '${AppLegalInfo.accessibilityPermissionNotice} '
+            '기기·설정에 따라 동작이 달라질 수 있어요.',
             style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.4),
           ),
           const SizedBox(height: 12),
@@ -390,6 +392,7 @@ youtu.be
               ],
             ),
             Text(
+              '${AppLegalInfo.vpnPermissionNotice} '
               'DoH(암호화 DNS)를 쓰는 브라우저는 우회될 수 있어요. VPN 권한이 필요합니다.',
               style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.35),
             ),

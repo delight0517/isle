@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'insight_portfolio_store.dart';
-import 'models/insight_card.dart';
 
 class DepthMatchPeer {
   const DepthMatchPeer({

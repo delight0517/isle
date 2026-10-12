@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/block_schedule/schedule_active_service.dart';
 import '../../../../core/navigation/isle_routes.dart';
+import '../../../../core/navigation/schedule_overlay_navigation.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/services/isle_user_defaults.dart';
@@ -97,7 +98,7 @@ class YoutubeFocusPanel extends StatelessWidget {
                   ? (scheduleLocked ? '지금 스케줄로 막는 중' : '스케줄 켜짐 · 편집하기')
                   : '예: 밤 11시~아침 7시 자동 차단',
               highlight: scheduleLocked,
-              onTap: () => context.push(IsleRoutes.blockSchedules),
+              onTap: () => pushBlockScheduleList(context),
             ),
             if (Platform.isIOS || Platform.isAndroid) ...[
               const SizedBox(height: 6),

@@ -68,6 +68,8 @@ class YoutubePodcastSavedPlaylistStore {
     return b;
   }
 
+  static bool get isOpen => _box?.isOpen ?? false;
+
   static List<YoutubePodcastSavedPlaylist> loadAll() {
     final raw = box.get(_key);
     if (raw == null || raw.isEmpty) return [];

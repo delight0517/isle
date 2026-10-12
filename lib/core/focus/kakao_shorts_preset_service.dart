@@ -29,7 +29,7 @@ class KakaoShortsPresetService {
 
   static const microRefillScheduleName = '카카오 쇼츠 · 5분 리필';
 
-  /// iOS DeviceActivity는 5분 롤링 창 미지원 → 매시간 N분 허용
+  /// iOS DeviceActivity는 5분 롤링 창 미지원 → 매시간 N분(예산 초과 시 2시간×2N분 블록)
   static ({int windowMinutes, int limitMinutes}) microRefillLimits() {
     if (Platform.isIOS) return (windowMinutes: 60, limitMinutes: 5);
     return (windowMinutes: 5, limitMinutes: 3);
@@ -143,14 +143,20 @@ class KakaoShortsPresetService {
     );
   }
 
-  /// Safari에서 카카오 웹 쇼츠 (보조)
-  static Future<void> enableSafariKakaoDomain() async {
+  /// 카카오 웹 쇼츠 차단 (Safari 확장 · Android VPN)
+  static Future<void> enableKakaoWebBlock() async {
     await WebsiteBlockStore.ensureOpen();
     if (!WebsiteBlockStore.isBlocked('kakao.com')) {
       await WebsiteBlockStore.toggle('kakao.com');
     }
-    await IosRulesExportService.exportNow();
+    if (Platform.isIOS) {
+      await IosRulesExportService.exportNow();
+    }
+    await BlockScheduleEnforcementService.syncPlatformEnforcement(force: true);
   }
+
+  /// @deprecated — [enableKakaoWebBlock] 사용
+  static Future<void> enableSafariKakaoDomain() => enableKakaoWebBlock();
 
   static Future<void> enablePomodoro30x10() => KakaoShortsAddictionStore.setPomodoroEnabled(true);
 }

@@ -7,7 +7,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.isle.app</string>
+		<string>group.com.isle.app.moa</string>
 	</array>
 </dict>
 </plist>

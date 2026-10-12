@@ -12,10 +12,18 @@ class LibraryEntry {
   final String channelId;
   final String channelName;
   final String? summary;
-  final String origin; // watch_later | youtube_playlist | brunch_sync | youtube_history | digest
+  final String
+      origin; // watch_later | youtube_playlist | brunch_sync | youtube_history | digest
   final String? sourceId;
   final DateTime importedAt;
   final DateTime? publishedAt;
+
+  /// 자막 기반 브이로그 스타일 글 (버튼 한 번으로 생성) — [summary]와 별도 보관
+  final String? generatedPost;
+
+  /// MOA 안에서 실제 재생이 확인된 YouTube 시청 시간만 누적한다.
+  final int watchSeconds;
+  final DateTime? lastWatchedAt;
 
   const LibraryEntry({
     required this.id,
@@ -30,6 +38,9 @@ class LibraryEntry {
     this.sourceId,
     required this.importedAt,
     this.publishedAt,
+    this.generatedPost,
+    this.watchSeconds = 0,
+    this.lastWatchedAt,
   });
 
   factory LibraryEntry.fromJson(Map<String, dynamic> j) => LibraryEntry(
@@ -43,8 +54,12 @@ class LibraryEntry {
         summary: j['summary'] as String?,
         origin: j['origin'] as String? ?? 'import',
         sourceId: j['source_id'] as String?,
-        importedAt: DateTime.tryParse(j['imported_at'] as String? ?? '') ?? DateTime.now(),
+        importedAt: DateTime.tryParse(j['imported_at'] as String? ?? '') ??
+            DateTime.now(),
         publishedAt: DateTime.tryParse(j['published_at'] as String? ?? ''),
+        generatedPost: j['generated_post'] as String?,
+        watchSeconds: (j['watch_seconds'] as num?)?.toInt() ?? 0,
+        lastWatchedAt: DateTime.tryParse(j['last_watched_at'] as String? ?? ''),
       );
 
   Map<String, dynamic> toJson() => {
@@ -60,7 +75,38 @@ class LibraryEntry {
         if (sourceId != null) 'source_id': sourceId,
         'imported_at': importedAt.toIso8601String(),
         if (publishedAt != null) 'published_at': publishedAt!.toIso8601String(),
+        if (generatedPost != null) 'generated_post': generatedPost,
+        if (watchSeconds > 0) 'watch_seconds': watchSeconds,
+        if (lastWatchedAt != null)
+          'last_watched_at': lastWatchedAt!.toIso8601String(),
       };
+
+  LibraryEntry copyWith({
+    String? summary,
+    String? generatedPost,
+    String? title,
+    String? channelId,
+    String? channelName,
+    int? watchSeconds,
+    DateTime? lastWatchedAt,
+  }) =>
+      LibraryEntry(
+        id: id,
+        title: title ?? this.title,
+        url: url,
+        thumbnailUrl: thumbnailUrl,
+        sourceType: sourceType,
+        channelId: channelId ?? this.channelId,
+        channelName: channelName ?? this.channelName,
+        summary: summary ?? this.summary,
+        origin: origin,
+        sourceId: sourceId,
+        importedAt: importedAt,
+        publishedAt: publishedAt,
+        generatedPost: generatedPost ?? this.generatedPost,
+        watchSeconds: watchSeconds ?? this.watchSeconds,
+        lastWatchedAt: lastWatchedAt ?? this.lastWatchedAt,
+      );
 
   FeedItem toFeedItem({double relevanceBoost = 0.15}) {
     final topics = TopicMatcher.detectTopics('$title $channelName');
@@ -130,6 +176,8 @@ class LibraryEntry {
     required String title,
     String channelName = '',
     String channelId = '',
+    int watchSeconds = 0,
+    DateTime? lastWatchedAt,
   }) {
     final url = 'https://www.youtube.com/watch?v=$videoId';
     return LibraryEntry(
@@ -143,6 +191,8 @@ class LibraryEntry {
       origin: 'youtube_history',
       importedAt: DateTime.now(),
       publishedAt: DateTime.now(),
+      watchSeconds: watchSeconds,
+      lastWatchedAt: lastWatchedAt,
     );
   }
 

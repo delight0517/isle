@@ -35,5 +35,19 @@ void main() {
       expect(js, contains('hideBlockedChannelLinkContainers'));
       expect(js, contains('isle-yt-channel-blocked-banner'));
     });
+
+    test('immediately checks fullscreen state after installing the guard', () {
+      final js = YoutubeChannelBlockScript.build([
+        BlockedChannel(
+          channelId: 'UCtest123',
+          channelName: 'Test',
+          blockedAt: DateTime(2026),
+        ),
+      ]);
+      expect(js, contains('installFullscreenGuard'));
+      expect(js, contains('runImmediateFullscreenCheck'));
+      expect(js, contains('webkitbeginfullscreen'));
+      expect(js, contains('fullscreenchange'));
+    });
   });
 }

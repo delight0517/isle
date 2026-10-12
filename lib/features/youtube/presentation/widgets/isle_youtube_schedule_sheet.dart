@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/block_schedule/isle_youtube_schedule_service.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
+import '../../../../core/navigation/schedule_overlay_navigation.dart';
 import '../../../../shared/widgets/isle_sheet.dart';
 
 /// 수동 — 매일 아침까지 Isle 유튜브 차단
@@ -12,8 +12,8 @@ Future<void> showIsleYoutubeScheduleSheet(BuildContext context) async {
 
   await showIsleModalSheet<void>(
     context: context,
-    builder: (ctx) => StatefulBuilder(
-      builder: (context, setLocal) {
+    builder: (sheetContext) => StatefulBuilder(
+      builder: (localCtx, setLocal) {
         return Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           child: Column(
@@ -38,7 +38,7 @@ Future<void> showIsleYoutubeScheduleSheet(BuildContext context) async {
                 trailing: const Icon(Icons.schedule),
                 onTap: () async {
                   final picked = await showTimePicker(
-                    context: context,
+                    context: localCtx,
                     initialTime: endTime,
                     helpText: '몇 시까지 막을까요?',
                   );
@@ -53,17 +53,16 @@ Future<void> showIsleYoutubeScheduleSheet(BuildContext context) async {
                     endMinute: endTime.minute,
                   );
                   if (!context.mounted) return;
-                  Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('「${schedule.name}」 스케줄 적용됨')),
                   );
-                  context.push('/settings/block-schedules/${schedule.id}');
+                  await popSheetThenPushScheduleEdit(sheetContext, context, schedule.id);
                 },
                 icon: const Icon(Icons.check),
                 label: const Text('스케줄 적용'),
               ),
               TextButton(
-                onPressed: () => context.push('/settings/block-schedules'),
+                onPressed: () => popSheetThenPushScheduleList(sheetContext, context),
                 child: const Text('스케줄 목록 보기'),
               ),
             ],

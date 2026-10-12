@@ -15,6 +15,7 @@ import '../../../core/youtube/blocked_channel_store.dart';
 import '../../../core/youtube/content_filter_store.dart';
 import '../../../shared/widgets/isle_app_bar.dart';
 import 'isle_backup_code_sheet.dart';
+import '../../../shared/widgets/survival_backup_guide_sheet.dart';
 import '../../feed/providers/feed_provider.dart';
 
 /// JSON 백업·복원 + 재설치 생존 (Documents/Isle Backup)
@@ -143,6 +144,18 @@ class _DataBackupScreenState extends ConsumerState<DataBackupScreen> {
           SnackBar(content: Text('백업 폴더: $path')),
         );
       }
+    } on StateError catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('폴더 설정 실패: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -189,6 +202,7 @@ class _DataBackupScreenState extends ConsumerState<DataBackupScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          SurvivalBackupGuideCard(onPickFolder: _busy ? null : _pickFolder, busy: _busy),
           FilledButton.icon(
             onPressed: _busy ? null : () => showIsleBackupCodeSheet(context, ref),
             icon: const Icon(Icons.qr_code_2),

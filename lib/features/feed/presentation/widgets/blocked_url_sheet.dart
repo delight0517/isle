@@ -9,6 +9,7 @@ import '../../../../core/block/models/pending_rule_removal.dart';
 import '../../../../core/block/rule_pending_removal_service.dart';
 import '../../../../core/block/rule_removal_lock.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/platform/platform_block_intent.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/youtube/blocked_url_store.dart';
 
@@ -113,8 +114,7 @@ class _BlockedUrlBodyState extends ConsumerState<_BlockedUrlBody> {
             Text('차단 URL', style: IsleText.subtitle()),
             const SizedBox(height: 8),
             Text(
-              'YouTube 검색·피드·구글 검색·Discover에서 해당 링크 카드를 숨깁니다.\n'
-              'Safari(⋮) → 「이 URL 차단」으로 추가.',
+              PlatformBlockCopy.blockedUrlScopeHint,
               style: IsleText.caption(color: IsleColors.muted),
             ),
             const SizedBox(height: 12),

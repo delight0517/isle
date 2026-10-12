@@ -14,11 +14,11 @@ import '../../../../core/library/interest_pipeline_store.dart';
 import '../../../../core/services/isle_user_defaults.dart';
 import '../../../../core/utils/topic_matcher.dart';
 import '../../../../core/utils/url_parser.dart';
+import '../../../../core/youtube/youtube_content_open_guard.dart';
+import '../../../../core/youtube/youtube_url_redirect.dart';
 import '../../../../core/youtube/blocked_channel_store.dart';
 import '../../../../core/youtube/channel_genre_block_store.dart';
 import '../../../../core/youtube/content_filter_store.dart';
-import '../../../../core/youtube/models/youtube_page_channel.dart';
-import '../../../youtube/presentation/widgets/feed_boost_sheet.dart';
 import 'feed_swipe_actions.dart';
 
 class FeedCard extends ConsumerWidget {
@@ -59,9 +59,29 @@ class FeedCard extends ConsumerWidget {
             : () async {
                 await EngagementTracker.recordContentOpen(item.url, sourceType: item.sourceType);
                 if (!context.mounted) return;
-                context.push(
-                  '/viewer?url=${Uri.encodeComponent(item.url)}&title=${Uri.encodeComponent(item.title)}',
-                );
+                if (!YoutubeContentOpenGuard.showDenialOrAllow(
+                  context,
+                  url: item.url,
+                  channelId: item.channelId,
+                  channelName: item.channelName,
+                  videoTitle: item.title,
+                )) {
+                  return;
+                }
+                final ytRoute = YoutubeUrlRedirect.inAppRoute(item.url);
+                if (ytRoute != null) {
+                  context.push(ytRoute);
+                  return;
+                }
+                final q = [
+                  'url=${Uri.encodeComponent(item.url)}',
+                  'title=${Uri.encodeComponent(item.title)}',
+                  if (item.channelId.isNotEmpty)
+                    'channelId=${Uri.encodeComponent(item.channelId)}',
+                  if (item.channelName.isNotEmpty)
+                    'channelName=${Uri.encodeComponent(item.channelName)}',
+                ].join('&');
+                context.push('/viewer?$q');
               },
         child: Opacity(
           opacity: isDemo ? 0.88 : 1,
@@ -213,29 +233,6 @@ class FeedCard extends ConsumerWidget {
                           _timeAgo(item.publishedAt),
                           style: IsleText.caption(color: IsleColors.muted),
                         ),
-                        if (item.sourceType == 'youtube' && !isDemo)
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(
-                              minWidth: IsleSize.minTouchTarget,
-                              minHeight: IsleSize.minTouchTarget,
-                            ),
-                            tooltip: '피드에 더 보기',
-                            icon: const Icon(Icons.thumb_up_alt_outlined, size: 18, color: IsleColors.gold500),
-                            onPressed: () {
-                              final vid = UrlParser.extractYouTubeVideoId(item.url) ?? '';
-                              showFeedBoostSheet(
-                                context,
-                                watch: YoutubePageChannel(
-                                  channelId: item.channelId,
-                                  channelName: item.channelName,
-                                  videoTitle: item.title,
-                                  videoId: vid,
-                                ),
-                                pageUrl: item.url,
-                              );
-                            },
-                          ),
                         if (!isDemo)
                           IconButton(
                             padding: EdgeInsets.zero,
@@ -405,12 +402,14 @@ class FeedCard extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     final feedNotifier = ref.read(feedProvider.notifier);
 
+    var blocked = false;
     if (choice == 'channel' || choice == 'genre') {
       if (item.channelId.isNotEmpty || item.channelName.isNotEmpty) {
         await ref.read(blockedChannelsProvider.notifier).blockChannel(
               channelId: item.channelId,
               channelName: item.channelName,
             );
+        blocked = true;
       }
     }
 
@@ -442,8 +441,11 @@ class FeedCard extends ConsumerWidget {
     await feedNotifier.removeBlockedFromFeed();
     if (!context.mounted) return;
     final msg = switch (choice) {
-      'channel' => '「${item.channelName.isNotEmpty ? item.channelName : item.title}」 채널을 차단했어요',
-      'genre' => '비슷한 유형도 피드에서 숨길게요',
+      'channel' when blocked =>
+        '「${item.channelName.isNotEmpty ? item.channelName : item.title}」 채널을 차단했어요',
+      'channel' => '채널 정보가 없어 차단하지 못했어요',
+      'genre' when blocked => '비슷한 유형도 피드에서 숨길게요',
+      'genre' => '채널 정보가 없어 유형 차단을 완료하지 못했어요',
       'video' => '이 영상을 숨겼어요',
       _ => '',
     };

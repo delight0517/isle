@@ -25,6 +25,18 @@ class ScheduleAppTargetsStore {
     return b;
   }
 
+  /// 이 스케줄에 대해 한 번이라도 실제 저장이 있었는지 — [loadForSchedule]은
+  /// 저장이 없어도 카탈로그 기본값(전부 blockInSlot:false)을 돌려주기 때문에
+  /// "아직 저장 안 됨"과 "명시적으로 다 꺼짐"을 구분 못 한다.
+  /// [ScheduleAppTargetsGuard]가 "잠긴 스케줄의 기존 값을 지킨다"를 최초
+  /// 생성 시점(아직 아무것도 없어 지킬 게 없음)에 잘못 적용해 처음 차단
+  /// 설정 자체가 카탈로그 기본값으로 되돌아가던 회귀를 막는 데 쓴다
+  /// (Cage에서 먼저 발견·수정, 2026-07-11 이식).
+  static bool hasSavedEntries(String scheduleId) {
+    final raw = box.get('$_prefix$scheduleId');
+    return raw != null && raw.isNotEmpty;
+  }
+
   static List<ScheduleAppTargetEntry> loadForSchedule(String scheduleId) {
     final raw = box.get('$_prefix$scheduleId');
     if (raw == null || raw.isEmpty) return _defaults();

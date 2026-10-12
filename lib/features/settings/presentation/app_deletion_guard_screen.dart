@@ -8,15 +8,21 @@ import '../../../shared/widgets/isle_app_bar.dart';
 
 /// 앱 삭제 방지 안내.
 ///
-/// 마찰 모델의 마지막 구멍(= Isle를 지워 쉴드를 무력화) 닫기. iOS는 서드파티가
-/// 자기 삭제를 막을 수 없으므로, Screen Time 「앱 삭제 금지」를 사용자가 직접
-/// 켜도록 단계별로 안내한다. 암호는 사용자가 정하고 Isle는 알 수 없다(§마찰 모델).
+/// **중요(07-09 정정, cage에서 먼저 발견)**: 예전엔 "앱을 지우면 차단이 풀린다"고
+/// 안내했는데, 이건 사실과 반대일 가능성이 높다 — iOS의 `ManagedSettingsStore`
+/// (개인용 Family Controls 인증)는 앱을 지워도 쉴드가 자동으로 안 풀리고,
+/// 오히려 그 상태로 굳어버려서 Isle를 다시 설치해 직접 풀지 않는 한 손댈 방법이
+/// 없어질 수 있다(Apple 개발자 문서·포럼에 반복적으로 보고된 동작 — Screen Time
+/// 설정 UI에서도 안 보이는 앱 자체 관리 쉴드라 일반적인 "다운타임 끄기"로도 안
+/// 풀림). 그래서 이 화면의 실제 의미는 "지우면 마찰 모델 구멍이 뚫린다"가 아니라
+/// "지우기 전에 Isle 안에서 먼저 차단을 풀어야 한다, 지운 뒤엔 늦을 수 있다"임.
+/// Screen Time 「앱 삭제 금지」는 실수로 지우는 걸 막는 안전장치로는 여전히 유효.
 class AppDeletionGuardScreen extends StatelessWidget {
   const AppDeletionGuardScreen({super.key});
 
   static const _steps = <_GuardStep>[
     _GuardStep('설정 → 스크린 타임',
-        '스크린 타임을 켜고, 「스크린 타임 암호 사용」으로 암호를 정하세요. 이 암호는 본인만 알아야 효과가 있어요.'),
+        '스크린 타임을 켜고, 「스크린 타임 [REDACTED] 암호를 정하세요. 이 암호는 본인만 알아야 효과가 있어요.'),
     _GuardStep('콘텐츠 및 개인정보 보호 제한', '같은 화면에서 「콘텐츠 및 개인정보 보호 제한」을 켭니다.'),
     _GuardStep('iTunes 및 App Store 구입', '들어가서 「앱 삭제」를 「허용 안 함」으로 바꾸세요.'),
     _GuardStep('완료',
@@ -51,9 +57,10 @@ class AppDeletionGuardScreen extends StatelessWidget {
                   Text('왜 필요한가요?', style: IsleText.subtitle()),
                   const SizedBox(height: 6),
                   Text(
-                    'Isle 차단은 강력하지만, 앱을 지우면 풀려요. iOS는 앱이 스스로 '
-                    '삭제를 막을 수 없어서, Screen Time의 「앱 삭제 금지」를 직접 켜야 '
-                    '이 마지막 구멍이 닫힙니다.',
+                    '⚠️ Isle를 지운다고 차단이 자동으로 풀리는 게 아니에요 — 오히려 '
+                    '그 상태로 남아서 다시 설치해 직접 풀어야 할 수 있어요. 지우기 '
+                    '전엔 반드시 Isle 안에서 먼저 차단을 해제하세요. 실수로 지우는 '
+                    '걸 막으려면 Screen Time의 「앱 삭제 금지」를 켜 두세요.',
                     style: IsleText.body(color: IsleColors.ocean700).copyWith(height: 1.4),
                   ),
                 ],

@@ -3,6 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../shared/widgets/isle_sheet.dart';
 import '../constants/app_typography.dart';
+import '../platform/platform_block_intent.dart';
+import '../explorer/explorer_site.dart';
+import '../guard/isle_content_block_guard.dart';
+import '../navigation/explorer_entry_guard.dart';
 import '../safety/content_safety_guard.dart';
 import '../youtube/youtube_url_redirect.dart';
 
@@ -87,9 +91,22 @@ class SafariWebConfig {
 
   static void open(BuildContext context, {String? url}) {
     var raw = (url?.trim().isNotEmpty ?? false) ? url!.trim() : homeUrl;
+    final deny = ExplorerEntryGuard.denyMessageForSite(
+      ExplorerSite.custom,
+      url: raw,
+    );
+    if (deny != null) {
+      ExplorerEntryGuard.showDenial(
+        context,
+        deny,
+        url: raw,
+        site: ExplorerSite.custom,
+      );
+      return;
+    }
     if (ContentSafetyGuard.matchUrl(raw) != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('안전 모드: 성인 사이트는 열 수 없어요')),
+        const SnackBar(content: Text('안전 모드: 성인 콘텐츠 사이트는 열 수 없어요')),
       );
       raw = homeUrl;
     } else {
@@ -113,10 +130,10 @@ class SafariWebConfig {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Safari · 주소 열기', style: IsleText.subtitle()),
+            Text(PlatformBlockCopy.urlSheetTitle, style: IsleText.subtitle()),
             const SizedBox(height: 6),
             Text(
-              'Safari에서 YouTube를 보면 Isle 한도·타임락이 적용됩니다.',
+              PlatformBlockCopy.urlSheetSubtitle,
               style: IsleText.caption(color: Colors.grey),
             ),
             const SizedBox(height: 12),
@@ -133,7 +150,7 @@ class SafariWebConfig {
             const SizedBox(height: 12),
             FilledButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Safari에서 열기'),
+              child: Text(PlatformBlockCopy.urlSheetOpenButton),
             ),
             const SizedBox(height: 8),
             OutlinedButton(
@@ -147,10 +164,21 @@ class SafariWebConfig {
     if (ok != null && context.mounted) {
       var raw = ctrl.text.trim();
       var target = raw.isEmpty ? homeUrl : resolveQueryOrUrl(raw);
+      final deny = IsleContentBlockGuard.denyInAppSafariNavigation(target);
+      if (deny != null) {
+        ExplorerEntryGuard.showDenial(
+          context,
+          deny,
+          url: target,
+          site: ExplorerSite.custom,
+        );
+        ctrl.dispose();
+        return;
+      }
       if (ContentSafetyGuard.matchUrl(target) != null) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('안전 모드: 성인 사이트는 열 수 없어요')),
+            const SnackBar(content: Text('안전 모드: 성인 콘텐츠 사이트는 열 수 없어요')),
           );
         }
         target = homeUrl;

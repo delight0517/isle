@@ -97,7 +97,8 @@ class _BlockChannelSheetBodyState extends ConsumerState<_BlockChannelSheetBody> 
         title: const Text('채널 차단'),
         content: Text(
           '「$channelLabel」 유튜브 채널을 차단할까요?\n\n'
-          '피드와 앱 안 유튜브에서 이 채널 영상이 숨겨집니다.',
+          '피드와 Isle 안 유튜브(WebView)에서 이 채널 영상이 숨겨집니다.\n'
+          '※ iOS 「YouTube」앱은 OS가 막아 줄 수 없어요 — 차단 탭 → 항상 막기에서 YouTube 앱을 선택하면 앱 전체를 막을 수 있어요.',
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('아니요')),

@@ -7,11 +7,22 @@ class YoutubePlaybackErrorProbe {
   static const jsChannelName = 'IslePlayback';
 
   static String build() {
-    final ch = jsChannelName;
+    const ch = jsChannelName;
     return '''
 (function() {
   if (window.__islePlaybackProbe) return;
   window.__islePlaybackProbe = true;
+  // WKWebView inline 설정과 video 속성을 함께 적용해야 iOS가 네이티브 플레이어로 빠지지 않는다.
+  function prepareInlineVideos() {
+    document.querySelectorAll('video').forEach(function(v) {
+      if (!v.hasAttribute('playsinline')) v.setAttribute('playsinline', '');
+      if (!v.hasAttribute('webkit-playsinline')) v.setAttribute('webkit-playsinline', '');
+    });
+  }
+  prepareInlineVideos();
+  new MutationObserver(prepareInlineVideos).observe(document.documentElement, {
+    childList: true, subtree: true
+  });
   var patterns = [
     'try again later',
     'playback id',

@@ -19,7 +19,11 @@ class _AppLogScreenState extends State<AppLogScreen> {
   @override
   Widget build(BuildContext context) {
     final logs = IsleAppLogService.recent.reversed.toList();
-    final allText = logs.map((e) => e.formatLine()).join('\n');
+    // 복사한 로그를 채팅·이슈에 붙여넣을 때 어느 버전에서 난 로그인지 항상
+    // 같이 붙어 있어야 한다(2026-07-11 cage 요청) — 화면엔 버전이 따로
+    // 보이지만 복사 버튼이 실제로 담는 텍스트엔 안 들어있던 버그.
+    final allText =
+        'App: ${AppReleaseInfo.label}\n\n${logs.map((e) => e.formatLine()).join('\n')}';
 
     return Scaffold(
       appBar: const IsleAppBar(title: '앱 로그'),

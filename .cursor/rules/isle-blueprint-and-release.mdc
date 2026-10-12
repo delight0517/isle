@@ -9,16 +9,16 @@ alwaysApply: true
 
 1. **Architecture Snapshot**: Before major changes, list files to touch and core functions inside them.
 2. **Deletion Ban**: Do not delete entire files or large logic blocks unless the user says `REPLACE_ENTIRE_FILE`.
-3. **Trace Log**: After significant work, update `isle/.cursor_trace/LATEST_CHANGES.md` (added / removed / why / revert hint).
+3. **Trace Log**: Complexity ≥4 or 4+ files — update `isle/.cursor_trace/LATEST_CHANGES.md`.
 4. **User feedback**: Log recurring UX/product feedback in `isle/.cursor_trace/USER_FEEDBACK_LOG.md` with date and version.
 
 ## App name & version (ALWAYS)
 
 - Single source: `lib/core/constants/app_release_info.dart` + `pubspec.yaml` `version:` — **both must match** on every release.
 - **On screen**: `AppVersionBadge` stays visible (corner); tap copies `Isle vX.Y.Z+N`.
-- **On every update**: bump `buildNumber` (and `version` when needed) in both files.
+- **On every update**: bump `buildNumber` when shipping **user-visible app code** (see `.cursor/rules/agent-efficiency.mdc` §3).
 - **App logs**: Every line via `IsleAppLogService` includes app name, `vX.Y.Z+N`, and UTC timestamp (never message-only).
-- **Agent chat footer** (required at end of every assistant reply for this project):
+- **Agent chat footer** (replies that **changed app code** only):
 
 ```
 ---
@@ -32,3 +32,27 @@ Use actual values from `AppReleaseInfo.label` and `AppReleaseInfo.rebuildCommand
 - No "start from scratch" unless the directory is empty.
 - Preserve existing names, UI patterns, and comments unless broken.
 - Ask before resolving architectural conflicts by deleting one side.
+
+## Build / install discipline (ALWAYS)
+
+- Use **one build path per target**. Do not run Flutter, Xcode, Delete Fix, and ad-hoc install commands in parallel for the same app.
+- Before build/install, check whether another Codex/Claude/Cursor/Delete Fix session is already building. If so, wait and resume after the slot is clear.
+- Always confirm the stack before choosing a path:
+  - If `pubspec.yaml` + `lib/` exist, treat the app as Flutter with native iOS/Android bridges.
+  - If `ios/Runner` exists without Flutter files, treat it as Swift/iOS native.
+  - Keep this Flutter-vs-Swift check integrated even when another session says it worked on a different version.
+- Desktop/computer app target:
+  - Prefer the app's own rebuilder.
+  - If that fails, fix the rebuilder first.
+  - If no rebuilder exists, use Delete Fix / app delete flow and diagnose the concrete failure.
+- iPhone / external device target:
+  - Prefer Delete Fix / app delete flow.
+  - For Isle, use the single dispatcher: `./tool/agent_build_dispatch.sh iphone [UDID]`.
+  - For install-only: `./tool/agent_build_dispatch.sh iphone-install [UDID]`.
+  - This path heals Delete Fix, removes `.deletefixbak.*`, builds Profile, installs with `devicectl_install.sh`, and attaches console logs.
+- If another session says it used a Flutter or Swift-native variant, still verify the current directory directly before choosing the path.
+- If install appears stuck for 5 minutes, treat it as a failure to diagnose, not as waiting forever:
+  - collect Delete Fix context, terminal tail, device/install logs, and failure JSON;
+  - check USB trust/unlock/storage/signing;
+  - run Delete Fix heal before retrying.
+- When connected to an iPhone, use the Delete Fix iPhone console/log path to catch app crash/launch state after install.

@@ -1,4 +1,5 @@
 import 'explorer_site.dart';
+import '../platform/platform_block_intent.dart';
 
 /// 피드·탐색에서 열 수 있는 플랫폼
 class IslePlatform {
@@ -23,6 +24,10 @@ class IslePlatform {
   final int brandColor;
 
   String get exploreQuery => 'site=${site.name}&url=${Uri.encodeComponent(homeUrl)}';
+
+  /// UI 표시용 — `safari` id는 OS별 라벨 ([PlatformBlockCopy.inAppBrowserNavLabel]).
+  String get displayTitle =>
+      id == 'safari' ? PlatformBlockCopy.inAppBrowserNavLabel : title;
 }
 
 class PlatformCatalog {
@@ -96,7 +101,7 @@ class PlatformCatalog {
     IslePlatform(
       id: 'instagram',
       title: '인스타그램',
-      subtitle: '구독 피드 · 스토리 · Isle 게시',
+      subtitle: '피드·릴스 · 한도',
       site: ExplorerSite.instagram,
       homeUrl: 'https://www.instagram.com/',
       loginUrl: 'https://www.instagram.com/accounts/login/',

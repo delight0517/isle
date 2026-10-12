@@ -22,7 +22,7 @@ import '../../../../core/intervention/models/app_usage_limit_rule.dart';
 import '../../../../core/intervention/schedule_screen_time_service.dart';
 import '../../../../core/intervention/schedule_screen_time_store.dart';
 import '../../../../core/intervention/screen_time_selection_summary.dart';
-import '../../../../core/navigation/isle_routes.dart';
+import '../../../../core/navigation/schedule_overlay_navigation.dart';
 import '../../../../core/intervention/screen_time_persistence_service.dart';
 import '../../../../shared/widgets/screen_time_selection_preview.dart';
 import 'schedule_list_card.dart';
@@ -139,7 +139,8 @@ class _BlockScheduleOverviewState extends State<BlockScheduleOverview> {
           ],
         ],
         if (IsleUserDefaults.pendingScreenTimeReapply &&
-            ExternalAppShieldStore.hasSelection) ...[
+            (ExternalAppShieldStore.hasSelection ||
+                ScheduleScreenTimeStore.box.isNotEmpty)) ...[
           const SizedBox(height: 10),
           _ScreenTimeRestoreBanner(onRestored: _reload),
         ],
@@ -150,7 +151,7 @@ class _BlockScheduleOverviewState extends State<BlockScheduleOverview> {
             color: IsleColors.gold500,
             text: '스케줄 차단이 꺼져 있어요 — 아래 목록이 적용되지 않습니다.',
             actionLabel: '켜기',
-            onAction: () => context.push('/settings/block-schedules'),
+            onAction: () => pushBlockScheduleList(context),
           ),
         ],
         if (status != null && !_setupComplete(status)) ...[
@@ -164,7 +165,7 @@ class _BlockScheduleOverviewState extends State<BlockScheduleOverview> {
             const Spacer(),
             TextButton.icon(
               onPressed: () async {
-                await context.push('/settings/block-schedules');
+                await pushBlockScheduleList(context);
                 if (mounted) await _reload();
               },
               icon: const Icon(Icons.add, size: 18),
@@ -175,7 +176,7 @@ class _BlockScheduleOverviewState extends State<BlockScheduleOverview> {
         const SizedBox(height: 6),
         if (!hasAnySchedule)
           _EmptySchedulesCard(onAdd: () async {
-            await context.push('/settings/block-schedules');
+            await pushBlockScheduleList(context);
             if (mounted) await _reload();
           })
         else
@@ -183,7 +184,7 @@ class _BlockScheduleOverviewState extends State<BlockScheduleOverview> {
                 schedule: s,
                 active: _activeIds.contains(s.id),
                 onTap: () async {
-                  await context.push(IsleRoutes.blockScheduleEdit(s.id));
+                  await pushBlockScheduleEdit(context, s.id);
                   if (mounted) await _reload();
                 },
                 onEditApps: () async {
@@ -602,7 +603,7 @@ class _ScreenTimeRestoreBanner extends StatelessWidget {
     return _WarningStrip(
       icon: Icons.restore,
       color: IsleColors.ocean700,
-      text: '앱을 다시 설치했어요. 저장된 차단 앱 목록이 있어요 — Screen Time 승인 한 번만 하면 다시 적용됩니다.',
+      text: '앱을 다시 설치했어요. 차단·한도 데이터는 복구됐어요 — 아래 「승인」을 눌렀을 때만 Screen Time을 물어봅니다.',
       actionLabel: '승인',
       onAction: () => unawaited(_approve(context)),
     );
@@ -694,7 +695,7 @@ class _SetupGapBannerState extends State<_SetupGapBanner> {
         color: IsleColors.gold500,
         text: '차단 시간표가 없어요 — 언제 막을지 추가하세요',
         actionLabel: '스케줄 추가',
-        onAction: () => context.push('/settings/block-schedules'),
+        onAction: () => pushBlockScheduleList(context),
       );
     }
     if (!status.masterOn) {
@@ -703,7 +704,7 @@ class _SetupGapBannerState extends State<_SetupGapBanner> {
         color: IsleColors.muted,
         text: '스케줄 차단 스위치가 꺼져 있어요',
         actionLabel: '켜기',
-        onAction: () => context.push('/settings/block-schedules'),
+        onAction: () => pushBlockScheduleList(context),
       );
     }
     return const SizedBox.shrink();

@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/moa_strings.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_typography.dart';
 import '../../core/focus/isle_product_focus.dart';
 class IsleBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final VoidCallback? onCenterTap;
   final VoidCallback? onCenterLongPress;
 
   const IsleBottomNav({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.onCenterTap,
     this.onCenterLongPress,
   });
 
@@ -23,6 +25,7 @@ class IsleBottomNav extends StatelessWidget {
       return _FocusBottomNav(
         currentIndex: currentIndex.clamp(0, 2),
         onTap: onTap,
+        onCenterTap: onCenterTap,
         onCenterLongPress: onCenterLongPress,
       );
     }
@@ -52,11 +55,13 @@ class _FocusBottomNav extends StatelessWidget {
   const _FocusBottomNav({
     required this.currentIndex,
     required this.onTap,
+    this.onCenterTap,
     this.onCenterLongPress,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final VoidCallback? onCenterTap;
   final VoidCallback? onCenterLongPress;
 
   @override
@@ -64,21 +69,25 @@ class _FocusBottomNav extends StatelessWidget {
     return Material(
       color: Colors.white,
       elevation: 0,
-      child: SafeArea(
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: Color(0xFFF0EEFF), width: 1)),
+        ),
+        child: SafeArea(
         top: false,
         child: SizedBox(
-          height: IsleSize.bottomNavH,
+          height: 60,
           child: Row(
             children: [
               Expanded(
                 child: Tooltip(
-                  message: '차단·스케줄',
+                  message: 'SNS 바로 열기',
                   child: _SideItem(
                     index: 0,
                     currentIndex: currentIndex,
-                    icon: Icons.shield_outlined,
-                    selectedIcon: Icons.shield,
-                    label: '차단',
+                    icon: Icons.apps_outlined,
+                    selectedIcon: Icons.apps,
+                    label: 'SNS',
                     onTap: onTap,
                   ),
                 ),
@@ -86,29 +95,30 @@ class _FocusBottomNav extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Tooltip(
-                  message: '탭: 나의 Isle · 길게: 유튜브·인스타 바로 열기',
+                  message: '탭: 빠른 실행(QR·앱) · 길게: 유튜브·인스타 바로 열기',
                   child: _CenterIsleButton(
                     selected: currentIndex == 1,
-                    onTap: () => onTap(1),
+                    onTap: onCenterTap ?? () => onTap(1),
                     onLongPress: onCenterLongPress,
                   ),
                 ),
               ),
               Expanded(
                 child: Tooltip(
-                  message: '받기·소통 — 링크·DM',
+                  message: '시간 관리 · 사용 통계',
                   child: _SideItem(
                     index: 2,
                     currentIndex: currentIndex,
-                    icon: Icons.inbox_outlined,
-                    selectedIcon: Icons.inbox,
-                    label: '받기',
+                    icon: Icons.timer_outlined,
+                    selectedIcon: Icons.timer,
+                    label: MoaStrings.of(context).t('time'),
                     onTap: onTap,
                   ),
                 ),
               ),
             ],
           ),
+        ),
         ),
       ),
     );
@@ -135,15 +145,30 @@ class _SideItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selected = currentIndex == index;
-    final color = selected ? IsleColors.ocean700 : IsleColors.muted;
+    final color = selected ? IsleColors.purple700 : IsleColors.muted;
     return InkWell(
       onTap: () => onTap(index),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(selected ? selectedIcon : icon, color: color, size: 26),
-          const SizedBox(height: 4),
-          Text(label, style: IsleText.caption(color: color)),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 40,
+            height: 32,
+            decoration: BoxDecoration(
+              color: selected ? IsleColors.purple100 : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(selected ? selectedIcon : icon, color: color, size: 22),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: IsleText.caption(color: color).copyWith(
+              fontSize: 10,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -174,29 +199,45 @@ class _CenterIsleButton extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 52,
-            height: 52,
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 50,
+            height: 40,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: selected ? IsleColors.ocean100 : Colors.transparent,
-              border: Border.all(
-                color: selected ? IsleColors.ocean500 : IsleColors.ocean100,
-                width: selected ? 2 : 1,
-              ),
+              gradient: selected
+                  ? const LinearGradient(
+                      colors: [IsleColors.purple700, IsleColors.purple500],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null,
+              color: selected ? null : IsleColors.purple100,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: IsleColors.purple700.withValues(alpha: 0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      )
+                    ]
+                  : null,
             ),
             child: Icon(
               Icons.landscape_outlined,
-              color: selected ? IsleColors.ocean700 : IsleColors.ocean500,
-              size: 32,
+              color: selected ? Colors.white : IsleColors.purple500,
+              size: 24,
             ),
           ),
           const SizedBox(height: 2),
           Text(
-            '나의 Isle',
+            MoaStrings.of(context).t('my_moa'),
             style: IsleText.caption(
-              color: selected ? IsleColors.ocean700 : IsleColors.muted,
-            ).copyWith(fontWeight: selected ? FontWeight.w600 : FontWeight.w500),
+              color: selected ? IsleColors.purple700 : IsleColors.muted,
+            ).copyWith(
+              fontSize: 10,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            ),
           ),
         ],
       ),

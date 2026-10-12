@@ -51,7 +51,22 @@ class InstagramPostCommentsScript {
   setTimeout(revealComments, 400);
   setTimeout(revealComments, 1200);
   if (!window.__isleIgCommentsObserver) {
-    window.__isleIgCommentsObserver = new MutationObserver(revealComments);
+    // 피드 스크롤 중에도 이 옵저버가 document 전체를 계속 관찰해서, 매 DOM
+    // mutation(무한 스크롤 로딩·영상 자동재생 상태 변화 등)마다 콜백이 불려
+    // JS 메인 스레드가 눌리는 게 실사용에서 확인된 랙·"피드가 한번에 여러 개
+    // 넘어가는" 버벅임의 원인이었다(2026-07-20). revealComments 자체는
+    // isPostPath()로 걸러도, 콜백 호출 자체의 브릿지 비용은 그대로 남는다.
+    // requestAnimationFrame으로 묶어서 한 프레임에 최대 1번만 실행한다.
+    var isleCommentsRafPending = false;
+    var isleCommentsObserverCallback = function() {
+      if (isleCommentsRafPending) return;
+      isleCommentsRafPending = true;
+      requestAnimationFrame(function() {
+        isleCommentsRafPending = false;
+        revealComments();
+      });
+    };
+    window.__isleIgCommentsObserver = new MutationObserver(isleCommentsObserverCallback);
     window.__isleIgCommentsObserver.observe(document.documentElement, { childList: true, subtree: true });
   }
 })();
