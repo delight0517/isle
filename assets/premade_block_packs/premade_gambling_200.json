@@ -1,0 +1,1010 @@
+{
+  "packId": "premade_gambling_200",
+  "displayName": "도박·토토·카지노 광고 200",
+  "description": "불법 스트리밍·게시판(xbbg 등) 사이드바 도박 광고 URL·키워드 200 — 확장이 링크 숨김 + 접속 차단",
+  "version": "1.0.0",
+  "generatedAt": "2026-06-30T00:10:15Z",
+  "entryCount": 200,
+  "entries": [
+    {
+      "pattern": "bet365.com",
+      "kind": "host",
+      "note": "gambling host · bet365.com"
+    },
+    {
+      "pattern": "betway.com",
+      "kind": "host",
+      "note": "gambling host · betway.com"
+    },
+    {
+      "pattern": "888casino.com",
+      "kind": "host",
+      "note": "gambling host · 888casino.com"
+    },
+    {
+      "pattern": "betsson.com",
+      "kind": "host",
+      "note": "gambling host · betsson.com"
+    },
+    {
+      "pattern": "unibet.com",
+      "kind": "host",
+      "note": "gambling host · unibet.com"
+    },
+    {
+      "pattern": "williamhill.com",
+      "kind": "host",
+      "note": "gambling host · williamhill.com"
+    },
+    {
+      "pattern": "ladbrokes.com",
+      "kind": "host",
+      "note": "gambling host · ladbrokes.com"
+    },
+    {
+      "pattern": "paddypower.com",
+      "kind": "host",
+      "note": "gambling host · paddypower.com"
+    },
+    {
+      "pattern": "coral.co.uk",
+      "kind": "host",
+      "note": "gambling host · coral.co.uk"
+    },
+    {
+      "pattern": "1xbet.com",
+      "kind": "host",
+      "note": "gambling host · 1xbet.com"
+    },
+    {
+      "pattern": "melbet.com",
+      "kind": "host",
+      "note": "gambling host · melbet.com"
+    },
+    {
+      "pattern": "22bet.com",
+      "kind": "host",
+      "note": "gambling host · 22bet.com"
+    },
+    {
+      "pattern": "parimatch.com",
+      "kind": "host",
+      "note": "gambling host · parimatch.com"
+    },
+    {
+      "pattern": "mostbet.com",
+      "kind": "host",
+      "note": "gambling host · mostbet.com"
+    },
+    {
+      "pattern": "stake.com",
+      "kind": "host",
+      "note": "gambling host · stake.com"
+    },
+    {
+      "pattern": "roobet.com",
+      "kind": "host",
+      "note": "gambling host · roobet.com"
+    },
+    {
+      "pattern": "bc.game",
+      "kind": "host",
+      "note": "gambling host · bc.game"
+    },
+    {
+      "pattern": "rollbit.com",
+      "kind": "host",
+      "note": "gambling host · rollbit.com"
+    },
+    {
+      "pattern": "duelbits.com",
+      "kind": "host",
+      "note": "gambling host · duelbits.com"
+    },
+    {
+      "pattern": "bovada.lv",
+      "kind": "host",
+      "note": "gambling host · bovada.lv"
+    },
+    {
+      "pattern": "bodog.eu",
+      "kind": "host",
+      "note": "gambling host · bodog.eu"
+    },
+    {
+      "pattern": "betonline.ag",
+      "kind": "host",
+      "note": "gambling host · betonline.ag"
+    },
+    {
+      "pattern": "mybookie.ag",
+      "kind": "host",
+      "note": "gambling host · mybookie.ag"
+    },
+    {
+      "pattern": "sportsbetting.ag",
+      "kind": "host",
+      "note": "gambling host · sportsbetting.ag"
+    },
+    {
+      "pattern": "draftkings.com",
+      "kind": "host",
+      "note": "gambling host · draftkings.com"
+    },
+    {
+      "pattern": "fanduel.com",
+      "kind": "host",
+      "note": "gambling host · fanduel.com"
+    },
+    {
+      "pattern": "betmgm.com",
+      "kind": "host",
+      "note": "gambling host · betmgm.com"
+    },
+    {
+      "pattern": "caesars.com",
+      "kind": "host",
+      "note": "gambling host · caesars.com"
+    },
+    {
+      "pattern": "pokerstars.com",
+      "kind": "host",
+      "note": "gambling host · pokerstars.com"
+    },
+    {
+      "pattern": "partypoker.com",
+      "kind": "host",
+      "note": "gambling host · partypoker.com"
+    },
+    {
+      "pattern": "ggpoker.com",
+      "kind": "host",
+      "note": "gambling host · ggpoker.com"
+    },
+    {
+      "pattern": "888poker.com",
+      "kind": "host",
+      "note": "gambling host · 888poker.com"
+    },
+    {
+      "pattern": "bwin.com",
+      "kind": "host",
+      "note": "gambling host · bwin.com"
+    },
+    {
+      "pattern": "sportingbet.com",
+      "kind": "host",
+      "note": "gambling host · sportingbet.com"
+    },
+    {
+      "pattern": "betfair.com",
+      "kind": "host",
+      "note": "gambling host · betfair.com"
+    },
+    {
+      "pattern": "pinnacle.com",
+      "kind": "host",
+      "note": "gambling host · pinnacle.com"
+    },
+    {
+      "pattern": "marathonbet.com",
+      "kind": "host",
+      "note": "gambling host · marathonbet.com"
+    },
+    {
+      "pattern": "betclic.com",
+      "kind": "host",
+      "note": "gambling host · betclic.com"
+    },
+    {
+      "pattern": "tipico.com",
+      "kind": "host",
+      "note": "gambling host · tipico.com"
+    },
+    {
+      "pattern": "interwetten.com",
+      "kind": "host",
+      "note": "gambling host · interwetten.com"
+    },
+    {
+      "pattern": "dafabet.com",
+      "kind": "host",
+      "note": "gambling host · dafabet.com"
+    },
+    {
+      "pattern": "sbobet.com",
+      "kind": "host",
+      "note": "gambling host · sbobet.com"
+    },
+    {
+      "pattern": "188bet.com",
+      "kind": "host",
+      "note": "gambling host · 188bet.com"
+    },
+    {
+      "pattern": "12bet.com",
+      "kind": "host",
+      "note": "gambling host · 12bet.com"
+    },
+    {
+      "pattern": "fun88.com",
+      "kind": "host",
+      "note": "gambling host · fun88.com"
+    },
+    {
+      "pattern": "w88.com",
+      "kind": "host",
+      "note": "gambling host · w88.com"
+    },
+    {
+      "pattern": "m88.com",
+      "kind": "host",
+      "note": "gambling host · m88.com"
+    },
+    {
+      "pattern": "bk8.com",
+      "kind": "host",
+      "note": "gambling host · bk8.com"
+    },
+    {
+      "pattern": "betvictor.com",
+      "kind": "host",
+      "note": "gambling host · betvictor.com"
+    },
+    {
+      "pattern": "skybet.com",
+      "kind": "host",
+      "note": "gambling host · skybet.com"
+    },
+    {
+      "pattern": "betfred.com",
+      "kind": "host",
+      "note": "gambling host · betfred.com"
+    },
+    {
+      "pattern": "boylesports.com",
+      "kind": "host",
+      "note": "gambling host · boylesports.com"
+    },
+    {
+      "pattern": "bet-at-home.com",
+      "kind": "host",
+      "note": "gambling host · bet-at-home.com"
+    },
+    {
+      "pattern": "coolbet.com",
+      "kind": "host",
+      "note": "gambling host · coolbet.com"
+    },
+    {
+      "pattern": "leovegas.com",
+      "kind": "host",
+      "note": "gambling host · leovegas.com"
+    },
+    {
+      "pattern": "mrgreen.com",
+      "kind": "host",
+      "note": "gambling host · mrgreen.com"
+    },
+    {
+      "pattern": "casumo.com",
+      "kind": "host",
+      "note": "gambling host · casumo.com"
+    },
+    {
+      "pattern": "rizk.com",
+      "kind": "host",
+      "note": "gambling host · rizk.com"
+    },
+    {
+      "pattern": "videoslots.com",
+      "kind": "host",
+      "note": "gambling host · videoslots.com"
+    },
+    {
+      "pattern": "jackpotcity.com",
+      "kind": "host",
+      "note": "gambling host · jackpotcity.com"
+    },
+    {
+      "pattern": "spinpalace.com",
+      "kind": "host",
+      "note": "gambling host · spinpalace.com"
+    },
+    {
+      "pattern": "royalvegas.com",
+      "kind": "host",
+      "note": "gambling host · royalvegas.com"
+    },
+    {
+      "pattern": "rubyfortune.com",
+      "kind": "host",
+      "note": "gambling host · rubyfortune.com"
+    },
+    {
+      "pattern": "spin.casino",
+      "kind": "host",
+      "note": "gambling host · spin.casino"
+    },
+    {
+      "pattern": "playojo.com",
+      "kind": "host",
+      "note": "gambling host · playojo.com"
+    },
+    {
+      "pattern": "partycasino.com",
+      "kind": "host",
+      "note": "gambling host · partycasino.com"
+    },
+    {
+      "pattern": "netbet.com",
+      "kind": "host",
+      "note": "gambling host · netbet.com"
+    },
+    {
+      "pattern": "dobaklife21.com",
+      "kind": "host",
+      "note": "gambling host · dobaklife21.com"
+    },
+    {
+      "pattern": "dobaklife.com",
+      "kind": "host",
+      "note": "gambling host · dobaklife.com"
+    },
+    {
+      "pattern": "dobak365.com",
+      "kind": "host",
+      "note": "gambling host · dobak365.com"
+    },
+    {
+      "pattern": "dobak119.com",
+      "kind": "host",
+      "note": "gambling host · dobak119.com"
+    },
+    {
+      "pattern": "casino777.com",
+      "kind": "host",
+      "note": "gambling host · casino777.com"
+    },
+    {
+      "pattern": "europacasino.com",
+      "kind": "host",
+      "note": "gambling host · europacasino.com"
+    },
+    {
+      "pattern": "777.com",
+      "kind": "host",
+      "note": "gambling host · 777.com"
+    },
+    {
+      "pattern": "casinoroom.com",
+      "kind": "host",
+      "note": "gambling host · casinoroom.com"
+    },
+    {
+      "pattern": "livecasino.com",
+      "kind": "host",
+      "note": "gambling host · livecasino.com"
+    },
+    {
+      "pattern": "evolution.com",
+      "kind": "host",
+      "note": "gambling host · evolution.com"
+    },
+    {
+      "pattern": "pragmaticplay.com",
+      "kind": "host",
+      "note": "gambling host · pragmaticplay.com"
+    },
+    {
+      "pattern": "microgaming.co.uk",
+      "kind": "host",
+      "note": "gambling host · microgaming.co.uk"
+    },
+    {
+      "pattern": "playtech.com",
+      "kind": "host",
+      "note": "gambling host · playtech.com"
+    },
+    {
+      "pattern": "betsoft.com",
+      "kind": "host",
+      "note": "gambling host · betsoft.com"
+    },
+    {
+      "pattern": "sportsbook.ag",
+      "kind": "host",
+      "note": "gambling host · sportsbook.ag"
+    },
+    {
+      "pattern": "bookmaker.eu",
+      "kind": "host",
+      "note": "gambling host · bookmaker.eu"
+    },
+    {
+      "pattern": "heritagesports.eu",
+      "kind": "host",
+      "note": "gambling host · heritagesports.eu"
+    },
+    {
+      "pattern": "betdsi.eu",
+      "kind": "host",
+      "note": "gambling host · betdsi.eu"
+    },
+    {
+      "pattern": "cloudbet.com",
+      "kind": "host",
+      "note": "gambling host · cloudbet.com"
+    },
+    {
+      "pattern": "bitsler.com",
+      "kind": "host",
+      "note": "gambling host · bitsler.com"
+    },
+    {
+      "pattern": "fortunejack.com",
+      "kind": "host",
+      "note": "gambling host · fortunejack.com"
+    },
+    {
+      "pattern": "bitcasino.io",
+      "kind": "host",
+      "note": "gambling host · bitcasino.io"
+    },
+    {
+      "pattern": "sportsbet.io",
+      "kind": "host",
+      "note": "gambling host · sportsbet.io"
+    },
+    {
+      "pattern": "nitrogensports.eu",
+      "kind": "host",
+      "note": "gambling host · nitrogensports.eu"
+    },
+    {
+      "pattern": "betbtc.co",
+      "kind": "host",
+      "note": "gambling host · betbtc.co"
+    },
+    {
+      "pattern": "totoworld.com",
+      "kind": "host",
+      "note": "gambling host · totoworld.com"
+    },
+    {
+      "pattern": "sportstoto.com",
+      "kind": "host",
+      "note": "gambling host · sportstoto.com"
+    },
+    {
+      "pattern": "proto.com",
+      "kind": "host",
+      "note": "gambling host · proto.com"
+    },
+    {
+      "pattern": "bepick.net",
+      "kind": "host",
+      "note": "gambling host · bepick.net"
+    },
+    {
+      "pattern": "nikebet.com",
+      "kind": "host",
+      "note": "gambling host · nikebet.com"
+    },
+    {
+      "pattern": "named.com",
+      "kind": "host",
+      "note": "gambling host · named.com"
+    },
+    {
+      "pattern": "pinnacle888.com",
+      "kind": "host",
+      "note": "gambling host · pinnacle888.com"
+    },
+    {
+      "pattern": "sevenluck.com",
+      "kind": "host",
+      "note": "gambling host · sevenluck.com"
+    },
+    {
+      "pattern": "toto-club.com",
+      "kind": "host",
+      "note": "gambling host · toto-club.com"
+    },
+    {
+      "pattern": "casino-club.com",
+      "kind": "host",
+      "note": "gambling host · casino-club.com"
+    },
+    {
+      "pattern": "baccarat-club.com",
+      "kind": "host",
+      "note": "gambling host · baccarat-club.com"
+    },
+    {
+      "pattern": "holdem-club.com",
+      "kind": "host",
+      "note": "gambling host · holdem-club.com"
+    },
+    {
+      "pattern": "slot-club.com",
+      "kind": "host",
+      "note": "gambling host · slot-club.com"
+    },
+    {
+      "pattern": "powerball-club.com",
+      "kind": "host",
+      "note": "gambling host · powerball-club.com"
+    },
+    {
+      "pattern": "sports-toto.com",
+      "kind": "host",
+      "note": "gambling host · sports-toto.com"
+    },
+    {
+      "pattern": "live-baccarat.com",
+      "kind": "host",
+      "note": "gambling host · live-baccarat.com"
+    },
+    {
+      "pattern": "live-casino.net",
+      "kind": "host",
+      "note": "gambling host · live-casino.net"
+    },
+    {
+      "pattern": "online-casino.net",
+      "kind": "host",
+      "note": "gambling host · online-casino.net"
+    },
+    {
+      "pattern": "crypto-casino.com",
+      "kind": "host",
+      "note": "gambling host · crypto-casino.com"
+    },
+    {
+      "pattern": "bitcoin-casino.com",
+      "kind": "host",
+      "note": "gambling host · bitcoin-casino.com"
+    },
+    {
+      "pattern": "/casino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/livecasino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/live-casino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/baccarat",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/baccara",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/bacara",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/slot",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/slots",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/roulette",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/blackjack",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/poker",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/holdem",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/hold'em",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/sportsbook",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/sports-bet",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/sportsbet",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/sportbet",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/betting",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/powerball",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/sadari",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/ladder",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/minigame",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/mini-game",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/toto",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/proto",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/sports-toto",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "/sportstoto",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "casino.",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "toto.",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "baccarat.",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "baccara.",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "slot.",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "bet.",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "poker.",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "livecasino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "onlinecasino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "sportbet",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "bookmaker",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "ref=casino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "aff=casino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "partner=casino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "goto=casino",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "ref=toto",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "aff=toto",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "partner=bet",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "카지노",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "바카라",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "토토",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "파워볼",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "사다리",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "홀덤",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "슬롯",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "룰렛",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "스포츠토토",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "프로토",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "미니게임",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "라이브카지노",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "블랙잭",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "안전놀이터",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "먹튀검증",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "사설토토",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "메이저놀이터",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "메이저토토",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "베팅",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "도박",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "카지노주소",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "토토주소",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "바카라주소",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "도박사이트",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "온라인카지노",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "스포츠베팅",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "실시간카지노",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "카지노사이트",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "토토사이트",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "evolutiongaming",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "pragmaticplay",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "microgaming",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "playtech",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "dobak",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "dobaklife",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "casinotitle",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "totoclub",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "baccaraclub",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "holdemclub",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "slotclub",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "powerballclub",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "livebaccarat",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    },
+    {
+      "pattern": "sportsbetting",
+      "kind": "urlContains",
+      "note": "gambling ad URL · embedded banner/link"
+    }
+  ]
+}

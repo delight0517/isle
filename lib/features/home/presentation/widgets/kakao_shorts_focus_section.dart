@@ -2,18 +2,18 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_typography.dart';
-import '../../../../core/focus/kakao_shorts_addiction_analyzer.dart';
 import '../../../../core/focus/kakao_shorts_addiction_store.dart';
+import '../../../../core/focus/kakao_shorts_addiction_analyzer.dart';
+import '../../../../core/platform/platform_block_intent.dart';
 import '../../../../core/focus/kakao_shorts_preset_service.dart';
-import '../../../../core/navigation/isle_routes.dart';
+import '../../../../core/navigation/schedule_overlay_navigation.dart';
 import '../../../../core/platform/isle_apple_platform.dart';
 
-/// 카카오톡 쇼츠 — OS 차단 · 5분 리필 · 30·10 · 중독 인사이트
+/// 카카오톡 쇼츠 — 사용 시간 관리 · 5분 리필 · 30·10 · 습관 인사이트
 class KakaoShortsFocusSection extends StatefulWidget {
   const KakaoShortsFocusSection({super.key});
 
@@ -80,8 +80,8 @@ class _KakaoShortsFocusSectionState extends State<KakaoShortsFocusSection> {
               Platform.isAndroid
                   ? '쇼츠는 카카오톡 앱 안에서만 돌아가요. '
                       '① 접근성 앱 차단 ② 5분마다 3분만 허용 ③ (선택) 30분 후 10분 휴식'
-                  : '쇼츠는 카카오톡 앱 안에서만 돌아가요. Isle이 확실히 막는 방법은 '
-                      '① iPhone 앱 차단 ② 5분마다 3분만 허용 ③ (선택) 30분 후 10분 휴식입니다.',
+                  : '쇼츠는 카카오톡 앱 안에서만 돌아가요. '
+                      '① 앱 차단 ② 5분마다 3분만 허용 ③ (선택) 30분 후 10분 휴식으로 사용을 줄일 수 있어요.',
               style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.4),
             ),
             if (insight != null) ...[
@@ -113,7 +113,7 @@ class _KakaoShortsFocusSectionState extends State<KakaoShortsFocusSection> {
                   label: '최강',
                   tip: Platform.isAndroid ? '접근성 · 카카오톡' : 'Screen Time · 카카오톡',
                 ),
-                _ChipTip(label: '쇼츠 끊기', tip: '5분 리필 3분'),
+                _ChipTip(label: '쇼츠 줄이기', tip: '5분 리필 3분'),
                 _ChipTip(label: '인식', tip: '연속 시청 분석'),
               ],
             ),
@@ -137,7 +137,7 @@ class _KakaoShortsFocusSectionState extends State<KakaoShortsFocusSection> {
                               ),
                             );
                             if (r.needsScreenTimePick) {
-                              context.push(IsleRoutes.blockScheduleEdit(r.schedule.id));
+                              pushBlockScheduleEdit(context, r.schedule.id);
                             }
                           }),
                   icon: const Icon(Icons.loop),
@@ -190,11 +190,10 @@ class _KakaoShortsFocusSectionState extends State<KakaoShortsFocusSection> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                if (!Platform.isAndroid)
-                  TextButton(
-                    onPressed: _busy ? null : () => _run(KakaoShortsPresetService.enableSafariKakaoDomain),
-                    child: const Text('Safari kakao.com'),
-                  ),
+                TextButton(
+                  onPressed: _busy ? null : () => _run(KakaoShortsPresetService.enableKakaoWebBlock),
+                  child: Text(PlatformBlockCopy.kakaoWebBlockButtonLabel),
+                ),
               ],
             ),
           ],

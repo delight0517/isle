@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/platform/platform_block_intent.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/services/isle_user_defaults.dart';
 import '../../../../core/social/instagram_auth_service.dart';
+import '../../../../core/social/instagram_safari_launch_guard.dart';
 import '../../../../core/social/instagram_web_config.dart';
 
 /// 받기·소통 ① — Instagram DM (답장 채널, 피드 스크롤 아님)
@@ -30,12 +32,22 @@ class _ShareInstagramDmSectionState extends State<ShareInstagramDmSection> {
   }
 
   Future<void> _safariLogin() async {
-    await InstagramAuthService.openLoginInSafari();
+    final blocked = InstagramSafariLaunchGuard.isEscapeBlocked;
+    if (blocked) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(PlatformBlockCopy.externalBrowserLoginBlockedSnack()),
+        ),
+      );
+      return;
+    }
+    await InstagramAuthService.openLoginInSafari(context: context);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Safari에서 로그인 후 「DM 열기」를 눌러 주세요'),
-        duration: Duration(seconds: 4),
+      SnackBar(
+        content: Text(PlatformBlockCopy.externalBrowserLoginSnack()),
+        duration: const Duration(seconds: 4),
       ),
     );
   }
@@ -103,11 +115,11 @@ class _ShareInstagramDmSectionState extends State<ShareInstagramDmSection> {
               ),
             ),
             const SizedBox(height: 12),
-            if (!_loggedIn) ...[
+            if (!_loggedIn && !InstagramSafariLaunchGuard.isEscapeBlocked) ...[
               OutlinedButton.icon(
                 onPressed: _safariLogin,
                 icon: const Icon(Icons.open_in_browser),
-                label: const Text('Safari로 로그인 (권장)'),
+                label: Text(PlatformBlockCopy.externalBrowserLoginButtonLabel()),
               ),
               const SizedBox(height: 6),
               TextButton(

@@ -36,6 +36,8 @@ class DeviceQaScreen extends StatefulWidget {
 
   static const qaItemIds = [
     'youtube_voice',
+    'youtube_lock_overlay',
+    'youtube_channel_block',
     'ai_schedule',
     'ai_isle_yt_schedule',
     'youtube_limits_ui',
@@ -47,6 +49,18 @@ class DeviceQaScreen extends StatefulWidget {
     'deploy_macos',
     'deploy_ios',
     'deploy_vercel',
+  ];
+
+  /// TODO §1 — iPhone 실기기 확인 우선 항목
+  static const devicePriorityIds = [
+    'youtube_voice',
+    'youtube_lock_overlay',
+    'ai_schedule',
+    'youtube_limits_ui',
+    'pomodoro',
+    'kakao_refill',
+    'youtube_account',
+    'android_blocking',
   ];
 
   @override
@@ -62,14 +76,27 @@ class _DeviceQaScreenState extends State<DeviceQaScreen> {
     DeviceQaItemDef(
       id: 'youtube_voice',
       title: '유튜브 음성',
-      steps: '① Google 로그인 ② 구독 탭 ③ 내 영상 ④ 내 채널 영상 재생·소리',
-      route: '/youtube/podcast',
+      steps:
+          '① Google 로그인 ② 구독·내 영상 ③ 재생목록(링크·계정 PL) ④ 오디오만·파형 ⑤ 소리',
+      route: '/youtube/podcast?qa=1',
+    ),
+    DeviceQaItemDef(
+      id: 'youtube_lock_overlay',
+      title: 'YouTube 잠금 오버레이',
+      steps: '① 스케줄 ON ② 오버레이 1개·칩「스케줄」 ③ 「이 스케줄 편집」 흰 화면 없음',
+      route: '/youtube/browser?qa=1',
+    ),
+    DeviceQaItemDef(
+      id: 'youtube_channel_block',
+      title: 'YouTube 채널 차단',
+      steps: '① 채널 숨기기 ② Isle 인앱 watch 즉시 차단 ③ 음성 재생 차단 ④ iOS YouTube앱=항상 막기',
+      route: '/home/my-isle/manage',
     ),
     DeviceQaItemDef(
       id: 'ai_schedule',
       title: 'AI·스케줄',
-      steps: '① AI 센터 → 키 붙여넣고 연결 ② Isle 유튜브 스케줄 ③ 차단 AI 챗',
-      route: '/settings/ai-hub',
+      steps: '① 키 붙여넣기·연결 테스트 ② Isle 유튜브 스케줄 ③ 차단 AI 챗',
+      route: '/settings/ai-hub?qa=1',
     ),
     DeviceQaItemDef(
       id: 'ai_isle_yt_schedule',
@@ -81,7 +108,7 @@ class _DeviceQaScreenState extends State<DeviceQaScreen> {
       id: 'youtube_limits_ui',
       title: '유튜브 한도 UI',
       steps: '슬라이더 변경 → 하단 sticky 저장 · 버전 배지와 겹치지 않는지',
-      route: IsleRoutes.youtubeLimits,
+      route: '${IsleRoutes.youtubeLimits}?qa=1',
     ),
     DeviceQaItemDef(
       id: 'pomodoro',
@@ -168,7 +195,19 @@ class _DeviceQaScreenState extends State<DeviceQaScreen> {
     final route = item.route;
     if (route != null && route.isNotEmpty) {
       await context.push(route);
+      if (!mounted) return;
+      unawaited(_runPreflight());
     }
+  }
+
+  DeviceQaItemDef? _nextPriorityItem() {
+    for (final id in DeviceQaScreen.devicePriorityIds) {
+      if (_checked.contains(id)) continue;
+      for (final item in _items) {
+        if (item.id == id) return item;
+      }
+    }
+    return null;
   }
 
   Future<void> _resetAll() async {
@@ -193,6 +232,7 @@ class _DeviceQaScreenState extends State<DeviceQaScreen> {
   Widget build(BuildContext context) {
     final done = DeviceQaStore.countChecked(_items.map((e) => e.id));
     final total = _items.length;
+    final next = _nextPriorityItem();
 
     return Scaffold(
       appBar: const IsleAppBar(title: '실기기 확인'),
@@ -224,6 +264,39 @@ class _DeviceQaScreenState extends State<DeviceQaScreen> {
               ],
             ),
           ),
+          if (next != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(IsleSize.cardRadius),
+                border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.35)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('다음 확인', style: IsleText.subtitle(color: const Color(0xFF1B5E20))),
+                  const SizedBox(height: 6),
+                  Text(next.title, style: IsleText.body()),
+                  const SizedBox(height: 4),
+                  Text(
+                    next.steps,
+                    style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.35),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: IsleSize.minTouchTarget,
+                    child: FilledButton.icon(
+                      onPressed: () => _open(next),
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('화면 열기'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 0),
@@ -257,8 +330,15 @@ class _DeviceQaScreenState extends State<DeviceQaScreen> {
           ..._items.map((item) {
             final checked = _checked.contains(item.id);
             final pre = _preflight[item.id];
+            final priority = DeviceQaScreen.devicePriorityIds.contains(item.id) && !checked;
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
+              shape: priority
+                  ? RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: IsleColors.ocean500.withValues(alpha: 0.55)),
+                    )
+                  : null,
               child: Column(
                 children: [
                   CheckboxListTile(

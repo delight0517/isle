@@ -4,16 +4,17 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/block/rule_removal_lock.dart';
 import '../../../../core/block_schedule/block_schedule_enforcement_service.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/intervention/app_intervention_service.dart';
 import '../../../../core/intervention/external_app_shield_store.dart';
-import '../../../../core/block/rule_removal_lock.dart';
 import '../../../../core/platform/isle_apple_platform.dart';
 import '../../../../shared/widgets/rule_removal_lock_controls.dart';
 import '../../../../shared/widgets/screen_time_selection_preview.dart';
+import 'safari_pause_widget.dart';
 
 /// 스케줄 없이 선택한 앱을 지금 바로 잠금 (전역 Screen Time / Android 접근성 쉴드)
 class AlwaysOnAppBlockSection extends StatefulWidget {
@@ -22,7 +23,8 @@ class AlwaysOnAppBlockSection extends StatefulWidget {
   final VoidCallback? onChanged;
 
   @override
-  State<AlwaysOnAppBlockSection> createState() => _AlwaysOnAppBlockSectionState();
+  State<AlwaysOnAppBlockSection> createState() =>
+      _AlwaysOnAppBlockSectionState();
 }
 
 class _AlwaysOnAppBlockSectionState extends State<AlwaysOnAppBlockSection> {
@@ -92,6 +94,19 @@ class _AlwaysOnAppBlockSectionState extends State<AlwaysOnAppBlockSection> {
         await _load();
         return;
       }
+      if (!RuleRemovalLock.lockEnabled) {
+        await RuleRemovalLock.setLockEnabled(true);
+        if (mounted) {
+          final min = RuleRemovalLock.freezeMinutes;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Safari·앱 끄기 전 $min분 대기가 켜졌어요 — 아래에서 시간을 바꿀 수 있어요',
+              ),
+            ),
+          );
+        }
+      }
       await AppInterventionService.applySavedAppShield();
     }
     await BlockScheduleEnforcementService.syncPlatformEnforcement(force: true);
@@ -103,9 +118,7 @@ class _AlwaysOnAppBlockSectionState extends State<AlwaysOnAppBlockSection> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _isAndroid
-                ? '접근성 차단 서비스 권한을 허용해 주세요'
-                : 'Screen Time 권한을 허용해 주세요',
+            _isAndroid ? '접근성 차단 서비스 권한을 허용해 주세요' : 'Screen Time 권한을 허용해 주세요',
           ),
         ),
       );
@@ -128,23 +141,36 @@ class _AlwaysOnAppBlockSectionState extends State<AlwaysOnAppBlockSection> {
     );
   }
 
+  Widget _stepLine(String n, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(n,
+              style: IsleText.caption(color: IsleColors.ocean700)
+                  .copyWith(fontWeight: FontWeight.w700)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(text,
+                style: IsleText.caption(color: IsleColors.muted)
+                    .copyWith(height: 1.35)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!IsleApplePlatform.isNativeBlockHost) {
       return const SizedBox.shrink();
     }
 
+    final freezeMin = RuleRemovalLock.freezeMinutes;
     final pickLabel = _isAndroid
         ? (_hasApps ? '막을 앱 변경' : 'Chrome·Instagram 등 앱 선택')
         : (_hasApps ? '막을 앱 변경' : 'Safari·Instagram 등 앱 선택');
-
-    final hint = _isAndroid
-        ? 'Chrome·YouTube 앱 등을 함께 고르면 QR·웹 링크 누수를 줄일 수 있어요. '
-            '해제는 위 「제거 잠금」 시간이 지나야 가능합니다. '
-            'iOS처럼 OS가 강제하지 않으므로 접근성을 끄면 우회될 수 있어요.'
-        : '완전 차단하려면 Safari·Chrome 등 모든 브라우저와 App Store까지 함께 고르세요. '
-            '브라우저를 막으면 QR·웹 링크가 새지 않고, App Store를 막으면 새 브라우저 설치도 막혀요. '
-            '해제는 위 「제거 잠금」 시간이 지나야 가능합니다.';
 
     return Card(
       color: _alwaysOn && _hasApps ? const Color(0xFFFFEBEE) : Colors.white,
@@ -153,22 +179,76 @@ class _AlwaysOnAppBlockSectionState extends State<AlwaysOnAppBlockSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: IsleColors.ocean100.withValues(alpha: 0.45),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '이 카드가 하는 일',
+                    style: IsleText.caption().copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: IsleColors.ocean900),
+                  ),
+                  const SizedBox(height: 6),
+                  _stepLine(
+                    '①',
+                    _isAndroid
+                        ? '막을 앱을 고릅니다 (Chrome·YouTube 앱 등)'
+                        : '막을 앱을 고릅니다 — Safari를 넣으면 브라우저로 유튜브·SNS 보는 것도 막혀요',
+                  ),
+                  _stepLine(
+                    '②',
+                    _isAndroid
+                        ? '계속 차단 ON → 선택한 Android 앱을 스케줄과 무관하게 차단하고, MOA 안의 대체 기능을 이용할 수 있어요.'
+                        : '계속 차단 ON → 선택한 iPhone 앱을 스케줄과 무관하게 차단하고, MOA 안의 대체 기능을 이용할 수 있어요.',
+                  ),
+                  _stepLine('③',
+                      '직접 해제하거나 목록을 바꿀 때는 아래 삭제 대기($freezeMin분, 변경 가능)가 적용돼요.'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               value: _alwaysOn && _hasApps,
-              onChanged: _busy
-                  ? null
-                  : (v) => _run(() => _toggleAlwaysOn(v)),
-              title: Text('항상 막기', style: IsleText.subtitle()),
+              onChanged: _busy ? null : (v) => _run(() => _toggleAlwaysOn(v)),
+              title: Text('선택한 앱 계속 차단', style: IsleText.subtitle()),
               subtitle: Text(
                 _hasApps
                     ? (_alwaysOn
-                        ? '지금 $_appCount개 앱 잠금 · 스케줄 없어도 유지'
-                        : '꺼짐 — 아래 스케줄 시간에만 잠금')
-                    : pickLabel,
-                style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.35),
+                        ? '켜짐 — $_appCount개 앱 계속 차단 중 (시스템 권한 유지 시)'
+                        : '꺼짐 — 차단 스케줄 시간에만 잠금')
+                    : '먼저 막을 앱을 선택하세요',
+                style: IsleText.caption(color: IsleColors.muted)
+                    .copyWith(height: 1.35),
               ),
             ),
+            const SizedBox(height: 6),
+            SafariPauseWidget(alwaysOn: _alwaysOn, hasApps: _hasApps),
+            if (_alwaysOn && _hasApps && !_isAndroid) ...[
+              const SizedBox(height: 4),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3E0),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade100),
+                ),
+                child: Text(
+                  'Safari를 막으면 유튜브·웹을 브라우저로 보는 우회도 함께 줄일 수 있어요. '
+                  '끄기 전 $freezeMin분 대기(삭제 대기)가 적용됩니다.',
+                  style: IsleText.caption(color: Colors.orange.shade900)
+                      .copyWith(height: 1.4),
+                ),
+              ),
+            ],
             if (_hasApps) ...[
               const SizedBox(height: 4),
               ScreenTimeSelectionPreview(
@@ -192,12 +272,13 @@ class _AlwaysOnAppBlockSectionState extends State<AlwaysOnAppBlockSection> {
                 label: Text(pickLabel),
               ),
             ),
-            const SizedBox(height: 6),
-            Text(
-              hint,
-              style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.35),
-            ),
-            if (!_isAndroid)
+            if (!_isAndroid) ...[
+              const SizedBox(height: 4),
+              Text(
+                '예: iPhone YouTube 앱을 차단하고 MOA 안의 YouTube를 이용할 수 있어요. Safari와 App Store는 필요할 때만 선택하세요.',
+                style: IsleText.caption(color: IsleColors.muted)
+                    .copyWith(height: 1.35),
+              ),
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
@@ -211,6 +292,24 @@ class _AlwaysOnAppBlockSectionState extends State<AlwaysOnAppBlockSection> {
                   label: const Text('앱 삭제까지 막기 (마지막 구멍)'),
                 ),
               ),
+            ],
+            if (_hasApps) ...[
+              const SizedBox(height: 8),
+              const Divider(height: 1),
+              const SizedBox(height: 8),
+              Text(
+                'Safari·앱 끄기 전 대기',
+                style: IsleText.body().copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '충동적으로 스위치를 끄지 않도록, 해제·목록 변경 전 $freezeMin분(기본) 대기합니다.',
+                style: IsleText.caption(color: IsleColors.muted)
+                    .copyWith(height: 1.35),
+              ),
+              const SizedBox(height: 8),
+              const RuleRemovalLockControls(compact: true),
+            ],
           ],
         ),
       ),

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
 import '../../core/constants/app_colors.dart';
+import '../../core/navigation/isle_navigation.dart';
+import '../../core/navigation/schedule_overlay_navigation.dart';
 import '../../core/constants/app_typography.dart';
 import '../../core/localization/schedule_strings.dart';
 import '../../core/platform/ios_internal_schedule_lock_controller.dart';
@@ -119,7 +119,7 @@ class _IosInternalLockOverlay extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
-                onPressed: () => context.push('/settings/block-schedules'),
+                onPressed: () => openBlockScheduleFromOverlay(context),
                 icon: const Icon(Icons.schedule, color: Colors.white),
                 label: Text(
                   ScheduleStrings.of(context).t('hub_title'),
@@ -128,7 +128,8 @@ class _IosInternalLockOverlay extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               TextButton(
-                onPressed: () => context.push('/settings/iphone-blocking'),
+                onPressed: () =>
+                    IsleNavigation.push('/settings/iphone-blocking', from: context),
                 child: const Text('iPhone 차단 기능 안내'),
               ),
             ],

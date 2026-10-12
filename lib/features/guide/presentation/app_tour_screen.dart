@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -24,7 +26,8 @@ class _AppTourScreenState extends State<AppTourScreen> {
   final _pageController = PageController();
   int _index = 0;
 
-  static List<_TourPage> get _pages => [
+  static List<_TourPage> _buildPages() {
+    final pages = <_TourPage>[
         _TourPage(
           icon: Icons.play_circle_filled,
           gradient: [const Color(0xFFB71C1C), const Color(0xFFFF0000)],
@@ -36,6 +39,21 @@ class _AppTourScreenState extends State<AppTourScreen> {
           hint: '밖에서 본 유튜브는 통계에 안 잡혀요',
           showFlow: true,
         ),
+    ];
+    if (Platform.isIOS) {
+      pages.add(
+        _TourPage(
+          icon: Icons.cloud_upload_outlined,
+          gradient: [const Color(0xFF0D3B66), IsleColors.ocean500],
+          title: '삭제해도\n데이터 유지',
+          body:
+              '설정 → 데이터 백업 → 「폴더 변경」으로 iCloud Drive 폴더를 지정하세요.\n'
+              '차단·구독·스케줄이 클라우드에 남아 재설치 후에도 복원할 수 있어요.',
+          hint: 'iCloud Drive · Isle Backup 폴더 추천',
+        ),
+      );
+    }
+    pages.addAll([
         _TourPage(
           icon: Icons.public_off,
           gradient: [IsleColors.ocean900, IsleColors.ocean500],
@@ -71,7 +89,11 @@ class _AppTourScreenState extends State<AppTourScreen> {
           hint: '건너뛰어도 피드·차단 탭에서 다시 열 수 있어요',
           isLast: true,
         ),
-      ];
+      ]);
+    return pages;
+  }
+
+  List<_TourPage> get _pages => _buildPages();
 
   @override
   void dispose() {

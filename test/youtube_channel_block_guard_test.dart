@@ -105,7 +105,7 @@ void main() {
   });
 
   group('YoutubeChannelBlockGuard.matchProbe', () {
-  test('blocks by channel id from watch probe', () {
+    test('blocks by channel id from watch probe', () {
       final hit = YoutubeChannelBlockGuard.matchProbe(
         channels: [ch(id: 'UCprobe99', name: '프로브 채널')],
         videos: const [],
@@ -149,7 +149,8 @@ void main() {
     test('matches @handle case-insensitively', () {
       final blocked = ch(id: '@StarCraft', name: 'SC');
       expect(
-        blocked.matches(const FeedChannelRef(channelId: '@starcraft', channelName: '')),
+        blocked.matches(
+            const FeedChannelRef(channelId: '@starcraft', channelName: '')),
         isTrue,
       );
     });
@@ -168,7 +169,8 @@ void main() {
       expect(script, contains('installClickGuard'));
       expect(script, contains('startIntervalSweep'));
       expect(script, contains('ytm-rich-grid-media'));
-      expect(script, isNot(contains('visibilitychange')));
+      expect(script, contains('enforceWatchPageBlock'));
+      expect(script, contains('visibilitychange'));
     });
 
     test('light mode defers heavy sweep for search', () {
@@ -177,12 +179,30 @@ void main() {
         lightMode: true,
       );
       expect(script, contains('const LIGHT = true'));
-      expect(script, contains('1600'));
+      expect(script, contains('1800'));
+      expect(script, contains('7000'));
     });
 
     test('skips work when lists empty', () {
       final script = YoutubeChannelBlockScript.build(const []);
       expect(script, contains('if (!blockedIds.length'));
+    });
+
+    test('installs a fullscreen guard so preset/keyword/channel blocks '
+        'cannot escape via native fullscreen playback (2026-07-13 실사용 '
+        '제보 — "한도 없음" 상태에서 프리셋으로 막은 영상도 전체화면을 누르면 '
+        '그대로 재생되던 버그, 한도 차단 엔진에만 있던 fullscreen 가드를 '
+        '프리셋 차단 쪽에도 추가)', () {
+      final script = YoutubeChannelBlockScript.build(
+        [ch(id: 'UCtest123', name: 'Test')],
+      );
+      expect(script, contains('installFullscreenGuard'));
+      expect(script, contains('webkitbeginfullscreen'));
+      expect(script, contains('fullscreenchange'));
+      expect(script, contains('webkitExitFullscreen'));
+      expect(script, contains('document.webkitFullscreenElement'));
+      expect(script, contains('setTimeout(function(){ exitAndPause(v); }, 600)'));
+      expect(script, contains("urlBlocked(location.href || '')"));
     });
   });
 }

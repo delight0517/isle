@@ -2,6 +2,7 @@ import Flutter
 import Security
 import SwiftUI
 import UIKit
+import WebKit
 
 #if canImport(FamilyControls)
 import FamilyControls
@@ -9,7 +10,7 @@ import ManagedSettings
 #endif
 
 private enum IsleAppGroupFiles {
-  static let appGroupId = "group.com.isle.app"
+  static let appGroupId = IsleAppIdentity.appGroupId
 
   static var containerURL: URL? {
     FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupId)
@@ -46,21 +47,24 @@ private struct IsleFamilyPickerContainer: View {
   @State private var selection: FamilyActivitySelection
   let onFinish: (FamilyActivitySelection) -> Void
   let onCancel: () -> Void
+  let title: String
 
   init(
     initial: FamilyActivitySelection,
+    title: String = "차단할 앱·카테고리",
     onFinish: @escaping (FamilyActivitySelection) -> Void,
     onCancel: @escaping () -> Void
   ) {
     _selection = State(initialValue: initial)
     self.onFinish = onFinish
     self.onCancel = onCancel
+    self.title = title
   }
 
   var body: some View {
     NavigationStack {
       FamilyActivityPicker(selection: $selection)
-        .navigationTitle("차단할 앱·카테고리")
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
@@ -94,6 +98,7 @@ enum IsleFamilyActivityPickerUI {
   static func present(
     existingEncoded: String?,
     additiveOnly: Bool = false,
+    title: String = "차단할 앱·카테고리",
     completion: @escaping (Result<[String: Any], Error>) -> Void
   ) {
     var initial = FamilyActivitySelection()
@@ -114,6 +119,7 @@ enum IsleFamilyActivityPickerUI {
     hostingRef = UIHostingController(
       rootView: IsleFamilyPickerContainer(
         initial: initial,
+        title: title,
         onFinish: { selection in
           hostingRef.dismiss(animated: true) {
             do {
@@ -323,6 +329,11 @@ final class ScreenTimeBridge: NSObject {
   }
 
   /// 스케줄 도메인 — OS `webContent`에는 적용하지 않음 (Isle WebView까지 차단됨).
+  /// youtube.com처럼 Safari 안 특정 사이트만 막고 싶으면 여기가 아니라
+  /// `applyAppShield`의 `store.shield.webDomains`(FamilyActivityPicker "웹 사이트"
+  /// 탭에서 고른 도메인)를 쓴다 — Safari 전용 인터스티셜 쉴드라 콘텐츠 필터
+  /// 익스텐션을 안 거치고, Isle WKWebView의 googlevideo.com 스트림과 안 겹친다
+  /// (2026-[REDACTED] 조사 완료 — TODO.md 참고, 이 함수는 그 목적으로 안 씀).
   func applyScheduleWebDomains(domains: [String]) -> Bool {
     #if canImport(FamilyControls) && canImport(ManagedSettings)
     guard AuthorizationCenter.shared.authorizationStatus == .approved else { return false }
@@ -357,6 +368,32 @@ final class ScreenTimeBridge: NSObject {
     } else {
       // ManagedSettings: webDomains is Set<WebDomainToken>?, not .specific policy.
       store.shield.webDomains = selection.webDomainTokens
+    }
+    return true
+    #else
+    return false
+    #endif
+  }
+
+  /// "올나이트 록다운" — 설치된 앱 전체를 카테고리 단위로 쉴드한다. 개별 앱
+  /// 선택(`applyAppShield`가 쓰는 `shield.applications`)과는 별개 키
+  /// (`shield.applicationCategories`)라 서로 덮어쓰지 않고 같이 적용된다.
+  /// 전화·긴급 SOS는 OS가 ManagedSettings 쉴드 대상에서 항상 제외하므로
+  /// 여기서 따로 예외 처리할 필요가 없다(Apple 시스템 보호 앱).
+  func applyLockdownShield(enable: Bool, allowedAppsEncoded: String?) -> Bool {
+    #if canImport(FamilyControls) && canImport(ManagedSettings)
+    guard AuthorizationCenter.shared.authorizationStatus == .approved else { return false }
+    let store = IsleScreenTimeStores.schedule
+    if enable {
+      let allowed = allowedAppsEncoded
+        .flatMap { Data(base64Encoded: $0) }
+        .flatMap { try? PropertyListDecoder().decode(FamilyActivitySelection.self, from: $0) }
+      IsleScheduleShieldSync.saveLockdownAllowedSelection(allowedAppsEncoded)
+      store.shield.applicationCategories = ShieldSettings.ActivityCategoryPolicy.all(
+        except: allowed?.applicationTokens ?? Set()
+      )
+    } else {
+      store.shield.applicationCategories = nil
     }
     return true
     #else
@@ -429,8 +466,12 @@ final class ScreenTimeBridge: NSObject {
     IsleAppGroupFiles.appGroupPath()
   }
 
-  func saveScheduleSelection(scheduleId: String, encoded: String) -> Bool {
-    IsleScheduleShieldSync.saveScheduleSelection(scheduleId: scheduleId, encoded: encoded)
+  func saveScheduleSelection(scheduleId: String, bundleId: String? = nil, encoded: String) -> Bool {
+    IsleScheduleShieldSync.saveScheduleSelection(
+      scheduleId: scheduleId,
+      bundleId: bundleId,
+      encoded: encoded
+    )
   }
 
   func saveGlobalFallbackSelection(encoded: String) -> Bool {
@@ -442,12 +483,16 @@ final class ScreenTimeBridge: NSObject {
   func applyActiveScheduleShield(
     scheduleIds: [String],
     domains: [String],
-    fallbackEncoded: String?
+    fallbackEncoded: String?,
+    lockdownActive: Bool,
+    lockdownAllowedAppsEncoded: String?
   ) -> Bool {
-    IsleScheduleShieldSync.applyActiveSchedules(
+    _ = IsleScheduleShieldSync.saveLockdownAllowedSelection(lockdownAllowedAppsEncoded)
+    return IsleScheduleShieldSync.applyActiveSchedules(
       scheduleIds: scheduleIds,
       domains: domains,
-      fallbackEncoded: fallbackEncoded
+      fallbackEncoded: fallbackEncoded,
+      lockdownActive: lockdownActive
     )
   }
 
@@ -522,7 +567,7 @@ final class ScreenTimeBridge: NSObject {
     }
   }
 
-  private static let persistenceKeychainService = "com.isle.app.screen_time_persistence"
+  private static let persistenceKeychainService = "com.isle.app.moa.screen_time_persistence"
   private static let persistenceKeychainAccount = "isle_screen_time_persistence_v1"
 
   func writePersistenceMirror(json: String) -> Bool {
@@ -627,6 +672,11 @@ final class ScreenTimeBridgePlugin: NSObject, FlutterPlugin {
       let args = call.arguments as? [String: Any]
       let encoded = args?["encoded"] as? String ?? ""
       result(bridge.applyAppShield(encoded: encoded))
+    case "applyLockdownShield":
+      let args = call.arguments as? [String: Any]
+      let enable = args?["enable"] as? Bool ?? false
+      let allowedAppsEncoded = args?["allowedAppsEncoded"] as? String
+      result(bridge.applyLockdownShield(enable: enable, allowedAppsEncoded: allowedAppsEncoded))
     case "clearScheduleEnforcement":
       bridge.clearScheduleEnforcement()
       result(nil)
@@ -669,8 +719,9 @@ final class ScreenTimeBridgePlugin: NSObject, FlutterPlugin {
     case "saveScheduleSelection":
       let args = call.arguments as? [String: Any]
       let sid = args?["scheduleId"] as? String ?? ""
+      let bundleId = args?["bundleId"] as? String
       let enc = args?["encoded"] as? String ?? ""
-      result(bridge.saveScheduleSelection(scheduleId: sid, encoded: enc))
+      result(bridge.saveScheduleSelection(scheduleId: sid, bundleId: bundleId, encoded: enc))
     case "saveGlobalFallbackSelection":
       let args = call.arguments as? [String: Any]
       let enc = args?["encoded"] as? String ?? ""
@@ -680,10 +731,14 @@ final class ScreenTimeBridgePlugin: NSObject, FlutterPlugin {
       let ids = args?["scheduleIds"] as? [String] ?? []
       let domains = args?["domains"] as? [String] ?? []
       let fallback = args?["fallbackEncoded"] as? String
+      let lockdownActive = args?["lockdownActive"] as? Bool ?? false
+      let lockdownAllowedAppsEncoded = args?["lockdownAllowedAppsEncoded"] as? String
       result(bridge.applyActiveScheduleShield(
         scheduleIds: ids,
         domains: domains,
-        fallbackEncoded: fallback
+        fallbackEncoded: fallback,
+        lockdownActive: lockdownActive,
+        lockdownAllowedAppsEncoded: lockdownAllowedAppsEncoded
       ))
     case "syncShieldFromSnapshot":
       result(bridge.syncShieldFromSnapshot())
@@ -708,15 +763,16 @@ final class ScreenTimeBridgePlugin: NSObject, FlutterPlugin {
       let args = call.arguments as? [String: Any]
       let existing = args?["existingEncoded"] as? String
       let additiveOnly = args?["additiveOnly"] as? Bool ?? false
+      let purpose = args?["purpose"] as? String ?? "block"
       Task { @MainActor in
         if AuthorizationCenter.shared.authorizationStatus != .approved {
           bridge.requestAuthorization { _ in
             Task { @MainActor in
-              await Self.runPicker(existing: existing, additiveOnly: additiveOnly, result: result)
+              await Self.runPicker(existing: existing, additiveOnly: additiveOnly, purpose: purpose, result: result)
             }
           }
         } else {
-          await Self.runPicker(existing: existing, additiveOnly: additiveOnly, result: result)
+          await Self.runPicker(existing: existing, additiveOnly: additiveOnly, purpose: purpose, result: result)
         }
       }
       #else
@@ -739,6 +795,7 @@ final class ScreenTimeBridgePlugin: NSObject, FlutterPlugin {
   private static func runPicker(
     existing: String?,
     additiveOnly: Bool,
+    purpose: String,
     result: @escaping FlutterResult
   ) async {
     #if canImport(FamilyControls)
@@ -746,7 +803,11 @@ final class ScreenTimeBridgePlugin: NSObject, FlutterPlugin {
       result(FlutterError(code: "not_authorized", message: "Screen Time 권한이 필요합니다.", details: nil))
       return
     }
-    IsleFamilyActivityPickerUI.present(existingEncoded: existing, additiveOnly: additiveOnly) { pickResult in
+    IsleFamilyActivityPickerUI.present(
+      existingEncoded: existing,
+      additiveOnly: additiveOnly,
+      title: purpose == "lockdownAllow" ? "잠금 중 허용할 앱" : "차단할 앱·카테고리"
+    ) { pickResult in
       switch pickResult {
       case .success(let map):
         result(map)
@@ -761,3 +822,193 @@ final class ScreenTimeBridgePlugin: NSObject, FlutterPlugin {
     #endif
   }
 }
+
+// MARK: - WebView session cookies (YouTube · Instagram)
+
+final class WebSessionBridgePlugin: NSObject, FlutterPlugin {
+  private static let sessionDomainHints = ["youtube", "google", "instagram", "facebook"]
+
+  static func register(with registrar: FlutterPluginRegistrar) {
+    let channel = FlutterMethodChannel(
+      name: "com.isle.app/web_session",
+      binaryMessenger: registrar.messenger()
+    )
+    let instance = WebSessionBridgePlugin()
+    registrar.addMethodCallDelegate(instance, channel: channel)
+  }
+
+  private static func isSessionDomain(_ domain: String) -> Bool {
+    let d = domain.lowercased()
+    return sessionDomainHints.contains { d.contains($0) }
+  }
+
+  func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    switch call.method {
+    case "exportCookies":
+      exportCookies(result: result)
+    case "importCookies":
+      guard let list = call.arguments as? [[String: Any]] else {
+        result(FlutterError(code: "bad_args", message: "cookies required", details: nil))
+        return
+      }
+      importCookies(list, result: result)
+    case "syncSafariCookiesToWebView":
+      syncSafariCookies(result: result)
+    case "clearDomainCookies":
+      let hint = (call.arguments as? String) ?? ""
+      clearDomainCookies(hint: hint, result: result)
+    default:
+      result(FlutterMethodNotImplemented)
+    }
+  }
+
+  private func exportCookies(result: @escaping FlutterResult) {
+    WKWebsiteDataStore.default().httpCookieStore.getAllCookies { cookies in
+      let filtered = cookies.filter { Self.isSessionDomain($0.domain) }
+      let arr: [[String: Any]] = filtered.map { c in
+        var m: [String: Any] = [
+          "name": c.name,
+          "value": c.value,
+          "domain": c.domain,
+          "path": c.path,
+          "isSecure": c.isSecure,
+          "isHTTPOnly": c.isHTTPOnly,
+        ]
+        if let exp = c.expiresDate {
+          m["expires"] = exp.timeIntervalSince1970
+        }
+        return m
+      }
+      DispatchQueue.main.async { result(arr) }
+    }
+  }
+
+  private func importCookies(_ list: [[String: Any]], result: @escaping FlutterResult) {
+    let store = WKWebsiteDataStore.default().httpCookieStore
+    let group = DispatchGroup()
+    for item in list {
+      guard let name = item["name"] as? String,
+            let value = item["value"] as? String,
+            let domain = item["domain"] as? String
+      else { continue }
+      let path = item["path"] as? String ?? "/"
+      var props: [HTTPCookiePropertyKey: Any] = [
+        .name: name,
+        .value: value,
+        .domain: domain,
+        .path: path,
+      ]
+      if let exp = item["expires"] as? Double {
+        props[.expires] = Date(timeIntervalSince1970: exp)
+      }
+      if (item["isSecure"] as? Bool) == true {
+        props[.secure] = "TRUE"
+      }
+      guard let cookie = HTTPCookie(properties: props) else { continue }
+      group.enter()
+      store.setCookie(cookie) { group.leave() }
+    }
+    group.notify(queue: .main) {
+      result(true)
+    }
+  }
+
+  private func clearDomainCookies(hint: String, result: @escaping FlutterResult) {
+    let needle = hint.lowercased()
+    let store = WKWebsiteDataStore.default().httpCookieStore
+    store.getAllCookies { cookies in
+      let targets = cookies.filter { $0.domain.lowercased().contains(needle) }
+      if targets.isEmpty {
+        DispatchQueue.main.async { result(true) }
+        return
+      }
+      let group = DispatchGroup()
+      for cookie in targets {
+        group.enter()
+        store.delete(cookie) { group.leave() }
+      }
+      group.notify(queue: .main) {
+        result(true)
+      }
+    }
+  }
+
+  private func syncSafariCookies(result: @escaping FlutterResult) {
+    let store = WKWebsiteDataStore.default().httpCookieStore
+    let shared = HTTPCookieStorage.shared.cookies ?? []
+    let filtered = shared.filter { Self.isSessionDomain($0.domain) }
+    if filtered.isEmpty {
+      result(0)
+      return
+    }
+    let group = DispatchGroup()
+    var count = 0
+    for cookie in filtered {
+      group.enter()
+      store.setCookie(cookie) {
+        count += 1
+        group.leave()
+      }
+    }
+    group.notify(queue: .main) {
+      result(count)
+    }
+  }
+}
+
+// MARK: - WKContentRuleList (Safe Browser — Safari CB와 동일 JSON)
+
+#if canImport(WebKit)
+final class WebContentRuleBridgePlugin: NSObject, FlutterPlugin {
+  private static var compiledRuleList: WKContentRuleList?
+
+  static func register(with registrar: FlutterPluginRegistrar) {
+    let channel = FlutterMethodChannel(
+      name: "com.isle.app/web_content_rules",
+      binaryMessenger: registrar.messenger()
+    )
+    let instance = WebContentRuleBridgePlugin()
+    registrar.addMethodCallDelegate(instance, channel: channel)
+  }
+
+  func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    switch call.method {
+    case "compileFromAppGroup":
+      Self.compileFromAppGroup { ok, err in
+        if ok {
+          result(true)
+        } else {
+          result(FlutterError(code: "compile_failed", message: err, details: nil))
+        }
+      }
+    default:
+      result(FlutterMethodNotImplemented)
+    }
+  }
+
+  private static func compileFromAppGroup(completion: @escaping (Bool, String?) -> Void) {
+    guard let dir = FileManager.default.containerURL(
+      forSecurityApplicationGroupIdentifier: IsleAppIdentity.appGroupId
+    ) else {
+      completion(false, "no app group")
+      return
+    }
+    let fileURL = dir.appendingPathComponent("content_blocker_v1.json")
+    guard let json = try? String(contentsOf: fileURL, encoding: .utf8), !json.isEmpty else {
+      completion(false, "no rules file")
+      return
+    }
+    WKContentRuleListStore.default().compileContentRuleList(
+      forIdentifier: "IsleSafeBrowserRules",
+      encodedContentRuleList: json
+    ) { list, error in
+      if let list = list {
+        compiledRuleList = list
+        completion(true, nil)
+      } else {
+        completion(false, error?.localizedDescription ?? "compile error")
+      }
+    }
+  }
+}
+#endif

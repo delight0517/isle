@@ -1,15 +1,18 @@
+import '../schedule_block_user_message.dart';
 import 'schedule_rule_enforcement.dart';
 
 class ScheduleWebBlockHit {
   const ScheduleWebBlockHit({
     required this.label,
     this.matchedPart,
+    this.scheduleId,
   });
 
   final String label;
   final String? matchedPart;
+  final String? scheduleId;
 
-  String get snackMessage => '스케줄 차단: $label';
+  String get snackMessage => ScheduleBlockUserMessage.scheduleDomainSnack(label);
 }
 
 /// 스케줄 활성 시간 — host·urlContains 4겹 레이어 (Blueprint §3)
@@ -34,6 +37,14 @@ class ScheduleWebBlockGuard {
         );
       }
     }
-    return ScheduleWebBlockHit(label: uri.host);
+    return ScheduleWebBlockHit(label: _friendlyHost(uri.host));
+  }
+
+  static String _friendlyHost(String host) {
+    final h = host.toLowerCase();
+    if (h.contains('youtube') || h.contains('youtu.be')) return 'YouTube';
+    if (h.contains('instagram')) return 'Instagram';
+    if (h.contains('google')) return 'Google';
+    return host;
   }
 }

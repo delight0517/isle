@@ -3,7 +3,12 @@ import SafariServices
 
 /// Safari Content Blocker — App Group `content_blocker_v1.json` (Isle rules export).
 class ContentBlockerRequestHandler: NSObject, NSExtensionRequestHandling {
-  private static let appGroupId = "group.com.isle.app"
+  private static let appGroupId: String = {
+    if let id = Bundle.main.object(forInfoDictionaryKey: "AppGroupId") as? String, !id.isEmpty {
+      return id
+    }
+    return "group.com.isle.app.moa"
+  }()
   private static let fileName = "content_blocker_v1.json"
 
   func beginRequest(with context: NSExtensionContext) {

@@ -322,7 +322,7 @@ class IslePlatformTile extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            subtitle ?? platform.title,
+            subtitle ?? platform.displayTitle,
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -400,6 +400,11 @@ class IsleInstagramDmTile extends StatelessWidget {
             maxLines: 2,
             style: IsleText.caption(color: IsleColors.ocean900)
                 .copyWith(fontWeight: FontWeight.w500, height: 1.2),
+          ),
+          Text(
+            '무제한',
+            textAlign: TextAlign.center,
+            style: IsleText.caption(color: IsleColors.muted).copyWith(fontSize: 10),
           ),
         ],
       ),

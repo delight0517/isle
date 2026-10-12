@@ -5,23 +5,29 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/platform/platform_block_intent.dart';
 import '../../../core/block_schedule/block_schedule_enforcement_service.dart';
 import '../../../core/block_schedule/block_schedule_store.dart';
 import '../../../core/block_schedule/schedule_limit_setup_helper.dart';
 import '../../../core/block_schedule/schedule_notification_service.dart';
 import '../../../core/block_schedule/models/block_schedule.dart';
 import '../../../core/block_schedule/schedule_active_service.dart';
+import '../../../core/block_schedule/schedule_display_helper.dart';
 import '../../../core/block_schedule/schedule_constants.dart';
 import '../../../core/block_schedule/schedule_lock_phase.dart';
 import '../../../core/block_schedule/schedule_edit_guard.dart';
 import '../../../core/block_schedule/schedule_lock_service.dart';
+import '../../../core/block_schedule/schedule_pending_target_service.dart';
+import '../../../core/block_schedule/schedule_pending_field_service.dart';
 import '../../../core/block_schedule/schedule_app_target_catalog.dart';
 import '../../../core/block_schedule/url_rules/schedule_rule_store.dart';
+import '../../../core/block/schedule_premade_block_pack_service.dart';
 import '../../../core/block_schedule/schedule_app_targets_store.dart';
 import '../../../core/block_schedule/schedule_slot_edit_policy.dart';
 import '../../../core/intervention/screen_time_selection_summary.dart';
 import '../../../core/intervention/schedule_screen_time_store.dart';
 import '../../../core/localization/schedule_strings.dart';
+import '../../../core/services/isle_app_log_service.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_typography.dart';
@@ -51,11 +57,16 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
   late TextEditingController _cooldownCtrl;
   Timer? _lockWake;
   bool _saving = false;
+  bool _loading = false;
+  DateTime? _lastLoadAt;
   final _targetsKey = GlobalKey<ScheduleAppTargetsSectionState>();
+
+  int _buildCount = 0;
 
   @override
   void initState() {
     super.initState();
+    IsleAppLogService.log('EditScreen.initState id=${widget.scheduleId}');
     WidgetsBinding.instance.addObserver(this);
     _nameCtrl = TextEditingController();
     _cooldownCtrl = TextEditingController(text: '30');
@@ -65,13 +76,24 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      unawaited(ScheduleLockService.finalizeExpiredLocks().then((_) {
+      unawaited(ScheduleLockService.finalizeExpiredLocks().then((_) async {
+        await SchedulePendingTargetService.tryApplyForSchedule(widget.scheduleId);
+        await SchedulePendingFieldService.tryApplyForSchedule(widget.scheduleId);
         if (mounted) _load();
       }));
     }
   }
 
   void _load() {
+    if (_loading) return;
+    final now = DateTime.now();
+    if (_lastLoadAt != null &&
+        now.difference(_lastLoadAt!) < const Duration(milliseconds: 800)) {
+      return;
+    }
+    _loading = true;
+    _lastLoadAt = now;
+    IsleAppLogService.log('EditScreen._load id=${widget.scheduleId}');
     unawaited(ScheduleScreenTimeStore.ensureOpen());
     final s = BlockScheduleStore.loadAll().where((e) => e.id == widget.scheduleId).firstOrNull;
     _schedule = s;
@@ -79,6 +101,7 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
       _nameCtrl.text = s.name;
       _cooldownCtrl.text = s.lockCooldownMinutes.toString();
     }
+    _loading = false;
     if (mounted) setState(() {});
     _scheduleLockWake();
   }
@@ -95,8 +118,16 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
         ? ScheduleLockService.countdownRemaining(s)
         : ScheduleLockService.editWindowRemaining(s);
     if (remaining == null || remaining <= Duration.zero) {
-      unawaited(ScheduleLockService.finalizeExpiredLocks().then((_) {
-        if (mounted) _load();
+      // 만료됐으면 1회만 정리·갱신 (500ms 무한 루프 방지)
+      unawaited(ScheduleLockService.finalizeExpiredLocks().then((_) async {
+        if (!mounted) return;
+        await SchedulePendingTargetService.tryApplyForSchedule(widget.scheduleId);
+        await SchedulePendingFieldService.tryApplyForSchedule(widget.scheduleId);
+        if (!mounted) return;
+        final nextPhase = _schedule == null
+            ? ScheduleLockPhase.unlocked
+            : ScheduleLockService.phase(_schedule!);
+        if (nextPhase != p) _load();
       }));
       return;
     }
@@ -105,7 +136,9 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
         : remaining + const Duration(milliseconds: 200);
     _lockWake = Timer(wake, () {
       if (!mounted) return;
-      unawaited(ScheduleLockService.finalizeExpiredLocks().then((_) {
+      unawaited(ScheduleLockService.finalizeExpiredLocks().then((_) async {
+        await SchedulePendingTargetService.tryApplyForSchedule(widget.scheduleId);
+        await SchedulePendingFieldService.tryApplyForSchedule(widget.scheduleId);
         if (mounted) _load();
       }));
     });
@@ -120,17 +153,40 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
     super.dispose();
   }
 
+  /// 잠금 중(편집 창 아님)이면 즉시 저장 대신 [SchedulePendingFieldService]에
+  /// 예약 — 15분 타임락 후 자동 적용된다. 이전엔 이 상태에서 편집 UI 자체를
+  /// 숨겼는데, 이제 앱 타깃(③단계)과 동일하게 시간표·이름·모드·on/off(①②단계)도
+  /// 잠금 중에 미리 바꿔두면 대기가 끝나는 대로 자동 반영된다(2026-07-20
+  /// 사용자 요청 — "수동으로 적용을 눌러도 자동으로 timelock 이후에 적용").
   Future<void> _save(
     BlockSchedule s, {
     _SaveFeedbackKind feedback = _SaveFeedbackKind.silent,
     String? message,
   }) async {
     if (_saving) return;
+    final original = _schedule;
+    if (original == null) return;
     final trimmed = _nameCtrl.text.trim();
     final toSave = trimmed.isEmpty ? s : s.copyWith(name: trimmed);
 
     setState(() => _saving = true);
     try {
+      if (ScheduleEditGuard.isCommitmentLocked(original)) {
+        final outcome = await SchedulePendingFieldService.requestFieldChange(
+          current: original,
+          desired: toSave,
+        );
+        _load();
+        if (!mounted || feedback == _SaveFeedbackKind.silent) return;
+        _showSaveFeedback(
+          message != null && outcome.kind == ScheduleFieldChangeOutcomeKind.immediate
+              ? message
+              : _buildQueuedMessage(outcome),
+          prominent: feedback == _SaveFeedbackKind.prominent,
+        );
+        return;
+      }
+
       await BlockScheduleStore.upsert(toSave);
       await ref.read(blockSchedulesProvider.notifier).reload();
       await BlockScheduleEnforcementService.syncPlatformEnforcement();
@@ -152,6 +208,19 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
       );
     } finally {
       if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  String _buildQueuedMessage(ScheduleFieldChangeOutcome outcome) {
+    switch (outcome.kind) {
+      case ScheduleFieldChangeOutcomeKind.noop:
+        return '바뀐 내용이 없어요.';
+      case ScheduleFieldChangeOutcomeKind.immediate:
+        return '저장됐어요.';
+      case ScheduleFieldChangeOutcomeKind.scheduled:
+      case ScheduleFieldChangeOutcomeKind.alreadyPending:
+        final mins = outcome.remaining?.inMinutes ?? 0;
+        return '잠금 중이라 지금은 안 바뀌어요 — 약 $mins분 후 자동 적용돼요.';
     }
   }
 
@@ -239,7 +308,9 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
     final missing = <String>[];
     if (!hasSlots) missing.add('① 시간표');
     if (!hasShieldSelection) {
-      missing.add(needsIosPick && !hasIosPick ? '③ iPhone 앱 Screen Time 선택' : '③ 차단·한도 대상');
+      missing.add(needsIosPick && !hasIosPick
+          ? '③ ${PlatformBlockCopy.nativeInstalledAppLabel} 선택'
+          : '③ 차단·한도 대상');
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -372,7 +443,9 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
             ],
             if (phase == ScheduleLockPhase.editWindow) ...[
               Text(
-                '편집 가능: ${ScheduleLockService.editWindowRemaining(s)?.inMinutes ?? 0}분 남음',
+                ScheduleLockService.editWindowRemaining(s) != null
+                    ? '편집 가능: ${ScheduleLockService.editWindowRemaining(s)?.inMinutes ?? 0}분 남음'
+                    : '편집 가능 — 「편집 완료 · 잠금」을 누를 때까지',
                 style: IsleText.caption(color: IsleColors.ocean700),
               ),
             ],
@@ -391,7 +464,11 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
                   await ScheduleLockService.cancelUnlock(s.id);
                   _load();
                 },
-                child: const Text('잠금 해제 취소'),
+                child: Text(
+                  phase == ScheduleLockPhase.editWindow
+                      ? '편집 완료 · 잠금 다시 걸기'
+                      : '잠금 해제 취소',
+                ),
               ),
           ],
         ),
@@ -403,17 +480,41 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
         ScheduleLockPhase.unlocked => '잠금 꺼짐',
         ScheduleLockPhase.locked => '잠김',
         ScheduleLockPhase.countdown => '대기 중',
-        ScheduleLockPhase.editWindow => '편집 가능 (5분)',
+        ScheduleLockPhase.editWindow => '편집 가능',
       };
+
+  /// ①③ 완료 여부 — `_ScheduleReadinessStrip`·스텝 기본 펼침 판정 공용
+  ({bool hasSlots, bool needsShieldApps, bool hasShieldSelection, int apps, int cats})
+      get _readiness {
+    final s = _schedule!;
+    final apps = ScreenTimeSelectionSummary.appCountForSchedule(s.id);
+    final cats = ScreenTimeSelectionSummary.categoryCountForSchedule(s.id);
+    final hasIsleOrDomain = ScheduleDisplayHelper.targetVisualsForSchedule(s).isNotEmpty;
+    return (
+      hasSlots: s.slots.isNotEmpty,
+      needsShieldApps: s.enforcementMode.appliesShieldInSlot,
+      hasShieldSelection: apps > 0 || cats > 0 || hasIsleOrDomain,
+      apps: apps,
+      cats: cats,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    _buildCount++;
+    if (_buildCount <= 5 || _buildCount % 20 == 0) {
+      IsleAppLogService.log('EditScreen.build #$_buildCount id=${widget.scheduleId} schedule=${_schedule != null}');
+    }
     final s = _schedule;
     if (s == null) {
       return const Scaffold(body: Center(child: Text('스케줄을 찾을 수 없습니다')));
     }
+    // canEdit는 삭제·URL 규칙(④)·앱 타깃(③, 자체 예약 로직 있음) 등 이
+    // 화면의 다른 섹션에 그대로 넘겨준다 — ①②(시간표·이름·모드·on/off)만
+    // 아래에서 canEdit 게이팅 없이 항상 인터랙티브하게 바꾸고, `_save()`가
+    // 내부적으로 잠금 상태를 보고 즉시 저장/15분 후 예약 적용을 분기한다
+    // (2026-07-20 사용자 요청 — 이전엔 잠금 중엔 편집 UI 자체가 안 보였음).
     final canEdit = ScheduleEditGuard.canEditScheduleFields(s);
-    final canEditName = canEdit;
     final commitmentLocked = ScheduleEditGuard.isCommitmentLocked(s);
     final active = ScheduleActiveService.isScheduleActiveNow(s);
     final sch = ScheduleStrings.of(context);
@@ -421,12 +522,12 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
     return Scaffold(
       appBar: IsleAppBar(
         title: s.name,
+        subtitle: ScheduleDisplayHelper.targetsSummaryDetailed(s),
         actions: [
-          if (canEdit)
-            TextButton(
-              onPressed: _saving ? null : _savePrimary,
-              child: Text(_saving ? '저장 중…' : '완료'),
-            ),
+          TextButton(
+            onPressed: _saving ? null : _savePrimary,
+            child: Text(_saving ? '저장 중…' : '완료'),
+          ),
           if (canEdit)
             IconButton(
               icon: const Icon(Icons.delete_outline),
@@ -439,6 +540,7 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
                   );
                   return;
                 }
+                await SchedulePremadePackService.deleteScheduleLinks(s.id);
                 await ScheduleRuleStore.deleteForSchedule(s.id);
                 await ref.read(blockSchedulesProvider.notifier).reload();
                 if (context.mounted) context.pop();
@@ -456,145 +558,375 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
                   : sch.t('active_blocking'),
               style: IsleText.caption(color: Colors.red.shade700),
             ),
-          Card(
-            margin: EdgeInsets.zero,
-            child: ExpansionTile(
-              tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              title: Text(sch.t('edit_help_title'), style: IsleText.caption()),
+          if (commitmentLocked) ...[
+            const SizedBox(height: 8),
+            _CommitmentLockBanner(
+              schedule: s,
+              onUnlockStarted: _load,
+            ),
+          ],
+          _ScheduleReadinessStrip(schedule: s),
+          const SizedBox(height: 16),
+          _CollapsibleStep(
+            step: 1,
+            icon: Icons.schedule,
+            title: sch.t('step1_title'),
+            summary: s.slots.isEmpty
+                ? sch.t('no_windows_yet')
+                : ScheduleDisplayHelper.formatScheduleTimes(s.slots),
+            initiallyExpanded: s.slots.isEmpty,
+            helpBody: sch.t('step1_sub'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  sch.t('edit_help_body'),
-                  style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.45),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(sch.t('schedule_enabled')),
+                  value: s.enabled,
+                  onChanged: (v) => _save(s.copyWith(enabled: v)),
+                ),
+                TextField(
+                  controller: _nameCtrl,
+                  decoration: InputDecoration(
+                    labelText: sch.t('schedule_name'),
+                    helperText: sch.t('schedule_name_hint'),
+                    border: const OutlineInputBorder(),
+                  ),
+                  onSubmitted: (_) => _save(
+                    s.copyWith(name: _nameCtrl.text.trim()),
+                    feedback: _SaveFeedbackKind.brief,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (s.slots.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      sch.t('no_windows_yet'),
+                      style: IsleText.caption(color: IsleColors.muted),
+                    ),
+                  )
+                else
+                  ...ScheduleWindowSheet.summarize(s.slots).map(
+                    (line) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.schedule, size: 16, color: IsleColors.ocean500),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(line, style: IsleText.body())),
+                        ],
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _editWindows(s),
+                    icon: Icon(s.slots.isEmpty ? Icons.add : Icons.edit_calendar),
+                    label: Text(s.slots.isEmpty ? sch.t('window_add') : sch.t('window_edit')),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
-          _RequiredSetupCard(schedule: s),
-          const SizedBox(height: 16),
-          ScheduleEditSectionHeader(
-            step: 1,
-            icon: Icons.schedule,
-            title: sch.t('step1_title'),
-            subtitle: sch.t('step1_sub'),
-          ),
           const SizedBox(height: 10),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(sch.t('schedule_enabled')),
-            value: s.enabled,
-            onChanged: ScheduleEditGuard.canToggleScheduleEnabled(s)
-                ? (v) => _save(s.copyWith(enabled: v))
-                : null,
-          ),
-          TextField(
-            controller: _nameCtrl,
-            enabled: canEditName,
-            decoration: InputDecoration(labelText: sch.t('schedule_name'), border: const OutlineInputBorder()),
-            onSubmitted: canEditName
-                ? (_) => _save(
-                      s.copyWith(name: _nameCtrl.text.trim()),
-                      feedback: _SaveFeedbackKind.brief,
-                    )
-                : null,
-          ),
-          const SizedBox(height: 8),
-          if (s.slots.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Text(
-                sch.t('no_windows_yet'),
-                style: IsleText.caption(color: IsleColors.muted),
-              ),
-            )
-          else
-            ...ScheduleWindowSheet.summarize(s.slots).map(
-              (line) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    const Icon(Icons.schedule, size: 16, color: IsleColors.ocean500),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(line, style: IsleText.body())),
-                  ],
-                ),
-              ),
-            ),
-          const SizedBox(height: 8),
-          if (canEdit)
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _editWindows(s),
-                icon: Icon(s.slots.isEmpty ? Icons.add : Icons.edit_calendar),
-                label: Text(s.slots.isEmpty ? sch.t('window_add') : sch.t('window_edit')),
-              ),
-            ),
-          const Divider(height: 28),
-          ScheduleEditSectionHeader(
+          _CollapsibleStep(
             step: 2,
             icon: Icons.tune,
             title: sch.t('step2_title'),
-            subtitle: sch.t('step2_sub'),
+            summary: s.enforcementMode
+                .localizedLabel(Localizations.localeOf(context).languageCode),
+            initiallyExpanded: false,
+            child: ScheduleEnforcementModePicker(
+              value: s.enforcementMode,
+              onChanged: (m) => _setEnforcementMode(s, m),
+            ),
           ),
           const SizedBox(height: 10),
-          ScheduleEnforcementModePicker(
-            value: s.enforcementMode,
-            onChanged: canEdit ? (m) => _setEnforcementMode(s, m) : null,
-          ),
-          const Divider(height: 28),
-          ScheduleEditSectionHeader(
+          _CollapsibleStep(
             step: 3,
             icon: Icons.apps_outage,
             title: sch.t('step3_title'),
-            subtitle: sch.t('step3_sub'),
+            summary: ScheduleDisplayHelper.configuredSummaryLine(s),
+            initiallyExpanded: _readiness.needsShieldApps && !_readiness.hasShieldSelection,
+            child: ScheduleAppTargetsSection(
+              key: _targetsKey,
+              schedule: s,
+              canEdit: canEdit,
+              commitmentLocked: commitmentLocked,
+            ),
           ),
           const SizedBox(height: 10),
-          ScheduleAppTargetsSection(
-            key: _targetsKey,
-            schedule: s,
-            canEdit: canEdit,
-          ),
-          const Divider(height: 28),
-          ScheduleEditSectionHeader(
+          _CollapsibleStep(
             step: 4,
             icon: Icons.link_off,
             title: '웹사이트 · URL',
-            subtitle: '붙여넣기 · 숫자 우회 · 유사 주소 차단',
+            summary: () {
+              final n = ScheduleRuleStore.loadForSchedule(s.id).length;
+              return n > 0 ? '규칙 $n개' : '규칙 없음';
+            }(),
+            initiallyExpanded: false,
+            child: ScheduleRulesSection(
+              scheduleId: s.id,
+              canEdit: canEdit,
+            ),
           ),
           const SizedBox(height: 10),
-          ScheduleRulesSection(
-            scheduleId: s.id,
-            canEdit: canEdit,
-          ),
-          const Divider(height: 28),
-          ScheduleEditSectionHeader(
+          _CollapsibleStep(
             step: 5,
             icon: Icons.lock_outline,
             title: sch.t('step4_title'),
-            subtitle: sch.t('step4_sub'),
+            summary: _phaseLabel(ScheduleLockService.phase(s)),
+            initiallyExpanded: false,
+            child: _lockPanel(s),
           ),
-          const SizedBox(height: 10),
-          _lockPanel(s),
           const SizedBox(height: 24),
-          if (canEdit)
-            SizedBox(
-              width: double.infinity,
-              height: IsleSize.minTouchTarget + 8,
-              child: FilledButton.icon(
-                onPressed: _saving ? null : _savePrimary,
-                icon: _saving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+          SizedBox(
+            width: double.infinity,
+            height: IsleSize.minTouchTarget + 8,
+            child: FilledButton.icon(
+              onPressed: _saving ? null : _savePrimary,
+              icon: _saving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.check),
+              label: Text(_saving ? sch.t('saving') : sch.t('save')),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 상단 카드 3개(사용법·타깃 설명·필수 항목) 병합 — 평소엔 한 줄, 탭하면 펼쳐짐
+class _ScheduleReadinessStrip extends StatefulWidget {
+  const _ScheduleReadinessStrip({required this.schedule});
+
+  final BlockSchedule schedule;
+
+  @override
+  State<_ScheduleReadinessStrip> createState() => _ScheduleReadinessStripState();
+}
+
+class _ScheduleReadinessStripState extends State<_ScheduleReadinessStrip> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final sch = ScheduleStrings.of(context);
+    final schedule = widget.schedule;
+    final hasSlots = schedule.slots.isNotEmpty;
+    final apps = ScreenTimeSelectionSummary.appCountForSchedule(schedule.id);
+    final cats = ScreenTimeSelectionSummary.categoryCountForSchedule(schedule.id);
+    final needsShieldApps = schedule.enforcementMode.appliesShieldInSlot;
+    final visuals = ScheduleDisplayHelper.targetVisualsForSchedule(schedule);
+    final hasShieldSelection = apps > 0 || cats > 0 || visuals.isNotEmpty;
+    final ready = hasSlots && (!needsShieldApps || hasShieldSelection);
+    final domainOnly = ScheduleDisplayHelper.hasYoutubeDomainsOnly(schedule);
+
+    final headline = ready
+        ? '✅ ${ScheduleDisplayHelper.configuredSummaryLine(schedule)}'
+        : '⚠️ ${!hasSlots ? sch.t('check_step1_need') : sch.t('check_step2_need')}';
+
+    return Card(
+      margin: EdgeInsets.zero,
+      color: ready ? IsleColors.ocean100.withValues(alpha: 0.3) : const Color(0xFFFFF3E0),
+      child: InkWell(
+        onTap: () => setState(() => _expanded = !_expanded),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      headline,
+                      maxLines: _expanded ? null : 1,
+                      overflow: _expanded ? null : TextOverflow.ellipsis,
+                      style: IsleText.body().copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: ready ? IsleColors.ocean700 : IsleColors.gold500,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _expanded ? Icons.expand_less : Icons.expand_more,
+                    size: 20,
+                    color: IsleColors.muted,
+                  ),
+                ],
+              ),
+              if (_expanded) ...[
+                const SizedBox(height: 10),
+                if (visuals.isEmpty)
+                  Text(
+                    sch.t('target_explainer_body'),
+                    style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.45),
+                  )
+                else
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      for (final v in visuals)
+                        Chip(
+                          avatar: Icon(v.icon, color: v.color, size: 16),
+                          label: Text(v.label, style: IsleText.caption()),
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                      )
-                    : const Icon(Icons.check),
-                label: Text(_saving ? sch.t('saving') : sch.t('save')),
+                    ],
+                  ),
+                if (domainOnly) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    sch.t('target_domain_youtube_only'),
+                    style: IsleText.caption(color: Colors.orange.shade900).copyWith(height: 1.4),
+                  ),
+                ],
+                const SizedBox(height: 10),
+                _readinessRow(
+                  ok: hasSlots,
+                  title: sch.t('check_step1'),
+                  subtitle: hasSlots
+                      ? sch.t('check_step1_ok', args: {'n': '${schedule.slots.length}'})
+                      : sch.t('check_step1_need'),
+                ),
+                const SizedBox(height: 6),
+                _readinessRow(
+                  ok: !needsShieldApps || hasShieldSelection,
+                  title: sch.t('check_step2'),
+                  subtitle: needsShieldApps
+                      ? (hasShieldSelection
+                          ? sch.t('check_step2_ok', args: {'apps': '$apps', 'cats': '$cats'})
+                          : sch.t('check_step2_need'))
+                      : sch.t('check_step2_optional'),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  sch.t('edit_help_body'),
+                  style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.4),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _readinessRow({
+    required bool ok,
+    required String title,
+    required String subtitle,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          ok ? Icons.check_circle : Icons.radio_button_unchecked,
+          size: 18,
+          color: ok ? IsleColors.grassDeep : IsleColors.muted,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            '$title\n$subtitle',
+            style: IsleText.caption(
+              color: ok ? IsleColors.ocean700 : IsleColors.muted,
+            ).copyWith(height: 1.35),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 스텝 아코디언 — 완료된 스텝은 한 줄 요약으로 접힘, 미완료 스텝만 기본 펼침
+class _CollapsibleStep extends StatefulWidget {
+  const _CollapsibleStep({
+    required this.step,
+    required this.icon,
+    required this.title,
+    required this.summary,
+    required this.initiallyExpanded,
+    required this.child,
+    this.helpBody,
+  });
+
+  final int step;
+  final IconData icon;
+  final String title;
+  final String summary;
+  final bool initiallyExpanded;
+  final Widget child;
+  /// 펼쳤을 때 본문 위에 한 번 더 보여줄 사용법 한 줄 (선택)
+  final String? helpBody;
+
+  @override
+  State<_CollapsibleStep> createState() => _CollapsibleStepState();
+}
+
+class _CollapsibleStepState extends State<_CollapsibleStep> {
+  late bool _expanded = widget.initiallyExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: ScheduleEditSectionHeader(
+                      step: widget.step,
+                      icon: widget.icon,
+                      title: widget.title,
+                      subtitle: widget.summary,
+                    ),
+                  ),
+                  Icon(
+                    _expanded ? Icons.expand_less : Icons.expand_more,
+                    size: 20,
+                    color: IsleColors.muted,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_expanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.helpBody != null && widget.helpBody!.trim().isNotEmpty) ...[
+                    Text(
+                      widget.helpBody!,
+                      style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.35),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                  widget.child,
+                ],
               ),
             ),
         ],
@@ -603,82 +935,72 @@ class _BlockScheduleEditScreenState extends ConsumerState<BlockScheduleEditScree
   }
 }
 
-class _RequiredSetupCard extends StatelessWidget {
-  const _RequiredSetupCard({required this.schedule});
+class _CommitmentLockBanner extends StatelessWidget {
+  const _CommitmentLockBanner({required this.schedule, required this.onUnlockStarted});
 
   final BlockSchedule schedule;
+  final VoidCallback onUnlockStarted;
 
   @override
   Widget build(BuildContext context) {
-    final sch = ScheduleStrings.of(context);
-    final hasSlots = schedule.slots.isNotEmpty;
-    final apps = ScreenTimeSelectionSummary.appCountForSchedule(schedule.id);
-    final cats = ScreenTimeSelectionSummary.categoryCountForSchedule(schedule.id);
-    final needsShieldApps = schedule.enforcementMode.appliesShieldInSlot;
-    final hasShieldSelection = apps > 0 || cats > 0;
-    final ready = hasSlots && (!needsShieldApps || hasShieldSelection);
+    final phase = ScheduleLockService.phase(schedule);
+    final cooldown = schedule.lockCooldownMinutes;
 
-    Widget row({
-      required bool ok,
-      required String title,
-      required String subtitle,
-    }) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            ok ? Icons.check_circle : Icons.radio_button_unchecked,
-            size: 18,
-            color: ok ? IsleColors.grassDeep : IsleColors.muted,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '$title\n$subtitle',
-              style: IsleText.caption(
-                color: ok ? IsleColors.ocean700 : IsleColors.muted,
-              ).copyWith(height: 1.35),
-            ),
-          ),
-        ],
-      );
-    }
-
-    if (ready) return const SizedBox.shrink();
-
-    final footer = sch.t('check_footer');
     return Card(
-      color: const Color(0xFFFFF3E0),
+      color: Colors.orange.shade50,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.orange.shade200),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              sch.t('not_ready'),
-              style: IsleText.caption(color: IsleColors.gold500).copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 8),
-            row(
-              ok: hasSlots,
-              title: sch.t('check_step1'),
-              subtitle: hasSlots
-                  ? sch.t('check_step1_ok', args: {'n': '${schedule.slots.length}'})
-                  : sch.t('check_step1_need'),
+            Row(
+              children: [
+                Icon(Icons.lock_outline, color: Colors.orange.shade800, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  '설정 잠금 활성',
+                  style: IsleText.body().copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: Colors.orange.shade900,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 6),
-            row(
-              ok: !needsShieldApps || hasShieldSelection,
-              title: sch.t('check_step2'),
-              subtitle: needsShieldApps
-                  ? (hasShieldSelection
-                      ? sch.t('check_step2_ok', args: {'apps': '$apps', 'cats': '$cats'})
-                      : sch.t('check_step2_need'))
-                  : sch.t('check_step2_optional'),
-            ),
-            if (footer.trim().isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(footer, style: IsleText.badge(color: IsleColors.muted)),
+            if (phase == ScheduleLockPhase.locked) ...[
+              Text(
+                '지금 바꿔도 즉시 반영되지 않고 잠금 해제 대기($cooldown분) 후 자동 적용돼요.\n'
+                '시간표·이름·모드·전체 on/off, 앱 추가·제거 전부 지금 예약할 수 있어요.',
+                style: IsleText.caption(color: Colors.orange.shade900).copyWith(height: 1.4),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(backgroundColor: Colors.orange.shade700),
+                  onPressed: () async {
+                    await ScheduleLockService.startUnlockCountdown(schedule.id);
+                    onUnlockStarted();
+                  },
+                  icon: const Icon(Icons.lock_open),
+                  label: Text('잠금 해제 시작 — $cooldown분 대기'),
+                ),
+              ),
+            ] else if (phase == ScheduleLockPhase.countdown) ...[
+              Text(
+                '잠금 해제 카운트다운 중 · ${ScheduleLockService.countdownRemaining(schedule)?.inMinutes ?? 0}분 남음\n'
+                '지금까지 예약한 변경(시간표·이름·모드·on/off·앱)은 대기가 끝나면 자동 적용돼요.',
+                style: IsleText.caption(color: Colors.orange.shade900).copyWith(height: 1.4),
+              ),
+            ] else if (phase == ScheduleLockPhase.editWindow) ...[
+              Text(
+                '편집 가능 상태입니다. 아래에서 수정하세요.',
+                style: IsleText.caption(color: IsleColors.ocean700),
+              ),
             ],
           ],
         ),

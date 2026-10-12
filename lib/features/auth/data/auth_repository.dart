@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/auth/google_sign_in_config.dart';
 import '../../../core/constants/env.dart';
+import '../../../core/services/account_data_deletion_service.dart';
 import '../../../core/services/isle_app_log_service.dart';
 import 'models/user_profile.dart';
 
@@ -100,6 +100,32 @@ class AuthRepository {
     } catch (_) {}
     await _client.auth.signOut();
     IsleAppLogService.log('Signed out — local Hive data kept on device');
+  }
+
+  /// 서버 프로필 삭제 + 로컬 민감 데이터 삭제 (인증 계정 완전 삭제는 이메일 요청).
+  Future<void> deleteAccountAndLocalData() async {
+    if (!Env.isSupabaseConfigured) {
+      await AccountDataDeletionService.clearLocalSensitiveData();
+      return;
+    }
+    await AccountDataDeletionService.deleteAccountAndLocalData(_client);
+  }
+
+  /// 로그인 사용자 — 서버 프로필·차단 동기화 데이터 삭제 후 로그아웃.
+  /// auth.users 레코드 완전 삭제는 Supabase 관리자·이메일 요청으로 처리(Play 정책).
+  Future<void> deleteRemoteAccountData() async {
+    if (!Env.isSupabaseConfigured) {
+      throw StateError('클라우드 연동이 설정되지 않았습니다.');
+    }
+    final user = currentUser;
+    if (user == null) {
+      throw StateError('로그인된 계정이 없습니다.');
+    }
+    final userId = user.id;
+    await _client.from('blocked_channels').delete().eq('user_id', userId);
+    await _client.from('profiles').delete().eq('id', userId);
+    await signOut();
+    IsleAppLogService.log('Remote account data deleted for $userId');
   }
 
   Future<UserProfile?> getProfile(String userId) async {

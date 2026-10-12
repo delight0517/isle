@@ -108,21 +108,16 @@ class PersonalLibraryNotifier extends StateNotifier<List<LibraryEntry>> {
     final list = PersonalLibraryStore.loadEntries();
     final idx = list.indexWhere((e) => e.url == url);
     if (idx < 0) return;
-    final old = list[idx];
-    list[idx] = LibraryEntry(
-      id: old.id,
-      title: old.title,
-      url: old.url,
-      thumbnailUrl: old.thumbnailUrl,
-      sourceType: old.sourceType,
-      channelId: old.channelId,
-      channelName: old.channelName,
-      summary: summary,
-      origin: old.origin,
-      sourceId: old.sourceId,
-      importedAt: old.importedAt,
-      publishedAt: old.publishedAt,
-    );
+    list[idx] = list[idx].copyWith(summary: summary);
+    await PersonalLibraryStore.saveEntries(list);
+    state = list;
+  }
+
+  Future<void> updateGeneratedPost(String url, String post) async {
+    final list = PersonalLibraryStore.loadEntries();
+    final idx = list.indexWhere((e) => e.url == url);
+    if (idx < 0) return;
+    list[idx] = list[idx].copyWith(generatedPost: post);
     await PersonalLibraryStore.saveEntries(list);
     state = list;
   }

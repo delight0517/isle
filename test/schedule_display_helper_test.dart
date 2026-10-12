@@ -28,7 +28,7 @@ void main() {
     expect(ScheduleDisplayHelper.activeDayIndexes(slots).length, 7);
   });
 
-  test('uniqueTargetKeys counts safari and youtube separately', () {
+  test('uniqueTargetKeys counts domain schedules separately', () {
     final schedules = [
       BlockSchedule(
         id: 'a',
@@ -44,10 +44,11 @@ void main() {
       ),
     ];
     final keys = ScheduleDisplayHelper.uniqueTargetKeysForSchedules(schedules);
-    expect(keys.length, greaterThanOrEqualTo(2));
+    expect(keys, contains('domains'));
+    expect(keys.length, greaterThanOrEqualTo(1));
   });
 
-  test('targetVisuals infers YouTube from schedule name without store', () {
+  test('targetVisuals uses domains not schedule name', () {
     final s = BlockSchedule(
       id: 't',
       name: 'YouTube 전체 차단',
@@ -55,6 +56,37 @@ void main() {
       domains: BlockSchedule.defaultYoutubeDomains,
     );
     final v = ScheduleDisplayHelper.targetVisualsForSchedule(s);
-    expect(v.any((e) => e.label.contains('YouTube')), isTrue);
+    expect(v.any((e) => e.key == 'domains'), isTrue);
+    expect(v.any((e) => e.label == 'YouTube'), isFalse);
+  });
+
+  test('configuredSummaryLine empty when nothing selected', () {
+    final s = BlockSchedule(
+      id: 'empty',
+      name: 'safari',
+      slots: const [ScheduleSlot(day: 0, startMinute: 0, endMinute: 60)],
+    );
+    expect(
+      ScheduleDisplayHelper.configuredSummaryLine(s),
+      contains('아무 것도 안 고름'),
+    );
+  });
+
+  test('activeScheduleChipLabel shows safety line time', () {
+    final s = BlockSchedule(
+      id: 'safety',
+      name: '안전 라인 — 야간 완전 차단',
+      slots: [
+        for (var d = 0; d < 7; d++)
+          ScheduleSlot(day: d, startMinute: 21 * 60 + 30, endMinute: 10 * 60),
+      ],
+      isSafetyBaseline: true,
+    );
+    final text = ScheduleDisplayHelper.activeScheduleChipLabel(
+      s,
+      at: DateTime(2026, 7, 16, 23, 0),
+    );
+    expect(text, contains('안전 라인'));
+    expect(text, contains('10:00'));
   });
 }

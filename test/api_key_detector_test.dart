@@ -51,6 +51,35 @@ void main() {
       expect(r.confidence, AiKeyDetectionConfidence.low);
     });
 
+    test('extractFromPaste pulls key from labeled line', () {
+      const paste = 'OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz123456';
+      expect(
+        ApiKeyDetector.extractFromPaste(paste),
+        'sk-proj-abcdefghijklmnopqrstuvwxyz123456',
+      );
+      expect(ApiKeyDetector.detect(paste).providerId, 'openai');
+    });
+
+    test('extractFromPaste pulls embedded OpenRouter token', () {
+      const paste =
+          'My key is sk-or-v1-abcdefghijklmnopqrstuvwxyz123456 for OpenRouter';
+      expect(
+        ApiKeyDetector.extractFromPaste(paste),
+        'sk-or-v1-abcdefghijklmnopqrstuvwxyz123456',
+      );
+    });
+
+    test('shouldAutoApply for high confidence only', () {
+      expect(
+        ApiKeyDetector.shouldAutoApply('sk-proj-abcdefghijklmnopqrstuvwxyz123456'),
+        isTrue,
+      );
+      expect(
+        ApiKeyDetector.shouldAutoApply('sk-abcdefghijklmnopqrstuvwxyz1234567890'),
+        isFalse,
+      );
+    });
+
     test('fallback chain for medium sk-', () {
       final detected = ApiKeyDetector.detect('sk-abcdefghijklmnopqrstuvwxyz1234567890');
       final ids = ApiKeyDetector.fallbackProviderIds(detected);

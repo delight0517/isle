@@ -7,6 +7,8 @@ import '../../../../core/navigation/isle_routes.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/services/isle_user_defaults.dart';
+import '../../../../core/usage_budget/usage_budget_models.dart';
+import '../../../../core/usage_budget/usage_budget_store.dart';
 import '../../../../core/youtube/youtube_usage_lock.dart';
 import '../../../../core/youtube/youtube_watch_timer_store.dart';
 
@@ -58,17 +60,20 @@ class _YoutubeWatchLimitHubCardState extends State<YoutubeWatchLimitHubCard> {
     final current = interval
         ? IsleUserDefaults.youtubeIntervalAllowMinutes
         : IsleUserDefaults.youtubeDailyLimitMinutes;
+    final budget = UsageBudgetStore.policyFor(UsageBudgetTarget.youtube);
+    final budgetOn = budget?.enabled ?? false;
     final isLowering = allowMinutes < current;
-    if (!isLowering &&
-        !YoutubeUsageLock.canApplyChange(
-          currentMinutes: current,
-          newMinutes: allowMinutes,
-          currentlyEnabled: YoutubeWatchTimerStore.isEnabled,
-          newEnabled: true,
-        )) {
+    final canApply = YoutubeUsageLock.canApplyPolicyChange(
+      currentlyEnabled: budgetOn || YoutubeWatchTimerStore.isEnabled,
+      newEnabled: true,
+      currentDailyTotalMinutes: budgetOn ? budget!.dailyCapMinutes : current,
+      newDailyTotalMinutes: allowMinutes,
+      modeChanged: budgetOn || interval != YoutubeWatchTimerStore.usesInterval,
+    );
+    if (!canApply) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('타임락: 먼저 대기를 시작하세요')),
+          const SnackBar(content: Text('타임락: 한도 방식 변경은 대기 완료 후 가능해요')),
         );
       }
       return;

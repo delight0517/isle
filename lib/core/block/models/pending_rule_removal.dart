@@ -1,6 +1,7 @@
 enum PendingRuleRemovalKind {
   keyword,
   blockedUrl,
+  premadePack,
 }
 
 class PendingRuleRemoval {

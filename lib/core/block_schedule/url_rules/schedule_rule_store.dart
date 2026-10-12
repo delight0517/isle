@@ -64,6 +64,19 @@ class ScheduleRuleStore {
     await saveAll(loadAll().where((r) => r.scheduleId != scheduleId).toList());
   }
 
+  static Future<int> deleteForScheduleAndPack({
+    required String scheduleId,
+    required String packId,
+  }) async {
+    final all = loadAll();
+    final kept = all
+        .where((r) => !(r.scheduleId == scheduleId && r.premadePackId == packId))
+        .toList();
+    final removed = all.length - kept.length;
+    await saveAll(kept);
+    return removed;
+  }
+
   static bool hasDuplicate({
     required String scheduleId,
     required ScheduleRuleKind kind,

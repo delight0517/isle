@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../constants/app_release_info.dart';
@@ -147,6 +148,18 @@ class IsleDebugLogService {
 
     if (kind == 'unclean_shutdown') return true;
 
+    if (msg.contains('fwfevaluatejavascripterror') ||
+        (msg.contains('failed evaluating javascript') &&
+            st.contains('isle_webview_factory'))) {
+      return true;
+    }
+
+    if (msg.contains('pathaccessexception') &&
+        msg.contains('file provider storage') &&
+        msg.contains('survival backup')) {
+      return true;
+    }
+
     if (msg.contains('pathnotfoundexception') &&
         (msg.contains('session_active.flag') ||
             msg.contains('isle_state_checkpoint') ||
@@ -167,6 +180,11 @@ class IsleDebugLogService {
     if ((kind == 'error_widget' || kind == 'flutter_error') &&
         msg.contains('bad state: no element') &&
         st.contains('schedule_app_targets_section')) {
+      return true;
+    }
+
+    // 레이아웃 경고 — 크래시 배너가 이걸 잡으면 setState 연쇄만 유발
+    if (msg.contains('renderflex overflowed')) {
       return true;
     }
 
@@ -245,8 +263,14 @@ class IsleDebugLogService {
     );
     _crashes.insert(0, report);
     if (_crashes.length > 50) _crashes.length = 50;
-    for (final fn in List<void Function(CrashReport)>.from(_crashListeners)) {
-      fn(report);
+    // 빌드·페인트 중 동기 호출 시 IsleCrashAlertBanner setState 연쇄 방지
+    final listeners = List<void Function(CrashReport)>.from(_crashListeners);
+    if (listeners.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        for (final fn in listeners) {
+          fn(report);
+        }
+      });
     }
     await _appendTimeline(report.toTimelineJson());
     log(

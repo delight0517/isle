@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/block_schedule/models/schedule_enforcement_mode.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
-import '../../../../core/localization/schedule_strings.dart';
 
 /// 스케줄 차단 방식 3종
 class ScheduleEnforcementModePicker extends StatelessWidget {
@@ -104,7 +103,9 @@ class ScheduleEnforcementModePicker extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      mode.localizedSubtitle(lang),
+                                      mode.localizedScenario(lang),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: IsleText.caption(color: IsleColors.muted),
                                     ),
                                   ],
@@ -122,7 +123,6 @@ class ScheduleEnforcementModePicker extends StatelessWidget {
             ),
           ),
         ),
-        _ScenarioExpansion(mode: value),
       ],
     );
   }
@@ -151,45 +151,6 @@ class _StrengthDots extends StatelessWidget {
           ),
         );
       }),
-    );
-  }
-}
-
-/// 선택 모드 예시 — 기본 접힘 (본문 스크롤 절약)
-class _ScenarioExpansion extends StatelessWidget {
-  const _ScenarioExpansion({required this.mode});
-
-  final ScheduleEnforcementMode mode;
-
-  @override
-  Widget build(BuildContext context) {
-    final sch = ScheduleStrings.of(context);
-    final lang = Localizations.localeOf(context).languageCode;
-    return Card(
-      margin: const EdgeInsets.only(top: 8),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        title: Text(
-          sch.t('scenario_heading'),
-          style: IsleText.caption(color: IsleColors.muted),
-        ),
-        subtitle: Text(
-          mode.localizedScenario(lang),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: IsleText.caption(color: IsleColors.muted),
-        ),
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              mode.localizedScenario(lang),
-              style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.45),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

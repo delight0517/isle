@@ -1,11 +1,16 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'usage_day.dart';
 import '../block_schedule/schedule_edit_guard.dart';
 import '../services/isle_user_defaults.dart';
+import '../usage_budget/usage_budget_models.dart';
+import '../usage_budget/usage_budget_store.dart';
 import '../youtube/youtube_usage_lock.dart';
 import '../youtube/youtube_watch_timer_store.dart';
 
 /// youtube · instagram · brunch — 일일 체류 한도 (WebView 열림 시 1초 tick)
+///
+/// Instagram DM([PlatformWatchId.instagramDm])은 한도 없음 — 피드·릴스만 [instagram] 카운트.
 enum PlatformWatchId { youtube, instagram, instagramDm, brunch }
 
 class PlatformWatchLimitStore {
@@ -23,14 +28,12 @@ class PlatformWatchLimitStore {
 
   static Box<String> get box {
     final b = _box;
-    if (b == null || !b.isOpen) throw StateError('PlatformWatchLimitStore not open');
+    if (b == null || !b.isOpen)
+      throw StateError('PlatformWatchLimitStore not open');
     return b;
   }
 
-  static String _todayKey() {
-    final n = DateTime.now();
-    return '${n.year}-${n.month.toString().padLeft(2, '0')}-${n.day.toString().padLeft(2, '0')}';
-  }
+  static String _todayKey() => UsageDay.key();
 
   static void _ensureToday(PlatformWatchId id) {
     final dayK = '${id.name}_day';
@@ -42,14 +45,36 @@ class PlatformWatchLimitStore {
     }
   }
 
+  /// DM·유튜브 뮤직(음성)처럼 시간 한도를 두지 않는 모드
+  static bool isAlwaysUnlimited(PlatformWatchId id) =>
+      id == PlatformWatchId.instagramDm;
+
+  static String? budgetTargetFor(PlatformWatchId id) {
+    switch (id) {
+      case PlatformWatchId.youtube:
+        return UsageBudgetTarget.youtube;
+      case PlatformWatchId.instagram:
+        return UsageBudgetTarget.instagram;
+      case PlatformWatchId.brunch:
+        return UsageBudgetTarget.brunch;
+      case PlatformWatchId.instagramDm:
+        return null;
+    }
+  }
+
   static bool isEnabled(PlatformWatchId id) {
+    if (isAlwaysUnlimited(id)) return false;
+    final budgetTarget = budgetTargetFor(id);
+    if (budgetTarget != null && UsageBudgetStore.isEnabled(budgetTarget)) {
+      return true;
+    }
     switch (id) {
       case PlatformWatchId.youtube:
         return YoutubeWatchTimerStore.isEnabled;
       case PlatformWatchId.instagram:
         return IsleUserDefaults.instagramDailyLimitEnabled;
       case PlatformWatchId.instagramDm:
-        return IsleUserDefaults.instagramDmDailyLimitEnabled;
+        return false;
       case PlatformWatchId.brunch:
         return IsleUserDefaults.brunchDailyLimitEnabled;
     }
@@ -91,7 +116,7 @@ class PlatformWatchLimitStore {
       case PlatformWatchId.instagram:
         await IsleUserDefaults.setInstagramDailyLimitEnabled(v);
       case PlatformWatchId.instagramDm:
-        await IsleUserDefaults.setInstagramDmDailyLimitEnabled(v);
+        return;
       case PlatformWatchId.brunch:
         await IsleUserDefaults.setBrunchDailyLimitEnabled(v);
     }
@@ -102,10 +127,14 @@ class PlatformWatchLimitStore {
       case PlatformWatchId.youtube:
         return YoutubeWatchTimerStore.limitSeconds ~/ 60;
       case PlatformWatchId.instagram:
+        final budget = UsageBudgetStore.policyFor(UsageBudgetTarget.instagram);
+        if (budget != null && budget.enabled) return budget.dailyCapMinutes;
         return IsleUserDefaults.instagramDailyLimitMinutes;
       case PlatformWatchId.instagramDm:
         return IsleUserDefaults.instagramDmDailyLimitMinutes;
       case PlatformWatchId.brunch:
+        final budget = UsageBudgetStore.policyFor(UsageBudgetTarget.brunch);
+        if (budget != null && budget.enabled) return budget.dailyCapMinutes;
         return IsleUserDefaults.brunchDailyLimitMinutes;
     }
   }
@@ -118,14 +147,15 @@ class PlatformWatchLimitStore {
     switch (id) {
       case PlatformWatchId.youtube:
         if (YoutubeWatchTimerStore.usesInterval) {
-          await IsleUserDefaults.setYoutubeIntervalAllowMinutes(m.clamp(1, 120));
+          await IsleUserDefaults.setYoutubeIntervalAllowMinutes(
+              m.clamp(1, 120));
         } else {
           await IsleUserDefaults.setYoutubeDailyLimitMinutes(m);
         }
       case PlatformWatchId.instagram:
         await IsleUserDefaults.setInstagramDailyLimitMinutes(m);
       case PlatformWatchId.instagramDm:
-        await IsleUserDefaults.setInstagramDmDailyLimitMinutes(m);
+        return;
       case PlatformWatchId.brunch:
         await IsleUserDefaults.setBrunchDailyLimitMinutes(m);
     }
@@ -134,26 +164,47 @@ class PlatformWatchLimitStore {
   static int limitSeconds(PlatformWatchId id) => limitMinutes(id) * 60;
 
   static int secondsUsedToday(PlatformWatchId id) {
+    final budgetTarget = budgetTargetFor(id);
+    if (budgetTarget != null) {
+      // 정규화된 snapshot 사용 — 날짜 롤오버 시 어제값 노출 방지 (secondsRemaining와 동일 소스)
+      final snap = UsageBudgetStore.snapshot(budgetTarget);
+      if (snap != null) return snap.ledger.usedSecondsToday;
+    }
     if (id == PlatformWatchId.youtube) {
-      return YoutubeWatchTimerStore.secondsUsedToday;
+      return YoutubeWatchTimerStore.secondsUsed;
     }
     _ensureToday(id);
     return int.tryParse(box.get('${id.name}_seconds') ?? '') ?? 0;
   }
 
   static int secondsRemaining(PlatformWatchId id) {
+    final budgetTarget = budgetTargetFor(id);
+    if (budgetTarget != null) {
+      final snap = UsageBudgetStore.snapshot(budgetTarget);
+      if (snap != null) return snap.dailyRemainingSeconds;
+    }
     if (!isEnabled(id)) return limitSeconds(id);
     return (limitSeconds(id) - secondsUsedToday(id)).clamp(0, limitSeconds(id));
   }
 
   static bool isLimitReached(PlatformWatchId id) {
     if (!isEnabled(id)) return false;
-    if (id == PlatformWatchId.youtube) return YoutubeWatchTimerStore.isLimitReached;
+    final budgetTarget = budgetTargetFor(id);
+    if (budgetTarget != null && UsageBudgetStore.isEnabled(budgetTarget)) {
+      return UsageBudgetStore.isLimitReached(budgetTarget);
+    }
+    if (id == PlatformWatchId.youtube)
+      return YoutubeWatchTimerStore.isLimitReached;
     return secondsUsedToday(id) >= limitSeconds(id);
   }
 
   static void addSeconds(PlatformWatchId id, int seconds) {
-    if (seconds <= 0 || !isEnabled(id)) return;
+    if (seconds <= 0 || isAlwaysUnlimited(id) || !isEnabled(id)) return;
+    final budgetTarget = budgetTargetFor(id);
+    if (budgetTarget != null && UsageBudgetStore.isEnabled(budgetTarget)) {
+      UsageBudgetStore.addSeconds(budgetTarget, seconds);
+      return;
+    }
     if (id == PlatformWatchId.youtube) {
       YoutubeWatchTimerStore.addSeconds(seconds);
       return;
@@ -192,6 +243,7 @@ class PlatformWatchLimitStore {
   }
 
   static String formatRemainChip(PlatformWatchId id) {
+    if (isAlwaysUnlimited(id)) return '무제한';
     if (!isEnabled(id)) return '한도 끔';
     final remain = secondsRemaining(id);
     if (isLimitReached(id)) return '한도 도달';

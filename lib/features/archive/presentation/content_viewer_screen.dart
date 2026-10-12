@@ -22,6 +22,7 @@ import '../../../core/youtube/youtube_access_guard.dart';
 import '../../../core/youtube/youtube_block_reapply_hub.dart';
 import '../../../core/youtube/youtube_limit_gate.dart';
 import '../../../core/youtube/youtube_channel_block_guard.dart';
+import '../../../core/youtube/youtube_content_open_guard.dart';
 import '../../../core/youtube/youtube_channel_probe_script.dart';
 import '../../../core/youtube/youtube_webview_energy.dart';
 import '../../../core/youtube/youtube_webview_factory.dart';
@@ -33,7 +34,16 @@ import '../../youtube/presentation/widgets/block_channel_sheet.dart';
 class ContentViewerScreen extends ConsumerStatefulWidget {
   final String url;
   final String title;
-  const ContentViewerScreen({super.key, required this.url, required this.title});
+  final String channelId;
+  final String channelName;
+
+  const ContentViewerScreen({
+    super.key,
+    required this.url,
+    required this.title,
+    this.channelId = '',
+    this.channelName = '',
+  });
 
   @override
   ConsumerState<ContentViewerScreen> createState() => _ContentViewerScreenState();
@@ -47,6 +57,7 @@ class _ContentViewerScreenState extends ConsumerState<ContentViewerScreen> {
   YoutubePageChannel _probed = const YoutubePageChannel(channelId: '', channelName: '');
   YoutubeBlockHit? _nativeBlockHit;
   ContentSafetyHit? _safetyBlockHit;
+  String? _blockDenyMessage;
 
   bool get _isYouTube => widget.url.contains('youtube.com') || widget.url.contains('youtu.be');
   bool get _useWebShell => _isYouTube && IsleUserDefaults.useYoutubeWebShell;
@@ -122,6 +133,16 @@ class _ContentViewerScreenState extends ConsumerState<ContentViewerScreen> {
     if (YoutubeUrlRedirect.isYoutubeUrl(widget.url)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
+        final deny = YoutubeContentOpenGuard.denyOpen(
+          url: widget.url,
+          channelId: widget.channelId,
+          channelName: widget.channelName,
+          videoTitle: widget.title,
+        );
+        if (deny != null) {
+          setState(() => _blockDenyMessage = deny);
+          return;
+        }
         final route = YoutubeUrlRedirect.inAppRoute(widget.url);
         if (route != null) context.pushReplacement(route);
       });
@@ -139,12 +160,33 @@ class _ContentViewerScreenState extends ConsumerState<ContentViewerScreen> {
       setState(() {});
       return;
     }
+
+    final playbackDeny = YoutubeContentOpenGuard.denyOpen(
+      url: widget.url,
+      channelId: widget.channelId,
+      channelName: widget.channelName,
+      videoTitle: widget.title,
+    );
+    if (playbackDeny != null) {
+      _blockDenyMessage = playbackDeny;
+      setState(() {});
+      return;
+    }
+
     if (_isYouTube && !_useWebShell) {
       if (YoutubeAccessGuard.shouldBlockWebView) {
         setState(() {});
         return;
       }
-      _nativeBlockHit = _matchBlock(widget.url);
+      _nativeBlockHit = _matchBlock(
+        widget.url,
+        probe: YoutubePageChannel(
+          channelId: widget.channelId,
+          channelName: widget.channelName,
+          videoId: UrlParser.extractYouTubeVideoId(widget.url) ?? '',
+          videoTitle: widget.title,
+        ),
+      );
       if (_nativeBlockHit == null && !_urlExternallyBlocked) {
         final videoId = UrlParser.extractYouTubeVideoId(widget.url);
         if (videoId != null) {
@@ -373,6 +415,34 @@ class _ContentViewerScreenState extends ConsumerState<ContentViewerScreen> {
                 const SizedBox(height: 16),
                 Text(
                   _nativeBlockHit!.snackMessage,
+                  style: IsleText.subtitle(),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                FilledButton(
+                  onPressed: () => context.pop(),
+                  child: const Text('돌아가기'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (_blockDenyMessage != null) {
+      return Scaffold(
+        appBar: IsleAppBar(title: widget.title),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.block, size: 48, color: IsleColors.danger),
+                const SizedBox(height: 16),
+                Text(
+                  _blockDenyMessage!,
                   style: IsleText.subtitle(),
                   textAlign: TextAlign.center,
                 ),

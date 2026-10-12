@@ -7,6 +7,7 @@ import '../services/isle_user_defaults.dart';
 import '../youtube/models/youtube_schedule_rule.dart';
 import '../services/isle_local_data_sync.dart';
 import 'models/block_schedule.dart';
+import 'models/schedule_enforcement_mode.dart';
 import 'models/schedule_slot.dart';
 import 'schedule_constants.dart';
 import 'schedule_lock_service.dart';
@@ -34,22 +35,46 @@ class BlockScheduleStore {
     return b;
   }
 
+  static bool get isOpen => _box != null && _box!.isOpen;
+
   static bool get masterEnabled => IsleUserDefaults.youtubeScheduleLockEnabled;
 
+  // loadAll()이 캐시 없이 매번 전체 스케줄 리스트를 JSON 디코드하는데, 웹뷰가
+  // 열려있는 동안 1초마다 도는 워치 타이머(_recordScheduleBundleUsageSecond →
+  // ScheduleActiveService.activeSchedulesNow)가 이걸 매초 최대 두 번 호출한다
+  // — 스케줄이 많아질수록 브라우징(특히 인스타그램) 중 체감 렉으로 이어지던
+  // 실사용 버그(2026-07-13 사용자 제보). 쓰기 경로가 saveAll() 하나뿐이라
+  // 캐시 무효화가 안전하다 — saveAll() 호출 시에만 무효화한다.
+  static List<BlockSchedule>? _cache;
+
+  // 캐시 리스트 자체를 그대로 반환하면, 호출부의 "final list = loadAll();
+  // list.add(x); await saveAll(list);" 같은 흔한 패턴이 saveAll() 호출 전에
+  // 캐시를 직접 mutate해버려 그 사이 다른 loadAll() 호출이 아직 저장 안 된
+  // 상태를 보게 될 수 있다 — 매번 얕은 복사본을 반환해 캐시 자체는 항상
+  // saveAll()을 통해서만 바뀌게 한다.
   static List<BlockSchedule> loadAll() {
+    final cached = _cache;
+    if (cached != null) return List.of(cached);
     final raw = box.get(_schedulesKey);
-    if (raw == null) return [];
+    if (raw == null) {
+      _cache = [];
+      return [];
+    }
     try {
-      return (jsonDecode(raw) as List)
+      final parsed = (jsonDecode(raw) as List)
           .map((e) => BlockSchedule.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
+      _cache = parsed;
+      return List.of(parsed);
     } catch (_) {
+      _cache = [];
       return [];
     }
   }
 
   static Future<void> saveAll(List<BlockSchedule> list) async {
     await box.put(_schedulesKey, jsonEncode(list.map((e) => e.toJson()).toList()));
+    _cache = List.of(list);
     isleNotifyLocalDataChanged();
   }
 
@@ -58,6 +83,12 @@ class BlockScheduleStore {
     List<ScheduleSlot>? slots,
     bool locked = false,
     int lockCooldownMinutes = 30,
+    ScheduleEnforcementMode enforcementMode = ScheduleEnforcementMode.fullBlock,
+    bool blockIsleInApp = false,
+    bool enabled = true,
+    int? scheduledActivationAtMs,
+    int? scheduledDeactivationAtMs,
+    bool reservationLocked = false,
   }) async {
     final list = loadAll();
     final s = BlockSchedule(
@@ -66,6 +97,20 @@ class BlockScheduleStore {
       locked: locked,
       lockCooldownMinutes: lockCooldownMinutes.clamp(ScheduleConstants.minCooldownMinutes, 24 * 60),
       slots: slots ?? [],
+      // locked:true 로 만든 스케줄을 이 함수 안에서 바로 copyWith+upsert 하면
+      // ScheduleImportGuard(커밋먼트 락 보호)가 "이미 잠긴 스케줄 편집"으로 오인해
+      // enforcementMode 등을 방금 만든 기본값(fullBlock)으로 되돌려버린다.
+      // 최초 생성 시점에 최종 값을 바로 써서, 되돌아가도 이미 맞는 값이 되게 한다.
+      // blockIsleInApp(브라우저/Safari 차단 플래그)도 같은 이유로 여기서 바로
+      // 최종값을 써야 한다(cage 2026-07-11 이식 — blockIsleInApp이 계속
+      // false로 저장되던 버그). 예약 스케줄 필드(enabled/scheduledActivation
+      // AtMs 등, 2026-07-20 신설)도 같은 이유로 최초 생성 시점에 확정한다.
+      enforcementMode: enforcementMode,
+      blockIsleInApp: blockIsleInApp,
+      enabled: enabled,
+      scheduledActivationAtMs: scheduledActivationAtMs,
+      scheduledDeactivationAtMs: scheduledDeactivationAtMs,
+      reservationLocked: reservationLocked,
     );
     list.add(s);
     await saveAll(list);

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_build_config.dart';
 import '../../core/navigation/isle_navigation.dart';
+import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_release_info.dart';
 import '../../core/constants/app_typography.dart';
+import '../../core/constants/app_version_badge_layout.dart';
 import '../../core/services/isle_app_log_service.dart';
 import 'isle_crash_alert_banner.dart';
 import 'youtube_resume_overlay.dart';
@@ -36,23 +39,31 @@ class AppVersionBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
-  // 하단 탭(56) + FAB(56) + 여유 — SnackBar·FAB과 겹치지 않게 왼쪽 하단
-    final badgeBottom = bottomInset + 128;
+    return ListenableBuilder(
+      listenable: AppVersionBadgeLayout.instance,
+      builder: (context, _) {
+        final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+        final lift = AppVersionBadgeLayout.instance.extraBottomLift;
+        final kbInset = MediaQuery.viewInsetsOf(context).bottom;
+        // 키보드가 열리면 배지가 입력 영역을 가리지 않게 숨김
+        if (kbInset > 48) return const SizedBox.shrink();
+        final badgeBottom = bottomInset + IsleSize.versionBadgeBottomBase + lift;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Positioned(
-          left: 8,
-          bottom: badgeBottom,
-          child: _BadgeChip(
-            label: _label,
-            onTap: () => _copy(context),
-            onLongPress: () => _openLogOrBackup(context),
-          ),
-        ),
-      ],
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              left: 8,
+              bottom: badgeBottom,
+              child: _BadgeChip(
+                label: _label,
+                onTap: () => _copy(context),
+                onLongPress: () => _openLogOrBackup(context),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -128,7 +139,7 @@ class AppVersionOverlay extends StatelessWidget {
         const YoutubeResumeOverlay(),
         const YoutubePodcastResumeOverlay(),
         const IsleCrashAlertBanner(),
-        const AppVersionBadge(),
+        if (kDebugMode) const AppVersionBadge(),
       ],
     );
   }

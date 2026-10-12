@@ -20,8 +20,6 @@ class ScreenTimePersistenceService {
 
   static const exportKey = 'screen_time_persistence';
   static const _mirrorChannel = 'com.isle.app/screen_time';
-  static const _mirrorFile = 'screen_time_persistence_v1.json';
-  static const _keychainKey = 'isle_screen_time_persistence_v1';
 
   /// Hive 박스 → JSON (export / survival backup)
   static Future<Map<String, dynamic>> exportBundle() async {
@@ -164,22 +162,18 @@ class ScreenTimePersistenceService {
     if (!await IosScreenTimeService.isAvailable()) return;
 
     final hasData = ExternalAppShieldStore.hasSelection ||
-        ScheduleScreenTimeStore.box.isNotEmpty;
+        ScheduleScreenTimeStore.box.isNotEmpty ||
+        BlockScheduleStore.loadAll().any((s) => s.enabled && s.slots.isNotEmpty);
     if (!hasData) return;
 
     if (!await IosScreenTimeService.isAuthorized()) {
-      // 이미 승인됐으면 requestAuthorization은 즉시 반환(다이얼로그 없음).
-      // notDetermined이면 OS 다이얼로그를 자동으로 띄운다.
-      IsleAppLogService.log('Screen Time: not authorized — attempting auto re-auth');
-      final result = await IosScreenTimeService.requestAuthorizationDetailed();
-      if (!result.ok) {
+      if (hasData) {
         await IsleUserDefaults.setPendingScreenTimeReapply(true);
         IsleAppLogService.log(
-          'Screen Time: re-auth failed (${result.code}) — showing banner',
+          'Screen Time: not authorized — 차단 탭 배너에서만 재승인 (부팅 시 팝업 없음)',
         );
-        return;
       }
-      IsleAppLogService.log('Screen Time: re-auth succeeded automatically');
+      return;
     }
 
     await IsleUserDefaults.setPendingScreenTimeReapply(false);
@@ -191,10 +185,9 @@ class ScreenTimePersistenceService {
     IsleAppLogService.log('Screen Time: shields re-applied from saved picks');
   }
 
-  /// `main()` — survival restore 이후
+  /// `main()` — survival restore 이후 (쉴드 재적용은 [IsleDeferredOsSyncService])
   static Future<void> bootstrapAfterDataLoad() async {
     await restoreFromNativeMirrorIfNeeded();
-    await reapplyIfAuthorized(force: true);
   }
 
   /// 사용자가 Screen Time 승인 직후 (설정 화면 등)

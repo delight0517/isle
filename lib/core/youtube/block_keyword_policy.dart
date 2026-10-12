@@ -114,8 +114,9 @@ class BlockKeywordPolicy {
   };
 
   /// Safari 항상-차단에 넣으면 Isle·Safari 유튜브 전체가 막힘
+  /// (youtube.com은 Safari Content Blocker 전용 경로라 제외 — §8 참고. 서브도메인은
+  /// WebsiteBlockGuard의 접미사 매칭으로 자동 커버되므로 개별 등록은 계속 막는다)
   static const neverWebsiteBlockDomains = {
-    'youtube.com',
     'youtu.be',
     'googlevideo.com',
     'm.youtube.com',
@@ -127,7 +128,8 @@ class BlockKeywordPolicy {
     if (platformUrlNoise.contains(k)) return false;
     if (youtubeBroadNoise.contains(k)) return false;
     if (k.startsWith('@') && k.length < 5) return false;
-    if (k.length < 3) return false;
+    // 한국어 의미 명사 다수가 2글자(연예·정치·게임 등)라 하한을 2로 둔다.
+    if (k.length < 2) return false;
     return true;
   }
 
@@ -217,4 +219,28 @@ class BlockKeywordPolicy {
 
   static List<String> forTitleMatch(List<String> keywords) =>
       sanitizeStoredKeywords(keywords);
+
+  /// Google 검색 SERP — YouTube 주입과 동일 상한 + 검색어에 포함된 키워드는 제외(전체 가림 방지)
+  static List<String> forGoogleSearchInject(
+    List<String> keywords, {
+    String? searchQuery,
+  }) {
+    final safe = forYoutubeInject(keywords);
+    final q = searchQuery?.trim().toLowerCase();
+    if (q == null || q.isEmpty) return safe;
+    final terms = q
+        .split(RegExp(r'\s+'))
+        .map((t) => t.trim())
+        .where((t) => t.length >= 2)
+        .toSet();
+    if (terms.isEmpty) return safe;
+    return safe.where((kw) {
+      final k = kw.toLowerCase();
+      if (terms.contains(k)) return false;
+      for (final t in terms) {
+        if (k.contains(t) || t.contains(k)) return false;
+      }
+      return true;
+    }).toList();
+  }
 }

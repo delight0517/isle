@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/block_schedule/block_focus_service.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/platform/platform_block_intent.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_typography.dart';
 
@@ -70,8 +71,7 @@ class BlockFocusStatusCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Instagram·TikTok은 Isle 안 브라우저가 아니라 '
-            'iPhone/Mac의 앱 아이콘 자체를 Screen Time으로 잠급니다.',
+            PlatformBlockCopy.blockFocusExternalAppsHint,
             style: IsleText.caption(color: Colors.white.withValues(alpha: 0.78)).copyWith(height: 1.35),
           ),
           const SizedBox(height: 16),

@@ -14,7 +14,13 @@ class YoutubeViewportScript {
   el.textContent = `
     body { padding-top: ${topPx}px !important; padding-bottom: ${bottomPx}px !important; }
     ytm-mobile-topbar-renderer { margin-top: 0 !important; }
-    ytm-pivot-bar-renderer { margin-bottom: 0 !important; }
+    ytm-pivot-bar-renderer {
+      margin-bottom: 0 !important;
+      padding-bottom: 8px !important;
+      height: 56px !important;
+      min-height: 0 !important;
+      box-sizing: border-box !important;
+    }
     ytm-searchbox-suggestions, ytm-section-list-renderer { max-width: 100% !important; }
   `;
 })();

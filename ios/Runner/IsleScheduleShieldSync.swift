@@ -7,27 +7,52 @@ import ManagedSettings
 
 /// App Group 스케줄 스냅샷 + 스케줄별 selection blob → OS 쉴드 (BGTask·확장 공용).
 enum IsleScheduleShieldSync {
-  static let appGroupId = "group.com.isle.app"
+  static let appGroupId = IsleAppIdentity.appGroupId
   static let snapshotFileName = "schedule_snapshot_v1.json"
-  static let selectionKeyPrefix = "isle.st.sel.v2."
+  static let legacySelectionKeyPrefix = "isle.st.sel.v2."
+  static let selectionKeyPrefix = "isle.st.sel.v3."
+  static let lockdownAllowedAppsKey = "isle.st.lockdown.allowedApps.v1"
 
   static var sharedDefaults: UserDefaults? {
     UserDefaults(suiteName: appGroupId)
   }
 
-  static func selectionKey(for scheduleId: String) -> String {
-    selectionKeyPrefix + scheduleId
+  static func selectionKey(for scheduleId: String, bundleId: String? = nil) -> String {
+    guard let bundleId, !bundleId.isEmpty else {
+      return legacySelectionKeyPrefix + scheduleId
+    }
+    return selectionKeyPrefix + scheduleId + "." + bundleId
   }
 
   @discardableResult
-  static func saveScheduleSelection(scheduleId: String, encoded: String) -> Bool {
+  static func saveScheduleSelection(scheduleId: String, bundleId: String? = nil, encoded: String) -> Bool {
     guard !scheduleId.isEmpty, !encoded.isEmpty else { return false }
-    sharedDefaults?.set(encoded, forKey: selectionKey(for: scheduleId))
+    sharedDefaults?.set(encoded, forKey: selectionKey(for: scheduleId, bundleId: bundleId))
     return true
   }
 
-  static func loadScheduleSelection(scheduleId: String) -> String? {
-    sharedDefaults?.string(forKey: selectionKey(for: scheduleId))
+  static func loadScheduleSelection(scheduleId: String, bundleId: String? = nil) -> String? {
+    sharedDefaults?.string(forKey: selectionKey(for: scheduleId, bundleId: bundleId))
+  }
+
+  static func allSelections(forSchedule scheduleId: String) -> [String] {
+    guard let defaults = sharedDefaults else { return [] }
+    let prefix = selectionKeyPrefix + scheduleId + "."
+    return defaults.dictionaryRepresentation().keys
+      .filter { $0.hasPrefix(prefix) }
+      .compactMap { defaults.string(forKey: $0) }
+      .filter { !$0.isEmpty }
+  }
+
+  @discardableResult
+  static func saveLockdownAllowedSelection(_ encoded: String?) -> Bool {
+    guard let defaults = sharedDefaults else { return false }
+    if let encoded, !encoded.isEmpty {
+      defaults.set(encoded, forKey: lockdownAllowedAppsKey)
+    } else {
+      defaults.removeObject(forKey: lockdownAllowedAppsKey)
+    }
+    return true
   }
 
   #if canImport(FamilyControls)
@@ -49,16 +74,27 @@ enum IsleScheduleShieldSync {
   @discardableResult
   static func applyShield(
     selection: FamilyActivitySelection,
-    domains: [String]
+    domains: [String],
+    lockdownActive: Bool = false
   ) -> Bool {
     guard AuthorizationCenter.shared.authorizationStatus == .approved else { return false }
     let store = ManagedSettingsStore(named: .init("IsleSchedule"))
-    if selection.applicationTokens.isEmpty {
+    let allowed = lockdownActive
+      ? sharedDefaults?.string(forKey: lockdownAllowedAppsKey)
+        .flatMap { Data(base64Encoded: $0) }
+        .flatMap { try? PropertyListDecoder().decode(FamilyActivitySelection.self, from: $0) }
+        .map(\.applicationTokens) ?? Set()
+      : Set<ApplicationToken>()
+    var blockedApps = selection.applicationTokens
+    blockedApps.subtract(allowed)
+    if blockedApps.isEmpty {
       store.shield.applications = nil
     } else {
-      store.shield.applications = selection.applicationTokens
+      store.shield.applications = blockedApps
     }
-    if selection.categoryTokens.isEmpty {
+    if lockdownActive {
+      store.shield.applicationCategories = .all(except: allowed)
+    } else if selection.categoryTokens.isEmpty {
       store.shield.applicationCategories = nil
     } else {
       store.shield.applicationCategories = .specific(selection.categoryTokens, except: Set())
@@ -80,26 +116,30 @@ enum IsleScheduleShieldSync {
   static func applyActiveSchedules(
     scheduleIds: [String],
     domains: [String],
-    fallbackEncoded: String?
+    fallbackEncoded: String?,
+    lockdownActive: Bool = false
   ) -> Bool {
     guard AuthorizationCenter.shared.authorizationStatus == .approved else { return false }
     var encodings: [String] = []
     for id in scheduleIds {
-      if let e = loadScheduleSelection(scheduleId: id), !e.isEmpty {
-        encodings.append(e)
+      let perBundle = allSelections(forSchedule: id)
+      if !perBundle.isEmpty {
+        encodings.append(contentsOf: perBundle)
+      } else if let legacy = loadScheduleSelection(scheduleId: id), !legacy.isEmpty {
+        encodings.append(legacy)
       }
     }
     if encodings.isEmpty, let fb = fallbackEncoded, !fb.isEmpty {
       encodings = [fb]
     }
     if let merged = unionSelections(encodings) {
-      return applyShield(selection: merged, domains: domains)
+      return applyShield(selection: merged, domains: domains, lockdownActive: lockdownActive)
     }
-    if domains.isEmpty {
+    if domains.isEmpty && !lockdownActive {
       ManagedSettingsStore(named: .init("IsleSchedule")).clearAllSettings()
       return true
     }
-    return applyShield(selection: FamilyActivitySelection(), domains: domains)
+    return applyShield(selection: FamilyActivitySelection(), domains: domains, lockdownActive: lockdownActive)
   }
 
   @discardableResult
@@ -119,6 +159,10 @@ enum IsleScheduleShieldSync {
     }
 
     let ids = root["activeScheduleIds"] as? [String] ?? []
+    let activeSet = Set(ids)
+    let lockdownActive = (root["schedules"] as? [[String: Any]] ?? []).contains {
+      ($0["lockdownAllApps"] as? Bool) == true && activeSet.contains($0["id"] as? String ?? "")
+    }
     var domains = Set<String>()
     if let shieldList = root["shieldDomains"] as? [String] {
       for d in shieldList { domains.insert(d.lowercased()) }
@@ -138,7 +182,8 @@ enum IsleScheduleShieldSync {
     return applyActiveSchedules(
       scheduleIds: ids,
       domains: Array(domains),
-      fallbackEncoded: fallback
+      fallbackEncoded: fallback,
+      lockdownActive: lockdownActive
     )
   }
   #else
@@ -146,7 +191,8 @@ enum IsleScheduleShieldSync {
   static func applyActiveSchedules(
     scheduleIds: [String],
     domains: [String],
-    fallbackEncoded: String?
+    fallbackEncoded: String?,
+    lockdownActive: Bool = false
   ) -> Bool { false }
 
   @discardableResult

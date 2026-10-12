@@ -1,9 +1,12 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/env.dart';
 import '../library/youtube_library_service.dart';
+import '../services/isle_external_launch_guard.dart';
+import 'youtube_safari_launch_guard.dart';
 import 'youtube_webview_factory.dart';
 
 class YoutubeSystemAuthResult {
@@ -41,13 +44,22 @@ class YoutubeSystemAuthService {
     );
   }
 
-  /// Google 계정 페이지 — 인앱 Safari (WebView보다 차단 적음)
-  static Future<bool> openGoogleLoginInAppBrowser() async {
-    final uri = Uri.parse(YoutubeWebviewFactory.signInUrl());
-    if (await canLaunchUrl(uri)) {
-      return launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+  /// Google 계정 페이지 — 인앱 Safari (차단 중이면 열지 않음 · youtube 우회 방지)
+  static Future<bool> openGoogleLoginInAppBrowser({BuildContext? context}) async {
+    final deny = YoutubeSafariLaunchGuard.denyBrowsingEscape();
+    if (deny != null) {
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$deny · Safari 로그인은 사용할 수 없어요')),
+        );
+      }
+      return false;
     }
-    return launchUrl(uri, mode: LaunchMode.externalApplication);
+    return IsleExternalLaunchGuard.launchAllowed(
+      YoutubeWebviewFactory.signInUrl(),
+      mode: LaunchMode.inAppBrowserView,
+      context: context,
+    );
   }
 
   static String get webViewLoginHint => Platform.isIOS

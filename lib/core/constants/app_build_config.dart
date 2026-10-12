@@ -15,6 +15,9 @@ class AppBuildConfig {
   static bool get enableInterestPipeline => !isLightBuild;
   static bool get enablePersonalLibraryDigest => !isLightBuild;
 
+  /// Play 초기 출시 — UGC·소셜 피드 비노출 (심사 후 true 검토).
+  static bool get enableSocialUgc => false;
+
   static String get appTitle {
     if (isYoutubeFocusBuild) return 'Isle Focus';
     if (isLightBuild) return 'Isle Light';

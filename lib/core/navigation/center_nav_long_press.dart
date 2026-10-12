@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../constants/app_colors.dart';
+import '../platform/platform_block_intent.dart';
 import '../constants/app_typography.dart';
 import '../explorer/explorer_site.dart';
 import '../navigation/explorer_entry_guard.dart';
+import '../youtube/youtube_open_gate.dart';
 import '../services/isle_user_defaults.dart';
 import '../social/instagram_web_config.dart';
 import '../../shared/widgets/isle_sheet.dart';
@@ -28,7 +30,7 @@ Future<void> handleCenterNavLongPress(BuildContext context) async {
 
 void openCenterNavYoutube(BuildContext context) {
   HapticFeedback.lightImpact();
-  final deny = ExplorerEntryGuard.denyMessageForSite(ExplorerSite.youtube);
+  final deny = YoutubeOpenGate.denyDedicatedTab();
   if (deny != null) {
     ExplorerEntryGuard.showDenial(
       context,
@@ -42,7 +44,12 @@ void openCenterNavYoutube(BuildContext context) {
 
 void openCenterNavInstagram(BuildContext context) {
   HapticFeedback.lightImpact();
-  context.push(InstagramWebConfig.dmBrowserRoute(dmOnly: true));
+  // 피커 시트 문구는 "피드·DM (WebView)"라고 안내하는데 실제로는 DM으로만
+  // 고정돼 있어서, "인스타그램 열기"를 눌러도 피드는 못 보고 DM만 열리던
+  // 실사용 버그(2026-07-13, "홈에는 dm용 인스타만 있고 피드 여는 버튼이
+  // 안 보여" 제보) — 피드를 기본으로 열고, DM은 다른 진입점(공유 허브의
+  // "DM 받은편지함")에서 여전히 따로 열 수 있다.
+  context.push(InstagramWebConfig.dmBrowserRoute(dmOnly: false));
 }
 
 Future<void> showCenterNavPickerSheet(BuildContext context) async {
@@ -63,9 +70,20 @@ Future<void> showCenterNavPickerSheet(BuildContext context) async {
           ),
           const SizedBox(height: 16),
           _OpenTile(
+            icon: Icons.qr_code_scanner,
+            iconColor: const Color(0xFF1DB954),
+            title: 'QR 스캔',
+            subtitle: '카메라로 링크 열기 · Isle 안전 브라우저',
+            onTap: () {
+              Navigator.pop(ctx);
+              context.push('/home/share/qr');
+            },
+          ),
+          const SizedBox(height: 8),
+          _OpenTile(
             icon: Icons.explore_outlined,
             iconColor: const Color(0xFF0A84FF),
-            title: 'Safari',
+            title: PlatformBlockCopy.inAppBrowserNavLabel,
             subtitle: '앱 안 웹 브라우저',
             onTap: () {
               Navigator.pop(ctx);

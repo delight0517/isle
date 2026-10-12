@@ -37,8 +37,43 @@ class ApiKeyDetector {
   static final _gemini = RegExp(r'^AIza[0-9A-Za-z_-]{20,}$');
   static final _legacyOpenAi = RegExp(r'^sk-[A-Za-z0-9_-]{20,}$');
 
-  static ApiKeyDetectionResult detect(String raw) {
-    final key = raw.trim();
+  /// 붙여넣기 문자열에서 토큰만 추출 (라벨·따옴표·줄바꿈 포함 paste 대응)
+  static String extractFromPaste(String raw) {
+    var text = raw.trim();
+    if (text.isEmpty) return text;
+
+    final compact = text.replaceAll(RegExp(r'\s+'), '');
+    if (_matchKey(compact).isKnown) return compact;
+
+    if (_matchKey(text).isKnown) return text;
+
+    const embedded =
+        r'(sk-or-v1-[A-Za-z0-9_-]{20,}|sk-proj-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|gsk_[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{20,}|sk-[A-Za-z0-9_-]{20,})';
+    final embeddedMatch = RegExp(embedded).firstMatch(text);
+    if (embeddedMatch != null) return embeddedMatch.group(1)!;
+
+    for (final line in text.split(RegExp(r'[\r\n]+'))) {
+      var candidate = line.trim();
+      candidate = candidate.replaceFirst(RegExp(r'^[^:=#]+[:=#]\s*'), '');
+      candidate = candidate.replaceAll(RegExp('^["\']|["\']\$'), '').trim();
+      if (_matchKey(candidate).isKnown) return candidate;
+    }
+
+    return compact;
+  }
+
+  static bool looksLikeApiKey(String raw) => detect(extractFromPaste(raw)).isKnown;
+
+  static bool shouldAutoApply(String raw) {
+    final key = extractFromPaste(raw);
+    if (key.length < 24) return false;
+    final detected = detect(key);
+    return detected.isKnown && detected.confidence == AiKeyDetectionConfidence.high;
+  }
+
+  static ApiKeyDetectionResult detect(String raw) => _matchKey(extractFromPaste(raw));
+
+  static ApiKeyDetectionResult _matchKey(String key) {
     if (key.isEmpty) {
       return const ApiKeyDetectionResult(
         providerId: null,

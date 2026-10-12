@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="blocking_accessibility_desc">Isle가 차단 대상으로 지정한 앱이 열리면 차단 화면을 표시합니다. 어떤 앱이 열렸는지만 확인하며, 사용 데이터는 기기 밖으로 전송하지 않습니다.</string>
+    <string name="blocking_accessibility_desc">차단 목록에 넣은 앱이 열릴 때 알려 주기 위해 접근성이 필요합니다. 화면 내용을 읽거나 서버로 보내지 않습니다.</string>
 </resources>

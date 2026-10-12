@@ -8,7 +8,7 @@ require 'xcodeproj'
 
 IOS_DIR = File.dirname(__FILE__)
 PROJECT_PATH = File.join(IOS_DIR, 'Runner.xcodeproj')
-MAIN_BUNDLE_ID = 'com.isle.app.isle.dev.dfbeta22'
+MAIN_BUNDLE_ID = 'com.isle.app.moa.dev'
 TEAM_ID = 'V3J8MR637G'
 
 EXTENSIONS = [

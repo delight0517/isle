@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_build_config.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/explorer/explorer_site.dart';
@@ -53,20 +54,21 @@ class _ContentExplorerHubScreenState extends State<ContentExplorerHubScreen> {
             style: IsleText.caption(color: IsleColors.muted),
           ),
           const SizedBox(height: 12),
-          Card(
-            margin: const EdgeInsets.only(bottom: 16),
-            color: const Color(0xFFFDF2F7),
-            child: ListTile(
-              leading: const Icon(Icons.hub_outlined, color: Color(0xFFE1306C)),
-              title: Text('소셜 허브', style: IsleText.subtitle()),
-              subtitle: Text(
-                '인스타·페이스북·Isle 프로필·게시',
-                style: IsleText.caption(color: IsleColors.muted),
+          if (AppBuildConfig.enableSocialUgc)
+            Card(
+              margin: const EdgeInsets.only(bottom: 16),
+              color: const Color(0xFFFDF2F7),
+              child: ListTile(
+                leading: const Icon(Icons.hub_outlined, color: Color(0xFFE1306C)),
+                title: Text('소셜 허브', style: IsleText.subtitle()),
+                subtitle: Text(
+                  '인스타·페이스북·Isle 프로필·게시',
+                  style: IsleText.caption(color: IsleColors.muted),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/social'),
               ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/social'),
             ),
-          ),
           ...PlatformCatalog.platforms.map(
             (p) => Padding(
               padding: const EdgeInsets.only(bottom: 12),

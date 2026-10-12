@@ -26,13 +26,34 @@ class YoutubeFocusMetadataService {
     }
     final fetched = await fetchById(base.videoId);
     if (fetched == null) return base;
-    return YoutubeFocusVideo(
-      videoId: base.videoId,
-      title: fetched.title != 'YouTube' ? fetched.title : base.title,
-      channelName: fetched.channelName.isNotEmpty ? fetched.channelName : base.channelName,
-      thumbnailUrl: fetched.thumbnailUrl ?? base.thumbnailUrl,
-      durationSeconds: fetched.durationSeconds > 0 ? fetched.durationSeconds : base.durationSeconds,
-    );
+    return fetched;
+  }
+
+  /// Piped uploaderUrl → UC… / @handle (채널 ID-only 차단 매칭용)
+  static Future<String> channelIdFor(String videoId) async {
+    if (videoId.length != 11) return '';
+    for (final host in _hosts) {
+      try {
+        final res = await _dio.get<Map<String, dynamic>>('$host/streams/$videoId');
+        final d = res.data;
+        if (d == null) continue;
+        return _channelIdFromPiped(d);
+      } catch (_) {
+        continue;
+      }
+    }
+    return '';
+  }
+
+  static String _channelIdFromPiped(Map<String, dynamic> d) {
+    final raw = (d['uploaderUrl'] as String? ?? '').trim();
+    if (raw.isEmpty) return '';
+    final lower = raw.toLowerCase();
+    final channel = RegExp(r'/channel/(uc[\w-]+)', caseSensitive: false).firstMatch(lower);
+    if (channel != null) return channel.group(1)!;
+    final handle = RegExp(r'/@([\w.\-]+)').firstMatch(lower);
+    if (handle != null) return '@${handle.group(1)!}';
+    return '';
   }
 
   static Future<YoutubeFocusVideo?> fetchById(String videoId) async {

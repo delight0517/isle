@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/navigation/isle_routes.dart';
+import '../../../core/navigation/schedule_overlay_navigation.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/focus/isle_product_focus.dart';
@@ -97,7 +98,7 @@ class FocusHubScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           _quickLink(context, Icons.timer_outlined, '앱별 시간 한도', '/settings/app-usage-limits'),
-          _quickLink(context, Icons.schedule, '차단 스케줄', '/settings/block-schedules'),
+          _quickLink(context, Icons.schedule, '차단 스케줄', IsleRoutes.blockSchedulesOutsideShell, preferRoot: true),
           _quickLink(context, Icons.bar_chart_outlined, '시청 통계', '/settings/platform-stats'),
           if (IsleProductFocus.showAdvanced) ...[
             const SizedBox(height: 16),
@@ -164,13 +165,25 @@ class FocusHubScreen extends StatelessWidget {
     );
   }
 
-  Widget _quickLink(BuildContext context, IconData icon, String label, String route) {
+  Widget _quickLink(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String route, {
+    bool preferRoot = false,
+  }) {
     return ListTile(
       dense: true,
       leading: Icon(icon, color: IsleColors.ocean700, size: 22),
       title: Text(label, style: IsleText.body()),
       trailing: const Icon(Icons.chevron_right, size: 20, color: IsleColors.muted),
-      onTap: () => context.push(route),
+      onTap: () {
+        if (preferRoot) {
+          pushRoutePreferRoot(context, route);
+        } else {
+          context.push(route);
+        }
+      },
       visualDensity: VisualDensity.compact,
     );
   }

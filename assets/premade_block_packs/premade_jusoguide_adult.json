@@ -1,0 +1,2080 @@
+{
+  "packId": "premade_jusoguide_adult",
+  "displayName": "jusoguide 성인 바로가기",
+  "description": "jusoguide1.com 허브 + 바로가기 203개 (host·전체 URL)",
+  "version": "1.0.1",
+  "generatedAt": "2026-06-30T00:02:47Z",
+  "entryCount": 414,
+  "entries": [
+    {
+      "pattern": "jusoguide1.com",
+      "kind": "host",
+      "note": "jusoguide 바로가기 허브"
+    },
+    {
+      "pattern": "jusoguide",
+      "kind": "urlContains",
+      "note": "jusoguide 미러 (jusoguide2 등)"
+    },
+    {
+      "pattern": "/bbs/board.php?bo_table=adult",
+      "kind": "urlContains",
+      "note": "jusoguide1 성인 게시판 URL"
+    },
+    {
+      "pattern": "kr18.tv",
+      "kind": "host",
+      "note": "성인 · kr18 (수동 추가)"
+    },
+    {
+      "pattern": "mib19.co.kr",
+      "kind": "host",
+      "note": "jusoguide · MIB 존예녀따먹기"
+    },
+    {
+      "pattern": "la/?p_id=jusoguide",
+      "kind": "urlContains",
+      "note": "jusoguide URL · MIB 존예녀따먹기"
+    },
+    {
+      "pattern": "http://mib19.co.kr/la/?p_id=jusoguide",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · MIB 존예녀따먹기"
+    },
+    {
+      "pattern": "02.19hot.net",
+      "kind": "host",
+      "note": "jusoguide · 일구핫"
+    },
+    {
+      "pattern": "https://02.19hot.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 일구핫"
+    },
+    {
+      "pattern": "02.avpop.tv",
+      "kind": "host",
+      "note": "jusoguide · AVPOP"
+    },
+    {
+      "pattern": "https://02.avpop.tv/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AVPOP"
+    },
+    {
+      "pattern": "05.avsee.ru",
+      "kind": "host",
+      "note": "jusoguide · AVsee"
+    },
+    {
+      "pattern": "https://05.avsee.ru/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AVsee"
+    },
+    {
+      "pattern": "1004ak.com",
+      "kind": "host",
+      "note": "jusoguide · 천사티비"
+    },
+    {
+      "pattern": "https://1004ak.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 천사티비"
+    },
+    {
+      "pattern": "19avsite.org",
+      "kind": "host",
+      "note": "jusoguide · AV정복"
+    },
+    {
+      "pattern": "https://19avsite.org/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV정복"
+    },
+    {
+      "pattern": "19plus.cc",
+      "kind": "host",
+      "note": "jusoguide · 19플러스"
+    },
+    {
+      "pattern": "https://19plus.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 19플러스"
+    },
+    {
+      "pattern": "1day1ddal24.site",
+      "kind": "host",
+      "note": "jusoguide · 1일1딸"
+    },
+    {
+      "pattern": "https://1day1ddal24.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 1일1딸"
+    },
+    {
+      "pattern": "6.yadongpan.me",
+      "kind": "host",
+      "note": "jusoguide · 야동판"
+    },
+    {
+      "pattern": "https://6.yadongpan.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동판"
+    },
+    {
+      "pattern": "a34.yadontime.com",
+      "kind": "host",
+      "note": "jusoguide · 야동타임(NEW)"
+    },
+    {
+      "pattern": "https://a34.yadontime.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동타임(NEW)"
+    },
+    {
+      "pattern": "a8.xbbg.tv",
+      "kind": "host",
+      "note": "jusoguide · 엑스비비기"
+    },
+    {
+      "pattern": "https://a8.xbbg.tv/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 엑스비비기"
+    },
+    {
+      "pattern": "a9.xgirl.me",
+      "kind": "host",
+      "note": "jusoguide · 엑스누나"
+    },
+    {
+      "pattern": "https://a9.xgirl.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 엑스누나"
+    },
+    {
+      "pattern": "av-milk53.com",
+      "kind": "host",
+      "note": "jusoguide · AV밀크"
+    },
+    {
+      "pattern": "https://av-milk53.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV밀크"
+    },
+    {
+      "pattern": "av1.av19.art",
+      "kind": "host",
+      "note": "jusoguide · AV아트"
+    },
+    {
+      "pattern": "https://av1.av19.art/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV아트"
+    },
+    {
+      "pattern": "av19link.com",
+      "kind": "host",
+      "note": "jusoguide · AV19.org"
+    },
+    {
+      "pattern": "https://av19link.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV19.org"
+    },
+    {
+      "pattern": "avcrack.net",
+      "kind": "host",
+      "note": "jusoguide · AV크랙"
+    },
+    {
+      "pattern": "https://avcrack.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV크랙"
+    },
+    {
+      "pattern": "avdalgi-70.com",
+      "kind": "host",
+      "note": "jusoguide · AV달기"
+    },
+    {
+      "pattern": "https://avdalgi-70.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV달기"
+    },
+    {
+      "pattern": "avdojeon1.top",
+      "kind": "host",
+      "note": "jusoguide · 야한도전"
+    },
+    {
+      "pattern": "https://avdojeon1.top/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야한도전"
+    },
+    {
+      "pattern": "avdown19.com",
+      "kind": "host",
+      "note": "jusoguide · 포르노.kr"
+    },
+    {
+      "pattern": "https://avdown19.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 포르노.kr"
+    },
+    {
+      "pattern": "avhana-60.com",
+      "kind": "host",
+      "note": "jusoguide · AV하나"
+    },
+    {
+      "pattern": "https://avhana-60.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV하나"
+    },
+    {
+      "pattern": "avhiromi7.com",
+      "kind": "host",
+      "note": "jusoguide · AV히로미"
+    },
+    {
+      "pattern": "https://avhiromi7.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV히로미"
+    },
+    {
+      "pattern": "avhot.site",
+      "kind": "host",
+      "note": "jusoguide · AVHOT"
+    },
+    {
+      "pattern": "https://avhot.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AVHOT"
+    },
+    {
+      "pattern": "avhotgirl.me",
+      "kind": "host",
+      "note": "jusoguide · AV핫걸"
+    },
+    {
+      "pattern": "https://avhotgirl.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV핫걸"
+    },
+    {
+      "pattern": "avlove28.com",
+      "kind": "host",
+      "note": "jusoguide · av러브걸"
+    },
+    {
+      "pattern": "https://avlove28.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · av러브걸"
+    },
+    {
+      "pattern": "avmania.cc",
+      "kind": "host",
+      "note": "jusoguide · AV매니아"
+    },
+    {
+      "pattern": "https://avmania.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV매니아"
+    },
+    {
+      "pattern": "avpingyou19.com",
+      "kind": "host",
+      "note": "jusoguide · AV핑유걸"
+    },
+    {
+      "pattern": "https://avpingyou19.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV핑유걸"
+    },
+    {
+      "pattern": "avpink39.com",
+      "kind": "host",
+      "note": "jusoguide · AV핑크"
+    },
+    {
+      "pattern": "https://avpink39.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV핑크"
+    },
+    {
+      "pattern": "avspot47.com",
+      "kind": "host",
+      "note": "jusoguide · AV스팟"
+    },
+    {
+      "pattern": "https://avspot47.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV스팟"
+    },
+    {
+      "pattern": "avsshub.net",
+      "kind": "host",
+      "note": "jusoguide · SVIDEO"
+    },
+    {
+      "pattern": "https://avsshub.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · SVIDEO"
+    },
+    {
+      "pattern": "avyadong14.xyz",
+      "kind": "host",
+      "note": "jusoguide · AV야동"
+    },
+    {
+      "pattern": "https://avyadong14.xyz/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV야동"
+    },
+    {
+      "pattern": "avzone.sbs",
+      "kind": "host",
+      "note": "jusoguide · AV존"
+    },
+    {
+      "pattern": "https://avzone.sbs/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV존"
+    },
+    {
+      "pattern": "bamberry01.com",
+      "kind": "host",
+      "note": "jusoguide · 밤딸기"
+    },
+    {
+      "pattern": "https://bamberry01.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 밤딸기"
+    },
+    {
+      "pattern": "bampt2.com",
+      "kind": "host",
+      "note": "jusoguide · 밤포탈"
+    },
+    {
+      "pattern": "https://bampt2.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 밤포탈"
+    },
+    {
+      "pattern": "bamtube2.com",
+      "kind": "host",
+      "note": "jusoguide · 밤튜브"
+    },
+    {
+      "pattern": "https://bamtube2.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 밤튜브"
+    },
+    {
+      "pattern": "bbong04.com",
+      "kind": "host",
+      "note": "jusoguide · 뿅가리"
+    },
+    {
+      "pattern": "https://bbong04.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 뿅가리"
+    },
+    {
+      "pattern": "bo-zi66.net",
+      "kind": "host",
+      "note": "jusoguide · 보지넷"
+    },
+    {
+      "pattern": "https://bo-zi66.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 보지넷"
+    },
+    {
+      "pattern": "buska22.com",
+      "kind": "host",
+      "note": "jusoguide · 버스까"
+    },
+    {
+      "pattern": "https://buska22.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 버스까"
+    },
+    {
+      "pattern": "comein18.com",
+      "kind": "host",
+      "note": "jusoguide · 들어와"
+    },
+    {
+      "pattern": "https://comein18.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 들어와"
+    },
+    {
+      "pattern": "coolgirl10.org",
+      "kind": "host",
+      "note": "jusoguide · 쿨걸"
+    },
+    {
+      "pattern": "https://coolgirl10.org/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 쿨걸"
+    },
+    {
+      "pattern": "darkgirl12.com",
+      "kind": "host",
+      "note": "jusoguide · 다크걸"
+    },
+    {
+      "pattern": "https://darkgirl12.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 다크걸"
+    },
+    {
+      "pattern": "ddalbar.xyz",
+      "kind": "host",
+      "note": "jusoguide · 딸바"
+    },
+    {
+      "pattern": "https://ddalbar.xyz/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 딸바"
+    },
+    {
+      "pattern": "ddalq12.org",
+      "kind": "host",
+      "note": "jusoguide · 딸퀸"
+    },
+    {
+      "pattern": "https://ddalq12.org/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 딸퀸"
+    },
+    {
+      "pattern": "ddaltime179.com",
+      "kind": "host",
+      "note": "jusoguide · 딸타임"
+    },
+    {
+      "pattern": "https://ddaltime179.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 딸타임"
+    },
+    {
+      "pattern": "ddrblr56.com",
+      "kind": "host",
+      "note": "jusoguide · 딸블러"
+    },
+    {
+      "pattern": "https://ddrblr56.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 딸블러"
+    },
+    {
+      "pattern": "dg-soop22.com",
+      "kind": "host",
+      "note": "jusoguide · 동굴의숲"
+    },
+    {
+      "pattern": "https://dg-soop22.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 동굴의숲"
+    },
+    {
+      "pattern": "dobaklife21.com",
+      "kind": "host",
+      "note": "jusoguide · 인생도박"
+    },
+    {
+      "pattern": "https://dobaklife21.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 인생도박"
+    },
+    {
+      "pattern": "dodogirl5.com",
+      "kind": "host",
+      "note": "jusoguide · 도도걸"
+    },
+    {
+      "pattern": "https://dodogirl5.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 도도걸"
+    },
+    {
+      "pattern": "dogjoa88.net",
+      "kind": "host",
+      "note": "jusoguide · 개조아"
+    },
+    {
+      "pattern": "https://dogjoa88.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 개조아"
+    },
+    {
+      "pattern": "dragonfly66.com",
+      "kind": "host",
+      "note": "jusoguide · 잠자리"
+    },
+    {
+      "pattern": "https://dragonfly66.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 잠자리"
+    },
+    {
+      "pattern": "drck04.com",
+      "kind": "host",
+      "note": "jusoguide · 돌려치기"
+    },
+    {
+      "pattern": "https://drck04.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 돌려치기"
+    },
+    {
+      "pattern": "evian33.com",
+      "kind": "host",
+      "note": "jusoguide · 에비앙"
+    },
+    {
+      "pattern": "https://evian33.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 에비앙"
+    },
+    {
+      "pattern": "ggbam13.com",
+      "kind": "host",
+      "note": "jusoguide · 꽃밤"
+    },
+    {
+      "pattern": "https://ggbam13.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 꽃밤"
+    },
+    {
+      "pattern": "ggonghub33.com",
+      "kind": "host",
+      "note": "jusoguide · 꽁허브"
+    },
+    {
+      "pattern": "https://ggonghub33.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 꽁허브"
+    },
+    {
+      "pattern": "go2.kogirl.co",
+      "kind": "host",
+      "note": "jusoguide · AV코걸"
+    },
+    {
+      "pattern": "https://go2.kogirl.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV코걸"
+    },
+    {
+      "pattern": "gristmill32.com",
+      "kind": "host",
+      "note": "jusoguide · 방앗간"
+    },
+    {
+      "pattern": "https://gristmill32.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 방앗간"
+    },
+    {
+      "pattern": "happy-n63.com",
+      "kind": "host",
+      "note": "jusoguide · 해피밤"
+    },
+    {
+      "pattern": "https://happy-n63.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 해피밤"
+    },
+    {
+      "pattern": "hjtime103.com",
+      "kind": "host",
+      "note": "jusoguide · 현자타임스"
+    },
+    {
+      "pattern": "https://hjtime103.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 현자타임스"
+    },
+    {
+      "pattern": "honeybam1.com",
+      "kind": "host",
+      "note": "jusoguide · 꿀밤"
+    },
+    {
+      "pattern": "https://honeybam1.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 꿀밤"
+    },
+    {
+      "pattern": "hongdotoon120.com",
+      "kind": "host",
+      "note": "jusoguide · 홍도깨비"
+    },
+    {
+      "pattern": "https://hongdotoon120.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 홍도깨비"
+    },
+    {
+      "pattern": "hotg33.com",
+      "kind": "host",
+      "note": "jusoguide · 핫스팟"
+    },
+    {
+      "pattern": "https://hotg33.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 핫스팟"
+    },
+    {
+      "pattern": "jbjbgg.cc",
+      "kind": "host",
+      "note": "jusoguide · 정복걸"
+    },
+    {
+      "pattern": "https://jbjbgg.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 정복걸"
+    },
+    {
+      "pattern": "jogaeparty157.com",
+      "kind": "host",
+      "note": "jusoguide · 조개파티"
+    },
+    {
+      "pattern": "https://jogaeparty157.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 조개파티"
+    },
+    {
+      "pattern": "jotker53.cc",
+      "kind": "host",
+      "note": "jusoguide · 좆커넷"
+    },
+    {
+      "pattern": "https://jotker53.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 좆커넷"
+    },
+    {
+      "pattern": "k8.bbong.me",
+      "kind": "host",
+      "note": "jusoguide · 육봉"
+    },
+    {
+      "pattern": "https://k8.bbong.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 육봉"
+    },
+    {
+      "pattern": "kang24.com",
+      "kind": "host",
+      "note": "jusoguide · 강남19"
+    },
+    {
+      "pattern": "https://kang24.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 강남19"
+    },
+    {
+      "pattern": "kor11.grtv-48.com",
+      "kind": "host",
+      "note": "jusoguide · 걸스TV"
+    },
+    {
+      "pattern": "https://kor11.grtv-48.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 걸스TV"
+    },
+    {
+      "pattern": "kr1.avbox.cc",
+      "kind": "host",
+      "note": "jusoguide · avbox"
+    },
+    {
+      "pattern": "https://kr1.avbox.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · avbox"
+    },
+    {
+      "pattern": "kr1.avflix.co",
+      "kind": "host",
+      "note": "jusoguide · avflix"
+    },
+    {
+      "pattern": "https://kr1.avflix.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · avflix"
+    },
+    {
+      "pattern": "kr1.noonatv.com",
+      "kind": "host",
+      "note": "jusoguide · 야동25"
+    },
+    {
+      "pattern": "https://kr1.noonatv.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동25"
+    },
+    {
+      "pattern": "kr1.sektok.com",
+      "kind": "host",
+      "note": "jusoguide · 섹톡"
+    },
+    {
+      "pattern": "https://kr1.sektok.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 섹톡"
+    },
+    {
+      "pattern": "kr1.yd1st.com",
+      "kind": "host",
+      "note": "jusoguide · 야동주소"
+    },
+    {
+      "pattern": "https://kr1.yd1st.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동주소"
+    },
+    {
+      "pattern": "kr1.ydstation.co",
+      "kind": "host",
+      "note": "jusoguide · 야동주유소"
+    },
+    {
+      "pattern": "https://kr1.ydstation.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동주유소"
+    },
+    {
+      "pattern": "https://kr18.tv/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 왕부랄"
+    },
+    {
+      "pattern": "kr2.ddalsney.com",
+      "kind": "host",
+      "note": "jusoguide · 딸즈니"
+    },
+    {
+      "pattern": "https://kr2.ddalsney.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 딸즈니"
+    },
+    {
+      "pattern": "kr2.redgirls.co",
+      "kind": "host",
+      "note": "jusoguide · 레드걸스"
+    },
+    {
+      "pattern": "https://kr2.redgirls.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 레드걸스"
+    },
+    {
+      "pattern": "kr25.javgirl.co",
+      "kind": "host",
+      "note": "jusoguide · JAV걸"
+    },
+    {
+      "pattern": "https://kr25.javgirl.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · JAV걸"
+    },
+    {
+      "pattern": "kr3.hwangj.com",
+      "kind": "host",
+      "note": "jusoguide · 야동황제"
+    },
+    {
+      "pattern": "https://kr3.hwangj.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동황제"
+    },
+    {
+      "pattern": "kr34.yaddr.co",
+      "kind": "host",
+      "note": "jusoguide · 야딸두"
+    },
+    {
+      "pattern": "https://kr34.yaddr.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야딸두"
+    },
+    {
+      "pattern": "kr369.mysstv.com",
+      "kind": "host",
+      "note": "jusoguide · 색색티비"
+    },
+    {
+      "pattern": "https://kr369.mysstv.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 색색티비"
+    },
+    {
+      "pattern": "kr40.topgirl.co",
+      "kind": "host",
+      "note": "jusoguide · AV탑걸"
+    },
+    {
+      "pattern": "https://kr40.topgirl.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV탑걸"
+    },
+    {
+      "pattern": "kr5.yadong3.com",
+      "kind": "host",
+      "note": "jusoguide · 야동삼국지"
+    },
+    {
+      "pattern": "https://kr5.yadong3.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동삼국지"
+    },
+    {
+      "pattern": "kr7.ddal.xyz",
+      "kind": "host",
+      "note": "jusoguide · 딸플릭스"
+    },
+    {
+      "pattern": "https://kr7.ddal.xyz/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 딸플릭스"
+    },
+    {
+      "pattern": "kr83.sogirl.so",
+      "kind": "host",
+      "note": "jusoguide · AV쏘걸"
+    },
+    {
+      "pattern": "https://kr83.sogirl.so/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV쏘걸"
+    },
+    {
+      "pattern": "mdv15.com",
+      "kind": "host",
+      "note": "jusoguide · 몰디브"
+    },
+    {
+      "pattern": "https://mdv15.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 몰디브"
+    },
+    {
+      "pattern": "mingky13.net",
+      "kind": "host",
+      "note": "jusoguide · 밍키넷"
+    },
+    {
+      "pattern": "https://mingky13.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 밍키넷"
+    },
+    {
+      "pattern": "missvod4.com",
+      "kind": "host",
+      "note": "jusoguide · 미쓰에이브이"
+    },
+    {
+      "pattern": "https://missvod4.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 미쓰에이브이"
+    },
+    {
+      "pattern": "mmxxx4.net",
+      "kind": "host",
+      "note": "jusoguide · 미니멈맥스"
+    },
+    {
+      "pattern": "https://mmxxx4.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 미니멈맥스"
+    },
+    {
+      "pattern": "mobozi24.site",
+      "kind": "host",
+      "note": "jusoguide · 뭐보지"
+    },
+    {
+      "pattern": "https://mobozi24.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 뭐보지"
+    },
+    {
+      "pattern": "modooav10.com",
+      "kind": "host",
+      "note": "jusoguide · 모두AV"
+    },
+    {
+      "pattern": "https://modooav10.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 모두AV"
+    },
+    {
+      "pattern": "nightyd.top",
+      "kind": "host",
+      "note": "jusoguide · 밤의 황제"
+    },
+    {
+      "pattern": "https://nightyd.top/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 밤의 황제"
+    },
+    {
+      "pattern": "nvt44.com",
+      "kind": "host",
+      "note": "jusoguide · 노보텔"
+    },
+    {
+      "pattern": "https://nvt44.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 노보텔"
+    },
+    {
+      "pattern": "on3.onlysex.co",
+      "kind": "host",
+      "note": "jusoguide · 온리섹스"
+    },
+    {
+      "pattern": "https://on3.onlysex.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 온리섹스"
+    },
+    {
+      "pattern": "onlyfans07.com",
+      "kind": "host",
+      "note": "jusoguide · 온리팬스"
+    },
+    {
+      "pattern": "https://onlyfans07.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 온리팬스"
+    },
+    {
+      "pattern": "pigav.com",
+      "kind": "host",
+      "note": "jusoguide · 피그AV"
+    },
+    {
+      "pattern": "https://pigav.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 피그AV"
+    },
+    {
+      "pattern": "pinkbo44.com",
+      "kind": "host",
+      "note": "jusoguide · AV핑보걸"
+    },
+    {
+      "pattern": "https://pinkbo44.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV핑보걸"
+    },
+    {
+      "pattern": "porngg7.net",
+      "kind": "host",
+      "note": "jusoguide · GG넷"
+    },
+    {
+      "pattern": "https://porngg7.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · GG넷"
+    },
+    {
+      "pattern": "pornwavve.com",
+      "kind": "host",
+      "note": "jusoguide · 폰웨이브"
+    },
+    {
+      "pattern": "https://pornwavve.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 폰웨이브"
+    },
+    {
+      "pattern": "povkorea.com",
+      "kind": "host",
+      "note": "jusoguide · POVKOREA"
+    },
+    {
+      "pattern": "https://povkorea.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · POVKOREA"
+    },
+    {
+      "pattern": "pruna1.com",
+      "kind": "host",
+      "note": "jusoguide · 프루나"
+    },
+    {
+      "pattern": "https://pruna1.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 프루나"
+    },
+    {
+      "pattern": "red-pant19.com",
+      "kind": "host",
+      "note": "jusoguide · 빨간팬티"
+    },
+    {
+      "pattern": "https://red-pant19.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 빨간팬티"
+    },
+    {
+      "pattern": "red-run.xyz",
+      "kind": "host",
+      "note": "jusoguide · 레드대피소"
+    },
+    {
+      "pattern": "https://red-run.xyz/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 레드대피소"
+    },
+    {
+      "pattern": "redbanana24.com",
+      "kind": "host",
+      "note": "jusoguide · 레드바나나"
+    },
+    {
+      "pattern": "https://redbanana24.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 레드바나나"
+    },
+    {
+      "pattern": "redbus.vip",
+      "kind": "host",
+      "note": "jusoguide · 레드버스"
+    },
+    {
+      "pattern": "https://redbus.vip/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 레드버스"
+    },
+    {
+      "pattern": "redcat.tv",
+      "kind": "host",
+      "note": "jusoguide · RedCat tv"
+    },
+    {
+      "pattern": "https://redcat.tv/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · RedCat tv"
+    },
+    {
+      "pattern": "redcattv9.org",
+      "kind": "host",
+      "note": "jusoguide · 레드캣TV"
+    },
+    {
+      "pattern": "https://redcattv9.org/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 레드캣TV"
+    },
+    {
+      "pattern": "redcoconut24.com",
+      "kind": "host",
+      "note": "jusoguide · 레드코코넛"
+    },
+    {
+      "pattern": "https://redcoconut24.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 레드코코넛"
+    },
+    {
+      "pattern": "redgirl41.org",
+      "kind": "host",
+      "note": "jusoguide · 레드걸"
+    },
+    {
+      "pattern": "https://redgirl41.org/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 레드걸"
+    },
+    {
+      "pattern": "redmat01.com",
+      "kind": "host",
+      "note": "jusoguide · 빨강맛"
+    },
+    {
+      "pattern": "https://redmat01.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 빨강맛"
+    },
+    {
+      "pattern": "redvi82.com",
+      "kind": "host",
+      "note": "jusoguide · 빨간비디오"
+    },
+    {
+      "pattern": "https://redvi82.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 빨간비디오"
+    },
+    {
+      "pattern": "redzone21.org",
+      "kind": "host",
+      "note": "jusoguide · 레드존"
+    },
+    {
+      "pattern": "https://redzone21.org/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 레드존"
+    },
+    {
+      "pattern": "rmk-39.com",
+      "kind": "host",
+      "note": "jusoguide · 빨간밀크"
+    },
+    {
+      "pattern": "https://rmk-39.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 빨간밀크"
+    },
+    {
+      "pattern": "rtvvip.com",
+      "kind": "host",
+      "note": "jusoguide · 리얼타임"
+    },
+    {
+      "pattern": "https://rtvvip.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 리얼타임"
+    },
+    {
+      "pattern": "safezone5.com",
+      "kind": "host",
+      "note": "jusoguide · 안전지대"
+    },
+    {
+      "pattern": "https://safezone5.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 안전지대"
+    },
+    {
+      "pattern": "samdasoo61.com",
+      "kind": "host",
+      "note": "jusoguide · 삼다수"
+    },
+    {
+      "pattern": "https://samdasoo61.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 삼다수"
+    },
+    {
+      "pattern": "sanai17.com",
+      "kind": "host",
+      "note": "jusoguide · 싸나이"
+    },
+    {
+      "pattern": "https://sanai17.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 싸나이"
+    },
+    {
+      "pattern": "sb1.sexbam.xyz",
+      "kind": "host",
+      "note": "jusoguide · 섹밤"
+    },
+    {
+      "pattern": "https://sb1.sexbam.xyz/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 섹밤"
+    },
+    {
+      "pattern": "sektube29.site",
+      "kind": "host",
+      "note": "jusoguide · 섹튜브"
+    },
+    {
+      "pattern": "https://sektube29.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 섹튜브"
+    },
+    {
+      "pattern": "sexports43.com",
+      "kind": "host",
+      "note": "jusoguide · 섹포츠"
+    },
+    {
+      "pattern": "https://sexports43.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 섹포츠"
+    },
+    {
+      "pattern": "soda60.com",
+      "kind": "host",
+      "note": "jusoguide · AV소다"
+    },
+    {
+      "pattern": "https://soda60.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV소다"
+    },
+    {
+      "pattern": "somez3.com",
+      "kind": "host",
+      "note": "jusoguide · 썸질라"
+    },
+    {
+      "pattern": "https://somez3.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 썸질라"
+    },
+    {
+      "pattern": "sorabada94.com",
+      "kind": "host",
+      "note": "jusoguide · 소라바다"
+    },
+    {
+      "pattern": "https://sorabada94.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 소라바다"
+    },
+    {
+      "pattern": "sssk04.com",
+      "kind": "host",
+      "note": "jusoguide · 삼시색끼"
+    },
+    {
+      "pattern": "https://sssk04.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 삼시색끼"
+    },
+    {
+      "pattern": "sstal53.cc",
+      "kind": "host",
+      "note": "jusoguide · 섹탈"
+    },
+    {
+      "pattern": "https://sstal53.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 섹탈"
+    },
+    {
+      "pattern": "tsgirl31.net",
+      "kind": "host",
+      "note": "jusoguide · 쉬멜넷"
+    },
+    {
+      "pattern": "https://tsgirl31.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 쉬멜넷"
+    },
+    {
+      "pattern": "tv12.avhub.in",
+      "kind": "host",
+      "note": "jusoguide · AV허브"
+    },
+    {
+      "pattern": "https://tv12.avhub.in/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV허브"
+    },
+    {
+      "pattern": "tv12.kuya.in",
+      "kind": "host",
+      "note": "jusoguide · 꾸야TV"
+    },
+    {
+      "pattern": "https://tv12.kuya.in/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 꾸야TV"
+    },
+    {
+      "pattern": "unlishot51.cc",
+      "kind": "host",
+      "note": "jusoguide · 언리샷"
+    },
+    {
+      "pattern": "https://unlishot51.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 언리샷"
+    },
+    {
+      "pattern": "v40.av-com.me",
+      "kind": "host",
+      "note": "jusoguide · AV닷컴"
+    },
+    {
+      "pattern": "https://v40.av-com.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV닷컴"
+    },
+    {
+      "pattern": "v42.king-ddal.com",
+      "kind": "host",
+      "note": "jusoguide · 킹딸"
+    },
+    {
+      "pattern": "https://v42.king-ddal.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 킹딸"
+    },
+    {
+      "pattern": "virgin11.com",
+      "kind": "host",
+      "note": "jusoguide · 숫처녀"
+    },
+    {
+      "pattern": "https://virgin11.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 숫처녀"
+    },
+    {
+      "pattern": "vmall.poomboom999.co",
+      "kind": "host",
+      "note": "jusoguide · SIZE19"
+    },
+    {
+      "pattern": "https://vmall.poomboom999.co/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · SIZE19"
+    },
+    {
+      "pattern": "webddal12.com",
+      "kind": "host",
+      "note": "jusoguide · 웹딸"
+    },
+    {
+      "pattern": "https://webddal12.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 웹딸"
+    },
+    {
+      "pattern": "ww35.jogaezone.site",
+      "kind": "host",
+      "note": "jusoguide · 조개존"
+    },
+    {
+      "pattern": "https://ww35.jogaezone.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 조개존"
+    },
+    {
+      "pattern": "ww41.ddalclub.site",
+      "kind": "host",
+      "note": "jusoguide · 딸클럽"
+    },
+    {
+      "pattern": "https://ww41.ddalclub.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 딸클럽"
+    },
+    {
+      "pattern": "ww41.jogaeclub.site",
+      "kind": "host",
+      "note": "jusoguide · 조개클럽"
+    },
+    {
+      "pattern": "https://ww41.jogaeclub.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 조개클럽"
+    },
+    {
+      "pattern": "ww88.seuja.com",
+      "kind": "host",
+      "note": "jusoguide · 세우자"
+    },
+    {
+      "pattern": "https://ww88.seuja.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 세우자"
+    },
+    {
+      "pattern": "19bam16.me",
+      "kind": "host",
+      "note": "jusoguide · 19밤"
+    },
+    {
+      "pattern": "https://www.19bam16.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 19밤"
+    },
+    {
+      "pattern": "avtown19.me",
+      "kind": "host",
+      "note": "jusoguide · AV타운"
+    },
+    {
+      "pattern": "https://www.avtown19.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV타운"
+    },
+    {
+      "pattern": "avzoa.com",
+      "kind": "host",
+      "note": "jusoguide · AV조아"
+    },
+    {
+      "pattern": "https://www.avzoa.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV조아"
+    },
+    {
+      "pattern": "banana14.com",
+      "kind": "host",
+      "note": "jusoguide · 바나나티비"
+    },
+    {
+      "pattern": "https://www.banana14.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 바나나티비"
+    },
+    {
+      "pattern": "gmgg.xyz",
+      "kind": "host",
+      "note": "jusoguide · 구멍가계"
+    },
+    {
+      "pattern": "https://www.gmgg.xyz/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 구멍가계"
+    },
+    {
+      "pattern": "javseoul67.me",
+      "kind": "host",
+      "note": "jusoguide · JAV서울"
+    },
+    {
+      "pattern": "https://www.javseoul67.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · JAV서울"
+    },
+    {
+      "pattern": "jogemoa04.com",
+      "kind": "host",
+      "note": "jusoguide · 조개모아"
+    },
+    {
+      "pattern": "https://www.jogemoa04.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 조개모아"
+    },
+    {
+      "pattern": "mango59.icu",
+      "kind": "host",
+      "note": "jusoguide · 망고넷"
+    },
+    {
+      "pattern": "https://www.mango59.icu/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 망고넷"
+    },
+    {
+      "pattern": "nomotime9.com",
+      "kind": "host",
+      "note": "jusoguide · 노모타임"
+    },
+    {
+      "pattern": "https://www.nomotime9.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 노모타임"
+    },
+    {
+      "pattern": "pandalive.co.kr",
+      "kind": "host",
+      "note": "jusoguide · 팬더티비"
+    },
+    {
+      "pattern": "https://www.pandalive.co.kr/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 팬더티비"
+    },
+    {
+      "pattern": "sexbam61.net",
+      "kind": "host",
+      "note": "jusoguide · 섹스밤"
+    },
+    {
+      "pattern": "https://www.sexbam61.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 섹스밤"
+    },
+    {
+      "pattern": "sexzoa53.xyz",
+      "kind": "host",
+      "note": "jusoguide · 섹스조아"
+    },
+    {
+      "pattern": "https://www.sexzoa53.xyz/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 섹스조아"
+    },
+    {
+      "pattern": "sorabam38.me",
+      "kind": "host",
+      "note": "jusoguide · 소라밤"
+    },
+    {
+      "pattern": "https://www.sorabam38.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 소라밤"
+    },
+    {
+      "pattern": "tokky3.com",
+      "kind": "host",
+      "note": "jusoguide · AV토끼"
+    },
+    {
+      "pattern": "https://www.tokky3.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · AV토끼"
+    },
+    {
+      "pattern": "ya25.net",
+      "kind": "host",
+      "note": "jusoguide · 야설넷"
+    },
+    {
+      "pattern": "https://www.ya25.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야설넷"
+    },
+    {
+      "pattern": "yahtube19.com",
+      "kind": "host",
+      "note": "jusoguide · 야튜브(NEW)"
+    },
+    {
+      "pattern": "https://www.yahtube19.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야튜브(NEW)"
+    },
+    {
+      "pattern": "yako06.com",
+      "kind": "host",
+      "note": "jusoguide · 야동코리아"
+    },
+    {
+      "pattern": "https://www.yako06.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동코리아"
+    },
+    {
+      "pattern": "yamvk8.com",
+      "kind": "host",
+      "note": "jusoguide · 야무비"
+    },
+    {
+      "pattern": "https://www.yamvk8.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야무비"
+    },
+    {
+      "pattern": "yaworld.com",
+      "kind": "host",
+      "note": "jusoguide · 야동월드"
+    },
+    {
+      "pattern": "https://www.yaworld.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동월드"
+    },
+    {
+      "pattern": "ydong70.online",
+      "kind": "host",
+      "note": "jusoguide · 야동사거리"
+    },
+    {
+      "pattern": "https://www.ydong70.online/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동사거리"
+    },
+    {
+      "pattern": "yhzt29.me",
+      "kind": "host",
+      "note": "jusoguide · 유흥조타"
+    },
+    {
+      "pattern": "https://www.yhzt29.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 유흥조타"
+    },
+    {
+      "pattern": "야스모아.com",
+      "kind": "host",
+      "note": "jusoguide · 야스모아"
+    },
+    {
+      "pattern": "https://www.야스모아.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야스모아"
+    },
+    {
+      "pattern": "x10.yadongclubs.com",
+      "kind": "host",
+      "note": "jusoguide · 야동클럽"
+    },
+    {
+      "pattern": "https://x10.yadongclubs.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동클럽"
+    },
+    {
+      "pattern": "xn--2q1bl84a3e140c.com",
+      "kind": "host",
+      "note": "jusoguide · 야동투어"
+    },
+    {
+      "pattern": "https://xn--2q1bl84a3e140c.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동투어"
+    },
+    {
+      "pattern": "xvideos-k5.com",
+      "kind": "host",
+      "note": "jusoguide · XVIDEOS"
+    },
+    {
+      "pattern": "https://xvideos-k5.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · XVIDEOS"
+    },
+    {
+      "pattern": "xxgirl1.com",
+      "kind": "host",
+      "note": "jusoguide · 섹걸"
+    },
+    {
+      "pattern": "https://xxgirl1.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 섹걸"
+    },
+    {
+      "pattern": "xxjoa48.com",
+      "kind": "host",
+      "note": "jusoguide · XX조아"
+    },
+    {
+      "pattern": "https://xxjoa48.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · XX조아"
+    },
+    {
+      "pattern": "ya1.yacha19.com",
+      "kind": "host",
+      "note": "jusoguide · 야차19"
+    },
+    {
+      "pattern": "https://ya1.yacha19.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야차19"
+    },
+    {
+      "pattern": "yabam22.me",
+      "kind": "host",
+      "note": "jusoguide · 야밤"
+    },
+    {
+      "pattern": "https://yabam22.me/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야밤"
+    },
+    {
+      "pattern": "yaburi63.com",
+      "kind": "host",
+      "note": "jusoguide · 야부리"
+    },
+    {
+      "pattern": "https://yaburi63.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야부리"
+    },
+    {
+      "pattern": "yadong-30.com",
+      "kind": "host",
+      "note": "jusoguide · 야동박사"
+    },
+    {
+      "pattern": "https://yadong-30.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동박사"
+    },
+    {
+      "pattern": "yadong.center",
+      "kind": "host",
+      "note": "jusoguide · 야동센터"
+    },
+    {
+      "pattern": "https://yadong.center/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동센터"
+    },
+    {
+      "pattern": "yadong7.com",
+      "kind": "host",
+      "note": "jusoguide · 야동닷컴"
+    },
+    {
+      "pattern": "https://yadong7.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동닷컴"
+    },
+    {
+      "pattern": "yadongkuk25.com",
+      "kind": "host",
+      "note": "jusoguide · 야동국"
+    },
+    {
+      "pattern": "https://yadongkuk25.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동국"
+    },
+    {
+      "pattern": "yadongnala.com",
+      "kind": "host",
+      "note": "jusoguide · 야동나라"
+    },
+    {
+      "pattern": "https://yadongnala.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동나라"
+    },
+    {
+      "pattern": "yadongpage38.site",
+      "kind": "host",
+      "note": "jusoguide · 야동페이지"
+    },
+    {
+      "pattern": "https://yadongpage38.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동페이지"
+    },
+    {
+      "pattern": "yadongred3.org",
+      "kind": "host",
+      "note": "jusoguide · 야동도시"
+    },
+    {
+      "pattern": "https://yadongred3.org/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동도시"
+    },
+    {
+      "pattern": "yadongsite02.com",
+      "kind": "host",
+      "note": "jusoguide · 야동사이트"
+    },
+    {
+      "pattern": "https://yadongsite02.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동사이트"
+    },
+    {
+      "pattern": "yadongtheater19.site",
+      "kind": "host",
+      "note": "jusoguide · 야동극장"
+    },
+    {
+      "pattern": "https://yadongtheater19.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동극장"
+    },
+    {
+      "pattern": "yadongtoki.top",
+      "kind": "host",
+      "note": "jusoguide · 야동토끼"
+    },
+    {
+      "pattern": "https://yadongtoki.top/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동토끼"
+    },
+    {
+      "pattern": "yadongtv86.com",
+      "kind": "host",
+      "note": "jusoguide · 야동티비"
+    },
+    {
+      "pattern": "https://yadongtv86.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동티비"
+    },
+    {
+      "pattern": "yaflix.net",
+      "kind": "host",
+      "note": "jusoguide · 야플릭스"
+    },
+    {
+      "pattern": "https://yaflix.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야플릭스"
+    },
+    {
+      "pattern": "yagong87.com",
+      "kind": "host",
+      "note": "jusoguide · 야동공장"
+    },
+    {
+      "pattern": "https://yagong87.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동공장"
+    },
+    {
+      "pattern": "yamin31.com",
+      "kind": "host",
+      "note": "jusoguide · 야동의민족"
+    },
+    {
+      "pattern": "https://yamin31.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동의민족"
+    },
+    {
+      "pattern": "yamoa39.site",
+      "kind": "host",
+      "note": "jusoguide · 복숭아"
+    },
+    {
+      "pattern": "https://yamoa39.site/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 복숭아"
+    },
+    {
+      "pattern": "yaohri37.com",
+      "kind": "host",
+      "note": "jusoguide · 야오리"
+    },
+    {
+      "pattern": "https://yaohri37.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야오리"
+    },
+    {
+      "pattern": "yapl3.com",
+      "kind": "host",
+      "note": "jusoguide · 야동플레이"
+    },
+    {
+      "pattern": "https://yapl3.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동플레이"
+    },
+    {
+      "pattern": "yapro36.com",
+      "kind": "host",
+      "note": "jusoguide · 야프로"
+    },
+    {
+      "pattern": "https://yapro36.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야프로"
+    },
+    {
+      "pattern": "yargasm53.cc",
+      "kind": "host",
+      "note": "jusoguide · 야르가즘"
+    },
+    {
+      "pattern": "https://yargasm53.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야르가즘"
+    },
+    {
+      "pattern": "yarno30.com",
+      "kind": "host",
+      "note": "jusoguide · 야르노"
+    },
+    {
+      "pattern": "https://yarno30.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야르노"
+    },
+    {
+      "pattern": "yasitekor.com",
+      "kind": "host",
+      "note": "jusoguide · 야동사이트2"
+    },
+    {
+      "pattern": "https://yasitekor.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동사이트2"
+    },
+    {
+      "pattern": "yasome53.cc",
+      "kind": "host",
+      "note": "jusoguide · 야썸"
+    },
+    {
+      "pattern": "https://yasome53.cc/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야썸"
+    },
+    {
+      "pattern": "yasul20.com",
+      "kind": "host",
+      "note": "jusoguide · 야설닷컴"
+    },
+    {
+      "pattern": "https://yasul20.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야설닷컴"
+    },
+    {
+      "pattern": "yasyadong.tv",
+      "kind": "host",
+      "note": "jusoguide · 야스닷컴"
+    },
+    {
+      "pattern": "https://yasyadong.tv/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야스닷컴"
+    },
+    {
+      "pattern": "yd-house82.com",
+      "kind": "host",
+      "note": "jusoguide · 야동하우스"
+    },
+    {
+      "pattern": "https://yd-house82.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동하우스"
+    },
+    {
+      "pattern": "ydhub13.net",
+      "kind": "host",
+      "note": "jusoguide · 야동허브"
+    },
+    {
+      "pattern": "https://ydhub13.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동허브"
+    },
+    {
+      "pattern": "ydparty.tv",
+      "kind": "host",
+      "note": "jusoguide · 야동파티"
+    },
+    {
+      "pattern": "https://ydparty.tv/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동파티"
+    },
+    {
+      "pattern": "yeouibong64.com",
+      "kind": "host",
+      "note": "jusoguide · 여의봉"
+    },
+    {
+      "pattern": "https://yeouibong64.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 여의봉"
+    },
+    {
+      "pattern": "yhl-60.com",
+      "kind": "host",
+      "note": "jusoguide · 야동홀릭"
+    },
+    {
+      "pattern": "https://yhl-60.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동홀릭"
+    },
+    {
+      "pattern": "ytb-43.com",
+      "kind": "host",
+      "note": "jusoguide · 야튜브"
+    },
+    {
+      "pattern": "https://ytb-43.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야튜브"
+    },
+    {
+      "pattern": "z2.zqqzqq.com",
+      "kind": "host",
+      "note": "jusoguide · ZQQZQQ"
+    },
+    {
+      "pattern": "https://z2.zqqzqq.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · ZQQZQQ"
+    },
+    {
+      "pattern": "zamzatv14.com",
+      "kind": "host",
+      "note": "jusoguide · 잠자티비"
+    },
+    {
+      "pattern": "https://zamzatv14.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 잠자티비"
+    },
+    {
+      "pattern": "성인동영상.com",
+      "kind": "host",
+      "note": "jusoguide · 성인동영상닷컴"
+    },
+    {
+      "pattern": "https://성인동영상.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 성인동영상닷컴"
+    },
+    {
+      "pattern": "씹보지.net",
+      "kind": "host",
+      "note": "jusoguide · 씹보지넷"
+    },
+    {
+      "pattern": "https://씹보지.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 씹보지넷"
+    },
+    {
+      "pattern": "야볼래.xyz",
+      "kind": "host",
+      "note": "jusoguide · 개보지넷"
+    },
+    {
+      "pattern": "https://야볼래.xyz/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 개보지넷"
+    },
+    {
+      "pattern": "야통령5.com",
+      "kind": "host",
+      "note": "jusoguide · 야통령"
+    },
+    {
+      "pattern": "https://야통령5.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야통령"
+    },
+    {
+      "pattern": "헐렁보지.net",
+      "kind": "host",
+      "note": "jusoguide · 헐렁보지넷"
+    },
+    {
+      "pattern": "https://헐렁보지.net/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 헐렁보지넷"
+    },
+    {
+      "pattern": "19wiki3.com",
+      "kind": "host",
+      "note": "jusoguide · 야동위키 (timeout retry)"
+    },
+    {
+      "pattern": "https://19wiki3.com/",
+      "kind": "urlContains",
+      "note": "jusoguide full URL · 야동위키"
+    },
+    {
+      "pattern": "xn--o39a11om2k31f63b.com",
+      "kind": "host",
+      "note": "주소가이드.com (IDN punycode) — 주소모아·링크모음 허브, 사용자 제보 2026-07-13"
+    },
+    {
+      "pattern": "주소가이드",
+      "kind": "urlContains",
+      "note": "주소가이드 검색결과 URL 텍스트 매칭 보조 (IDN 미변환 케이스 대비)"
+    }
+  ]
+}

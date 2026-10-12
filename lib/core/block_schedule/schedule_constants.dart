@@ -2,6 +2,6 @@
 class ScheduleConstants {
   ScheduleConstants._();
 
-  static const minCooldownMinutes = 5;
+  static const minCooldownMinutes = 15;
   static const editWindowMinutes = 5;
 }

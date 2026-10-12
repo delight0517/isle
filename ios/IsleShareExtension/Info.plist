@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>AppGroupId</key>
-	<string>group.com.isle.app</string>
+	<string>group.com.isle.app.moa</string>
 	<key>CFBundleDisplayName</key>
 	<string>Isle</string>
 	<key>CFBundleExecutable</key>

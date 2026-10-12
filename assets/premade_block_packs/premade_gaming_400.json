@@ -1,10 +1,10 @@
 {
   "packId": "premade_gaming_400",
   "displayName": "게임 팩 400",
-  "description": "게임 YouTube 채널 200 + 게임 웹사이트 200",
-  "version": "1.0.0",
-  "generatedAt": "2026-06-13T05:36:48Z",
-  "entryCount": 400,
+  "description": "게임 YouTube 채널 326 + 게임 웹사이트 200 + SC2·스타리그 키워드 7 (SC/BW·SC2·OW·FPS·KR 크리에이터)",
+  "version": "1.2.1",
+  "generatedAt": "2026-06-30T00:00:00Z",
+  "entryCount": 544,
   "entries": [
     {
       "pattern": "@pewdiepie",
@@ -702,49 +702,54 @@
       "note": "gaming YT"
     },
     {
-      "pattern": "@lowspecgamer",
+      "pattern": "@jiyoonsc",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 KR — JiYoon 하이라이트"
     },
     {
-      "pattern": "@lowspecgamerofficial",
+      "pattern": "@shinheebeom",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 KR — 신희범 RagnaroK"
     },
     {
-      "pattern": "@lowspecgamer2",
+      "pattern": "@shin_sc2",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 KR — SHIN SC2 강의·래더"
     },
     {
-      "pattern": "@lowspecgamer3",
+      "pattern": "@inishin",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 KR — 인피쉰"
     },
     {
-      "pattern": "@lowspecgamer4",
+      "pattern": "@bakmogoon",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 KR — 박모군TV"
     },
     {
-      "pattern": "@lowspecgamer5",
+      "pattern": "@sc2solar",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 KR — Solar"
     },
     {
-      "pattern": "@lowspecgamer6",
+      "pattern": "@afgsl",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 KR — GSL 공식"
     },
     {
-      "pattern": "@lowspecgamer7",
+      "pattern": "@maxpax",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 — MaxPax"
     },
     {
-      "pattern": "@lowspecgamer8",
+      "pattern": "@day9tv",
       "kind": "channelURL",
-      "note": "gaming YT"
+      "note": "SC2 — Day9"
+    },
+    {
+      "pattern": "@sc2tv",
+      "kind": "channelURL",
+      "note": "SC2 — SC2TV"
     },
     {
       "pattern": "@winterstarcraft",
@@ -1007,6 +1012,681 @@
       "note": "gaming YT"
     },
     {
+      "pattern": "@blackwoonjang",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 흑운장TV"
+    },
+    {
+      "pattern": "@flash-bc2bt",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 이영호 FlaSh"
+    },
+    {
+      "pattern": "@bisustartv",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 택신TV"
+    },
+    {
+      "pattern": "@jd_tube",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 이제동TV"
+    },
+    {
+      "pattern": "@tvqueentube9060",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 김명운TV"
+    },
+    {
+      "pattern": "@zzooktube",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 장윤철"
+    },
+    {
+      "pattern": "@dotube",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 도멘TV"
+    },
+    {
+      "pattern": "@stork_youtube",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 송병구TV"
+    },
+    {
+      "pattern": "@altubetv",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 김성현TV"
+    },
+    {
+      "pattern": "@nadaup",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — NaDa"
+    },
+    {
+      "pattern": "@tv4776",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 변현제TV"
+    },
+    {
+      "pattern": "@calmtube1",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 김윤환TV"
+    },
+    {
+      "pattern": "@soma_zjd",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 짭제튜브"
+    },
+    {
+      "pattern": "UCZIXRFOX5EKMZGKX7LM-NMQ",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 조일장HERO"
+    },
+    {
+      "pattern": "UCSM0ZATULMZGLKWBKLVHS-Q",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — Soulkey"
+    },
+    {
+      "pattern": "@maetube0130",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 김정우TV"
+    },
+    {
+      "pattern": "UCGYIKWPA4CBKJQIC2HNMVJA",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 정윤종"
+    },
+    {
+      "pattern": "@hotubelight",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 이재호 Hotube"
+    },
+    {
+      "pattern": "@aghhi1234",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 안기효TV"
+    },
+    {
+      "pattern": "@mooktube9622",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 임진묵"
+    },
+    {
+      "pattern": "@settingpark",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 박태민 세팅박"
+    },
+    {
+      "pattern": "@tvsactube139",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 이예훈TV"
+    },
+    {
+      "pattern": "@tvrushtube5416",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 유영진TV"
+    },
+    {
+      "pattern": "@sharpragu",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 조기석 마왕TV"
+    },
+    {
+      "pattern": "@kyuntube",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 박성균TV"
+    },
+    {
+      "pattern": "@starcasttvkr",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 스타캐스트TV"
+    },
+    {
+      "pattern": "@starcraftkr",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 스타크래프트 공식"
+    },
+    {
+      "pattern": "@불멸의샤순신",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — 불멸의샤순신"
+    },
+    {
+      "pattern": "@evo-mangrusl",
+      "kind": "channelURL",
+      "note": "SC/BW+SC2 — 맨그러슬"
+    },
+    {
+      "pattern": "@sonic_md",
+      "kind": "channelURL",
+      "note": "SC1/BW KR — Sonic_md"
+    },
+    {
+      "pattern": "@pigstarcraft",
+      "kind": "channelURL",
+      "note": "SC2 — PiG"
+    },
+    {
+      "pattern": "@pigcoaching",
+      "kind": "channelURL",
+      "note": "SC2 — PiG Coaching"
+    },
+    {
+      "pattern": "@harstem",
+      "kind": "channelURL",
+      "note": "SC2 — Harstem"
+    },
+    {
+      "pattern": "@lambosc2",
+      "kind": "channelURL",
+      "note": "SC2 — LamboSC2"
+    },
+    {
+      "pattern": "@neurozerg",
+      "kind": "channelURL",
+      "note": "SC2 — Neuro"
+    },
+    {
+      "pattern": "@artosiscasts",
+      "kind": "channelURL",
+      "note": "SC/BW — ArtosisCasts"
+    },
+    {
+      "pattern": "@artosistv",
+      "kind": "channelURL",
+      "note": "SC — ArtosisTV"
+    },
+    {
+      "pattern": "UCJC4XTI7H_C5GDQSB5AB57W",
+      "kind": "channelURL",
+      "note": "SC — TastelessTV"
+    },
+    {
+      "pattern": "@falconpaladin",
+      "kind": "channelURL",
+      "note": "SC/BW — Falcon Paladin"
+    },
+    {
+      "pattern": "@alphaxsc2",
+      "kind": "channelURL",
+      "note": "SC2 — AlphaX"
+    },
+    {
+      "pattern": "@zombiegrub",
+      "kind": "channelURL",
+      "note": "SC2 — ZombieGrub"
+    },
+    {
+      "pattern": "@steadfastsc2",
+      "kind": "channelURL",
+      "note": "SC2 — Steadfast SC2"
+    },
+    {
+      "pattern": "@soopesports",
+      "kind": "channelURL",
+      "note": "SC esports — SOOP KR"
+    },
+    {
+      "pattern": "UCK5EBTUOJ_HKDXKHNMBLAXG",
+      "kind": "channelURL",
+      "note": "SC esports — SOOP EN"
+    },
+    {
+      "pattern": "@overwatchkr",
+      "kind": "channelURL",
+      "note": "OW — 오버워치 KR"
+    },
+    {
+      "pattern": "@ow_esports",
+      "kind": "channelURL",
+      "note": "OW esports"
+    },
+    {
+      "pattern": "@overwatchcontenders",
+      "kind": "channelURL",
+      "note": "OW Contenders"
+    },
+    {
+      "pattern": "@ow_esports_jp",
+      "kind": "channelURL",
+      "note": "OW esports JP"
+    },
+    {
+      "pattern": "@kimjaewonworld",
+      "kind": "channelURL",
+      "note": "OW KR — 김재원"
+    },
+    {
+      "pattern": "@haksal00",
+      "kind": "channelURL",
+      "note": "OW KR — 학살"
+    },
+    {
+      "pattern": "UCTT0HG9MHRATKZWWNQPPLHG",
+      "kind": "channelURL",
+      "note": "OW KR — 류제홍"
+    },
+    {
+      "pattern": "@karqgames",
+      "kind": "channelURL",
+      "note": "OW — KarQ"
+    },
+    {
+      "pattern": "@flats_ow",
+      "kind": "channelURL",
+      "note": "OW — Flats"
+    },
+    {
+      "pattern": "@ml7support",
+      "kind": "channelURL",
+      "note": "OW — mL7"
+    },
+    {
+      "pattern": "@emongg",
+      "kind": "channelURL",
+      "note": "OW — Emongg"
+    },
+    {
+      "pattern": "@jay3",
+      "kind": "channelURL",
+      "note": "OW — Jay3"
+    },
+    {
+      "pattern": "@stylosa",
+      "kind": "channelURL",
+      "note": "OW — Stylosa"
+    },
+    {
+      "pattern": "@svb_ow",
+      "kind": "channelURL",
+      "note": "OW — SVB"
+    },
+    {
+      "pattern": "@youroverwatch",
+      "kind": "channelURL",
+      "note": "OW — Your Overwatch"
+    },
+    {
+      "pattern": "@a10nerd",
+      "kind": "channelURL",
+      "note": "OW — A10"
+    },
+    {
+      "pattern": "@niandra",
+      "kind": "channelURL",
+      "note": "OW — Niandra"
+    },
+    {
+      "pattern": "@eskay_ow",
+      "kind": "channelURL",
+      "note": "OW — Eskay"
+    },
+    {
+      "pattern": "@redshellow",
+      "kind": "channelURL",
+      "note": "OW — Redshell"
+    },
+    {
+      "pattern": "@fitzyhere",
+      "kind": "channelURL",
+      "note": "OW — Fitzyhere"
+    },
+    {
+      "pattern": "@arrge",
+      "kind": "channelURL",
+      "note": "OW — Arrge"
+    },
+    {
+      "pattern": "@wantedow",
+      "kind": "channelURL",
+      "note": "OW — Wanted"
+    },
+    {
+      "pattern": "@dafran",
+      "kind": "channelURL",
+      "note": "OW — Dafran"
+    },
+    {
+      "pattern": "@samitofps",
+      "kind": "channelURL",
+      "note": "OW — SamitoFPS"
+    },
+    {
+      "pattern": "@bogur",
+      "kind": "channelURL",
+      "note": "OW — Bogur"
+    },
+    {
+      "pattern": "@yeatle",
+      "kind": "channelURL",
+      "note": "OW — Yeatle"
+    },
+    {
+      "pattern": "@spilo",
+      "kind": "channelURL",
+      "note": "OW — Spilo"
+    },
+    {
+      "pattern": "@kajor",
+      "kind": "channelURL",
+      "note": "OW — Kajor"
+    },
+    {
+      "pattern": "@temporal7453",
+      "kind": "channelURL",
+      "note": "OW — Temporal"
+    },
+    {
+      "pattern": "@natterow",
+      "kind": "channelURL",
+      "note": "OW — NatterOW"
+    },
+    {
+      "pattern": "@akshonesports",
+      "kind": "channelURL",
+      "note": "OW — Akshon Esports"
+    },
+    {
+      "pattern": "@owgrandmaster",
+      "kind": "channelURL",
+      "note": "OW — OWGrandmaster"
+    },
+    {
+      "pattern": "@surefour",
+      "kind": "channelURL",
+      "note": "OW — Surefour"
+    },
+    {
+      "pattern": "@kabajiow",
+      "kind": "channelURL",
+      "note": "OW — Kabaji"
+    },
+    {
+      "pattern": "@valorantesports",
+      "kind": "channelURL",
+      "note": "VAL — Champions Tour"
+    },
+    {
+      "pattern": "@valorantkr",
+      "kind": "channelURL",
+      "note": "VAL — Korea"
+    },
+    {
+      "pattern": "@sentinels",
+      "kind": "channelURL",
+      "note": "VAL — Sentinels"
+    },
+    {
+      "pattern": "@tenz",
+      "kind": "channelURL",
+      "note": "VAL — TenZ"
+    },
+    {
+      "pattern": "@tarik",
+      "kind": "channelURL",
+      "note": "VAL/FPS — tarik"
+    },
+    {
+      "pattern": "@hiko",
+      "kind": "channelURL",
+      "note": "VAL/FPS — Hiko"
+    },
+    {
+      "pattern": "@averagejonas",
+      "kind": "channelURL",
+      "note": "VAL — AverageJonas"
+    },
+    {
+      "pattern": "@woohoojin",
+      "kind": "channelURL",
+      "note": "VAL — Woohoojin"
+    },
+    {
+      "pattern": "@jollztv",
+      "kind": "channelURL",
+      "note": "VAL — JollzTV"
+    },
+    {
+      "pattern": "@skillcappedvalorant",
+      "kind": "channelURL",
+      "note": "VAL — SkillCapped"
+    },
+    {
+      "pattern": "@thinkingmansvalorant",
+      "kind": "channelURL",
+      "note": "VAL — Thinking Man's Valorant"
+    },
+    {
+      "pattern": "@playapex",
+      "kind": "channelURL",
+      "note": "Apex — official"
+    },
+    {
+      "pattern": "@playapexesports",
+      "kind": "channelURL",
+      "note": "Apex esports"
+    },
+    {
+      "pattern": "@iitztimmy",
+      "kind": "channelURL",
+      "note": "Apex — iiTzTimmy"
+    },
+    {
+      "pattern": "@imperialhal",
+      "kind": "channelURL",
+      "note": "Apex — ImperialHal"
+    },
+    {
+      "pattern": "@mande",
+      "kind": "channelURL",
+      "note": "Apex — Mande"
+    },
+    {
+      "pattern": "@counterstrike",
+      "kind": "channelURL",
+      "note": "CS — official"
+    },
+    {
+      "pattern": "@eslcs",
+      "kind": "channelURL",
+      "note": "CS — ESL"
+    },
+    {
+      "pattern": "@blastpremier",
+      "kind": "channelURL",
+      "note": "CS — BLAST"
+    },
+    {
+      "pattern": "@thewarowl",
+      "kind": "channelURL",
+      "note": "CS — TheWarOwl"
+    },
+    {
+      "pattern": "@pubg",
+      "kind": "channelURL",
+      "note": "PUBG — official"
+    },
+    {
+      "pattern": "@pubgesports",
+      "kind": "channelURL",
+      "note": "PUBG esports"
+    },
+    {
+      "pattern": "UCNZCXCN_HH_LU5RCSFXKGGQ",
+      "kind": "channelURL",
+      "note": "KR gaming — KIMBLUE"
+    },
+    {
+      "pattern": "@uzuhama",
+      "kind": "channelURL",
+      "note": "KR gaming — 우주하마"
+    },
+    {
+      "pattern": "@hanryang1125",
+      "kind": "channelURL",
+      "note": "KR gaming — 풍월량"
+    },
+    {
+      "pattern": "@hanryang9999",
+      "kind": "channelURL",
+      "note": "KR gaming — FULL월량"
+    },
+    {
+      "pattern": "@woowakgood",
+      "kind": "channelURL",
+      "note": "KR gaming — 우왁굳"
+    },
+    {
+      "pattern": "@wakjonggame",
+      "kind": "channelURL",
+      "note": "KR gaming — woowakgood game"
+    },
+    {
+      "pattern": "@chimchakman_official",
+      "kind": "channelURL",
+      "note": "KR gaming — 침착맨"
+    },
+    {
+      "pattern": "@chimchakman_gamefull",
+      "kind": "channelURL",
+      "note": "KR gaming — 침착맨 게임 풀버전"
+    },
+    {
+      "pattern": "@양띵",
+      "kind": "channelURL",
+      "note": "KR gaming — 양띵"
+    },
+    {
+      "pattern": "@acau",
+      "kind": "channelURL",
+      "note": "KR gaming — 악어"
+    },
+    {
+      "pattern": "@lilka",
+      "kind": "channelURL",
+      "note": "KR gaming — 릴카"
+    },
+    {
+      "pattern": "@sleepground",
+      "kind": "channelURL",
+      "note": "KR gaming — 잠뜰 TV"
+    },
+    {
+      "pattern": "@dottytv",
+      "kind": "channelURL",
+      "note": "KR gaming — 도티 TV"
+    },
+    {
+      "pattern": "@sutak_istp",
+      "kind": "channelURL",
+      "note": "KR gaming — 수탉"
+    },
+    {
+      "pattern": "UCVUKUKIM67EWFBQEMJJ2-EA",
+      "kind": "channelURL",
+      "note": "KR gaming — 마플"
+    },
+    {
+      "pattern": "@t1",
+      "kind": "channelURL",
+      "note": "LoL esports — T1"
+    },
+    {
+      "pattern": "@gengesports",
+      "kind": "channelURL",
+      "note": "LoL esports — Gen.G"
+    },
+    {
+      "pattern": "@drxglobal",
+      "kind": "channelURL",
+      "note": "LoL esports — DRX"
+    },
+    {
+      "pattern": "@dpluskia",
+      "kind": "channelURL",
+      "note": "LoL esports — Dplus KIA"
+    },
+    {
+      "pattern": "@lck",
+      "kind": "channelURL",
+      "note": "LoL esports — LCK"
+    },
+    {
+      "pattern": "@lolesports",
+      "kind": "channelURL",
+      "note": "LoL esports — global"
+    },
+    {
+      "pattern": "@lckglobal",
+      "kind": "channelURL",
+      "note": "LoL esports — LCK Global"
+    },
+    {
+      "pattern": "@epicgames",
+      "kind": "channelURL",
+      "note": "Epic Games"
+    },
+    {
+      "pattern": "@nintendoamerica",
+      "kind": "channelURL",
+      "note": "Nintendo America"
+    },
+    {
+      "pattern": "@gameranx",
+      "kind": "channelURL",
+      "note": "gaming media — gameranx"
+    },
+    {
+      "pattern": "@안내",
+      "kind": "channelURL",
+      "note": "KR gaming — 안내 (2026-07-15 사용자 제보)"
+    },
+    {
+      "pattern": "@jamsiho",
+      "kind": "channelURL",
+      "note": "KR gaming — jamsiho (2026-07-15 사용자 제보)"
+    },
+    {
+      "pattern": "@sc2supernova",
+      "kind": "channelURL",
+      "note": "SC2 — supernova (2026-07-15 사용자 제보)"
+    },
+    {
+      "pattern": "@agu_tv",
+      "kind": "channelURL",
+      "note": "SC/BW KR — AGU_TV (2026-07-15 사용자 제보)"
+    },
+    {
+      "pattern": "@sergiuhelldragoonhq",
+      "kind": "channelURL",
+      "note": "SC2 — SergiuHellDragoonHQ (2026-07-15 사용자 제보)"
+    },
+    {
+      "pattern": "@rainbowflavor_",
+      "kind": "channelURL",
+      "note": "SC2 — RainbowFlavor (2026-07-15 사용자 제보)"
+    },
+    {
+      "pattern": "@발스타홍구",
+      "kind": "channelURL",
+      "note": "SC/BW KR — 발스타홍구 (2026-07-15 사용자 제보)"
+    },
+    {
+      "pattern": "@pigcasts",
+      "kind": "channelURL",
+      "note": "SC2 — PiGCasts (2026-07-15 사용자 제보)"
+    },
+    {
+      "pattern": "UC4P7F8qenDo1O_5NvgBb_cg",
+      "kind": "channelURL",
+      "note": "SC — channel id (2026-07-15 사용자 제보, \"스타\" 분류)"
+    },
+    {
+      "pattern": "@군림보",
+      "kind": "channelURL",
+      "note": "PUBG(배그) KR — 군림보 (2026-07-15 사용자 제보, \"배그\" 분류 — bare custom URL 추정)"
+    },
+    {
       "pattern": "store.steampowered.com",
       "kind": "host",
       "note": "gaming site"
@@ -1133,8 +1813,8 @@
     },
     {
       "pattern": "youtube.com/gaming",
-      "kind": "urlContains",
-      "note": "gaming YT hub path only"
+      "kind": "host",
+      "note": "gaming site"
     },
     {
       "pattern": "ign.com",
@@ -2005,6 +2685,46 @@
       "pattern": "monsterenergy.com",
       "kind": "host",
       "note": "gaming site"
+    },
+    {
+      "pattern": "sc2",
+      "kind": "keyword",
+      "note": "SC2 keyword"
+    },
+    {
+      "pattern": "starcraft2",
+      "kind": "keyword",
+      "note": "SC2 keyword"
+    },
+    {
+      "pattern": "starcraft",
+      "kind": "keyword",
+      "note": "SC2 keyword"
+    },
+    {
+      "pattern": "스타2",
+      "kind": "keyword",
+      "note": "SC2 KR keyword"
+    },
+    {
+      "pattern": "스타크래프트2",
+      "kind": "keyword",
+      "note": "SC2 KR keyword"
+    },
+    {
+      "pattern": "스타리그",
+      "kind": "keyword",
+      "note": "SC/BW·SC2 리그·대회 KR keyword"
+    },
+    {
+      "pattern": "starcraft2",
+      "kind": "genreKeyword",
+      "note": "SC2 genre auto-discovery"
+    },
+    {
+      "pattern": "UCN5oT4zGJX-_H6pE5isAEeg",
+      "kind": "channelURL",
+      "note": "PUBG — channel id, resolved from youtube.com/군림보 vanity URL (2026-07-20 사용자 제보, \"배그\" 분류)"
     }
   ]
 }

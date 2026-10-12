@@ -2,7 +2,6 @@ import 'dart:async';
 
 import '../insight/insight_crafter_service.dart';
 import '../library/ai_summarizer.dart';
-import '../library/youtube_library_service.dart';
 import '../services/isle_app_log_service.dart';
 import '../services/isle_user_defaults.dart';
 import '../utils/url_parser.dart';
@@ -24,7 +23,7 @@ class SharedPlaylistCcSyncResult {
   final int articlesBuilt;
 }
 
-/// 공유 큐·플레이리스트 — Piped/URL·(옵션) 나중에 볼 → CC·기사 본문 동기화 [Volt: resume 시 stale만]
+/// 공유 큐·지원 플레이리스트 — URL·자막·기사 본문 동기화 [Volt: resume 시 stale만]
 class SharedPlaylistCcService {
   SharedPlaylistCcService._();
 
@@ -50,14 +49,16 @@ class SharedPlaylistCcService {
     var ingested = 0;
     if (ingestSources) {
       ingested = await _ingestSubscribedSources();
-      ingested += await _ingestWatchLaterIfLoggedIn();
     }
 
     var ccFetched = 0;
     var articlesBuilt = 0;
-    final queueId = SharedPlaylistStore.isleQueuePlaylistId;
+    const queueId = SharedPlaylistStore.isleQueuePlaylistId;
     final playlists = SharedPlaylistStore.loadAll();
-    final targets = playlists.where((p) => p.id == queueId || p.items.any((i) => i.sourceType == 'youtube')).toList();
+    final targets = playlists
+        .where((p) =>
+            p.id == queueId || p.items.any((i) => i.sourceType == 'youtube'))
+        .toList();
 
     for (final pl in targets) {
       if (ccFetched >= maxCcPerRun) break;
@@ -75,7 +76,8 @@ class SharedPlaylistCcService {
         }
         final needsCc = !item.hasTranscript ||
             item.ccSyncedAt == null ||
-            DateTime.now().difference(item.ccSyncedAt!) > const Duration(hours: 72);
+            DateTime.now().difference(item.ccSyncedAt!) >
+                const Duration(hours: 72);
         if (!needsCc) {
           updated.add(item);
           continue;
@@ -88,7 +90,9 @@ class SharedPlaylistCcService {
           next = item.copyWith(
             transcript: transcript,
             channelName: meta?.channelName ?? item.channelName,
-            title: meta?.title != null && meta!.title != 'YouTube' ? meta.title : item.title,
+            title: meta?.title != null && meta!.title != 'YouTube'
+                ? meta.title
+                : item.title,
             thumbnailUrl: meta?.thumbnailUrl ?? item.thumbnailUrl,
             ccSyncedAt: DateTime.now(),
           );
@@ -119,8 +123,10 @@ class SharedPlaylistCcService {
       }
     }
 
-    await IsleUserDefaults.setShareQueueLastSyncMs(DateTime.now().millisecondsSinceEpoch);
-    IsleAppLogService.log('CC sync · ingest=$ingested cc=$ccFetched articles=$articlesBuilt');
+    await IsleUserDefaults.setShareQueueLastSyncMs(
+        DateTime.now().millisecondsSinceEpoch);
+    IsleAppLogService.log(
+        'CC sync · ingest=$ingested cc=$ccFetched articles=$articlesBuilt');
     return SharedPlaylistCcSyncResult(
       ingested: ingested,
       ccFetched: ccFetched,
@@ -145,28 +151,6 @@ class SharedPlaylistCcService {
       }
     }
     return n;
-  }
-
-  static Future<int> _ingestWatchLaterIfLoggedIn() async {
-    if (!IsleUserDefaults.shareQueueSyncWatchLater) return 0;
-    // 계정 동기화가 WL→라이브러리·큐까지 처리하면 API 중복 호출 방지
-    if (IsleUserDefaults.youtubeSyncWatchLaterToLibrary) return 0;
-    try {
-      final items = await YoutubeLibraryService.fetchWatchLater(maxResults: 30);
-      var n = 0;
-      for (final e in items) {
-        final added = await _addToQueue(
-          url: e.url,
-          title: e.title,
-          thumbnailUrl: e.thumbnailUrl,
-          channelName: e.channelName,
-        );
-        if (added) n++;
-      }
-      return n;
-    } catch (_) {
-      return 0;
-    }
   }
 
   static Future<bool> _addToQueue({
@@ -225,7 +209,8 @@ class SharedPlaylistCcService {
   }
 
   static List<SharedPlaylistItem> queueItems() {
-    final q = SharedPlaylistStore.findById(SharedPlaylistStore.isleQueuePlaylistId);
+    final q =
+        SharedPlaylistStore.findById(SharedPlaylistStore.isleQueuePlaylistId);
     return q?.items ?? const [];
   }
 }

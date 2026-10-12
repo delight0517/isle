@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/blocking/blocking_controller_provider.dart';
 import '../../../../core/block_schedule/block_schedule_enforcement_service.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
@@ -38,6 +39,17 @@ class _WebsiteBlockSectionState extends State<WebsiteBlockSection> {
 
   Future<void> _load() async {
     await WebsiteBlockStore.ensureOpen();
+    if (Platform.isAndroid) {
+      final domains = WebsiteBlockStore.loadDomains();
+      final auth = await resolveBlockingController().isAuthorized();
+      if (!mounted) return;
+      setState(() {
+        _blocked = domains;
+        _custom = WebsiteBlockStore.customDomainsOnly();
+        _extensionActive = domains.isNotEmpty && auth;
+      });
+      return;
+    }
     final status = await IosExtensionStatus.load();
     if (!mounted) return;
     setState(() {
@@ -76,11 +88,17 @@ class _WebsiteBlockSectionState extends State<WebsiteBlockSection> {
     await _syncDomains();
     _customCtrl.clear();
     if (!mounted) return;
+    final rejected = !WebsiteBlockStore.loadDomains().contains(norm);
     setState(() {
       _blocked = WebsiteBlockStore.loadDomains();
       _custom = WebsiteBlockStore.customDomainsOnly();
       _saving = false;
     });
+    if (rejected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('이 도메인은 차단할 수 없어요 (Isle 재생 보호를 위해 제외됨)')),
+      );
+    }
   }
 
   Future<void> _removeCustom(String domain) async {
@@ -113,10 +131,16 @@ class _WebsiteBlockSectionState extends State<WebsiteBlockSection> {
     await WebsiteBlockStore.toggle(domain);
     await _syncDomains();
     if (!mounted) return;
+    final rejected = !isRemoving && !WebsiteBlockStore.loadDomains().contains(domain);
     setState(() {
       _blocked = WebsiteBlockStore.loadDomains();
       _saving = false;
     });
+    if (rejected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('이 도메인은 차단할 수 없어요 (Isle 재생 보호를 위해 제외됨)')),
+      );
+    }
   }
 
   @override

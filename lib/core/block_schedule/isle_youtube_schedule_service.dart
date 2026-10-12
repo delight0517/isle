@@ -19,18 +19,56 @@ class IsleYoutubeScheduleService {
     String? scheduleName,
     List<int> days = const [0, 1, 2, 3, 4, 5, 6],
   }) async {
-    await BlockScheduleStore.ensureOpen();
-    await ScheduleAppTargetsStore.ensureOpen();
-    await IsleUserDefaults.setYoutubeScheduleLockEnabled(true);
-
     final endMin = (endHour * 60 + endMinute).clamp(1, 1439);
     final slots = [
       for (final d in days)
         ScheduleSlot(day: d.clamp(0, 6), startMinute: 0, endMinute: endMin),
     ];
-    final name = scheduleName?.trim().isNotEmpty == true
-        ? scheduleName!.trim()
-        : '아침 Isle 유튜브';
+    return _applySlots(
+      slots: slots,
+      name: scheduleName?.trim().isNotEmpty == true
+          ? scheduleName!.trim()
+          : '아침 Isle 유튜브',
+    );
+  }
+
+  /// 허용 창 — [startMin]~[endMin]만 보게 하고 나머지 시간을 차단(보완 슬롯).
+  /// 예: 평일 15:00–19:00 허용 → 매일 00:00–15:00 + 19:00–24:00 차단.
+  static Future<BlockSchedule> applyAllowWindow({
+    required int startMinute,
+    required int endMinute,
+    String? scheduleName,
+    List<int> days = const [0, 1, 2, 3, 4, 5, 6],
+  }) async {
+    final start = startMinute.clamp(0, 1439);
+    final end = endMinute.clamp(1, 1440);
+    final slots = <ScheduleSlot>[];
+    for (final d in days) {
+      final day = d.clamp(0, 6);
+      // 허용 창 앞 (00:00 → start)
+      if (start > 0) {
+        slots.add(ScheduleSlot(day: day, startMinute: 0, endMinute: start));
+      }
+      // 허용 창 뒤 (end → 24:00)
+      if (end < 1440) {
+        slots.add(ScheduleSlot(day: day, startMinute: end, endMinute: 1440));
+      }
+    }
+    return _applySlots(
+      slots: slots,
+      name: scheduleName?.trim().isNotEmpty == true
+          ? scheduleName!.trim()
+          : '유튜브 허용 창',
+    );
+  }
+
+  static Future<BlockSchedule> _applySlots({
+    required List<ScheduleSlot> slots,
+    required String name,
+  }) async {
+    await BlockScheduleStore.ensureOpen();
+    await ScheduleAppTargetsStore.ensureOpen();
+    await IsleUserDefaults.setYoutubeScheduleLockEnabled(true);
 
     BlockSchedule? existing;
     for (final s in BlockScheduleStore.loadAll()) {

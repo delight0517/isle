@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/navigation/schedule_overlay_navigation.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
 import '../../core/focus/isle_product_focus.dart';
+import '../../core/platform/platform_block_intent.dart';
 import '../../core/youtube/youtube_clipboard_watch.dart';
 import '../../features/feed/presentation/widgets/block_from_link_sheet.dart';
 import '../../features/youtube/presentation/widgets/youtube_creator_insight_sheet.dart';
@@ -60,9 +62,15 @@ class _QuickLauncherSheet extends StatelessWidget {
             const SizedBox(height: 12),
             _section(context, '▶ 지금 보기', [
               _Action(
+                icon: Icons.qr_code_scanner,
+                color: const Color(0xFF1DB954),
+                label: 'QR 스캔',
+                onTap: () => _go(context, '/home/share/qr'),
+              ),
+              _Action(
                 icon: Icons.explore_outlined,
                 color: Color(0xFF0A84FF),
-                label: 'Safari',
+                label: PlatformBlockCopy.inAppBrowserNavLabel,
                 onTap: () {
                   Navigator.pop(context);
                   context.push(
@@ -83,9 +91,9 @@ class _QuickLauncherSheet extends StatelessWidget {
                 },
               ),
               _Action(
-                icon: Icons.content_paste,
+                icon: Icons.content_paste_go_outlined,
                 color: Color(0xFFFF0000),
-                label: 'URL 붙여넣기',
+                label: '복사한 YouTube',
                 onTap: () {
                   Navigator.pop(context);
                   YoutubeClipboardWatch.pasteAndPlay(context);
@@ -112,7 +120,7 @@ class _QuickLauncherSheet extends StatelessWidget {
                 icon: Icons.schedule,
                 color: Colors.red.shade700,
                 label: '스케줄',
-                onTap: () => _go(context, '/settings/block-schedules'),
+                onTap: () => pushBlockScheduleList(context),
               ),
               _Action(
                 icon: Icons.timer_outlined,

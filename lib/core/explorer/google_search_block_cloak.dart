@@ -39,6 +39,30 @@ class GoogleSearchBlockCloak {
   function tryInstall() {
     if (!isGoogleSearch()) return;
     installStyle();
+    scheduleFailsafe();
+  }
+
+  function failsafeReveal() {
+    if (!isGoogleSearch()) return;
+    var sel =
+      '#search div.g, #search div.MjjYud, #search div.Gx5Zad, #search div.xpdopen, #search div[data-hveid]';
+    try {
+      document.querySelectorAll(sel).forEach(function(node) {
+        if (node.getAttribute('data-isle-gs-kw') === '1') return;
+        if (node.getAttribute('data-isle-gs-url') === '1') return;
+        if (node.getAttribute('data-isle-embed-yt') === '1') return;
+        window.__isleGsMarkRevealed(node);
+      });
+    } catch (e) {}
+  }
+
+  function scheduleFailsafe() {
+    if (window.__isleGsFailsafeTimers) {
+      window.__isleGsFailsafeTimers.forEach(function(id) { clearTimeout(id); });
+    }
+    window.__isleGsFailsafeTimers = [600, 1500, 3500].map(function(ms) {
+      return setTimeout(failsafeReveal, ms);
+    });
   }
 
   tryInstall();

@@ -34,7 +34,9 @@ class IosScheduleSnapshot {
   static Map<String, dynamic> _buildPayload() {
     final now = DateTime.now();
     final schedules = BlockScheduleStore.loadAll();
-    final shieldIds = ScheduleEnforcementPolicy.shieldSchedulesNow(now).map((e) => e.id).toList();
+    final shieldIds = ScheduleEnforcementPolicy.shieldSchedulesNow(now)
+        .map((e) => e.id)
+        .toList();
     return {
       'version': 1,
       'writtenAtMs': now.millisecondsSinceEpoch,
@@ -49,6 +51,7 @@ class IosScheduleSnapshot {
         'id': s.id,
         'enabled': s.enabled,
         'locked': s.locked,
+        'lockdownAllApps': s.lockdownAllApps,
         'enforcementMode': s.enforcementMode.storageKey,
         'slots': s.slots.map(_slotMap).toList(),
         'domains': s.domains,

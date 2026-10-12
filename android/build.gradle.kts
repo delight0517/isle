@@ -35,39 +35,25 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
-
 // DeleteFix: JVM 17 alignment for all modules
 subprojects {
+    if (name == "app") return@subprojects
     afterEvaluate {
-        extensions.findByName("android")?.let { ext ->
-            (ext as com.android.build.gradle.BaseExtension).compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_17
-                targetCompatibility = JavaVersion.VERSION_17
-            }
+        extensions.findByType<com.android.build.gradle.BaseExtension>()?.compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
-        tasks.withType<JavaCompile>().configureEach {
-            sourceCompatibility = JavaVersion.VERSION_17.toString()
-            targetCompatibility = JavaVersion.VERSION_17.toString()
-        }
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-            compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+    }
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 // DeleteFix: compileSdk 35 floor — AGP resource linking (Base.V*.Theme.AppCompat)
 subprojects {
-    afterEvaluate {
-        extensions.findByType<com.android.build.gradle.LibraryExtension>()?.apply {
+    plugins.withId("com.android.library") {
+        extensions.configure<com.android.build.gradle.LibraryExtension> {
             if ((compileSdk ?: 0) < 35) {
                 compileSdk = 35
-            }
-        }
-        extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
-            val current = compileSdkVersion?.toString()
-                ?.removePrefix("android-")
-                ?.toIntOrNull() ?: 0
-            if (current < 35) {
-                compileSdkVersion(35)
             }
         }
     }

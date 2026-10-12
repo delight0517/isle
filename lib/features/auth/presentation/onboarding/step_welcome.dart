@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../../../../core/constants/app_legal_info.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../guide/presentation/widgets/youtube_isle_core_guide.dart';
@@ -32,6 +33,31 @@ class StepWelcome extends StatelessWidget {
             'Isle의 핵심은 「밖의 브라우저 유튜브는 막고, 시청은 Isle에서만」이에요. '
             '다음 단계에서 바로 설정할 수 있어요.',
             style: IsleText.body(color: IsleColors.muted).copyWith(height: 1.4),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: IsleColors.ocean100.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: IsleColors.ocean300.withValues(alpha: 0.4)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('안내', style: IsleText.body().copyWith(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                Text(
+                  AppLegalInfo.selfManagementNotice,
+                  style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.4),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppLegalInfo.thirdPartyDisclaimer,
+                  style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.4),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           const YoutubeIsleCoreGuide(compact: true),

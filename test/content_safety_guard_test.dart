@@ -41,4 +41,21 @@ void main() {
       expect(out, contains('kp=1'));
     });
   });
+
+  group('builtInAdultSearchKeywords — link aggregator entry path', () {
+    // "주소모아" 검색 → Google SERP 카드에 성인·도박 링크 허브가 그대로
+    // 노출되던 문제(2026-07-13, 사용자 제보 — "주소모아 검색해서 들어가는
+    // 것도 막아달라"). 사이트 자체는 도메인이 계속 바뀌어 호스트 차단만으론
+    // 못 따라잡지만, 검색 진입 경로는 검색어 자체로 카드 단위 필터링이
+    // 가능하다.
+    test('includes the reported Korean link-aggregator search terms', () {
+      for (final kw in ['주소모아', '주소모음', '링크모음', '최신주소', '주소가이드']) {
+        expect(
+          ContentSafetyGuard.builtInAdultSearchKeywords,
+          contains(kw),
+          reason: '"$kw" 검색 카드가 필터링돼야 함',
+        );
+      }
+    });
+  });
 }

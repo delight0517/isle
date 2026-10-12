@@ -18,6 +18,7 @@ import '../youtube/blocked_channel_store.dart';
 import '../youtube/content_filter_store.dart';
 import '../block_schedule/block_schedule_store.dart';
 import '../library/personal_library_store.dart';
+import 'setup_journey_service.dart';
 import '../ai/ai_config_store.dart';
 import 'isle_backup_codec.dart';
 import 'isle_app_log_service.dart';
@@ -38,6 +39,7 @@ class IsleSurvivalBackupService {
   static const _tmpFileName = 'current.json.tmp';
 
   static bool _safeToSync = false;
+  static bool _snapshotsEnabled = true;
   static Timer? _debounce;
   static DateTime? lastSyncAt;
 
@@ -90,17 +92,72 @@ class IsleSurvivalBackupService {
 
   static Future<void> ensureBootstrapped() async {
     await _ensureAndroidDefaultFolderIfNeeded();
-    final dir = await backupDirectory();
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
-    }
-    final snapDir = await _snapshotsDir();
-    if (!await snapDir.exists()) {
-      await snapDir.create(recursive: true);
-    }
+    final dir = await writableBackupDirectory();
+    _snapshotsEnabled = await _probeSnapshotsWritable(dir.path);
     final raw = _prefs.get(_lastSyncKey);
     if (raw != null) {
       lastSyncAt = DateTime.tryParse(raw);
+    }
+  }
+
+  /// iCloud File Provider·일부 공유 볼륨 — 하위 폴더 생성 불가
+  static bool isRestrictedBackupPath(String path) {
+    final p = path.toLowerCase();
+    return p.contains('file provider storage') ||
+        p.contains('/livefiles/') ||
+        p.contains('.nosync/') ||
+        p.contains('/appgroup/');
+  }
+
+  static Future<String?> validateWritableBackupFolder(String path) async {
+    final trimmed = path.trim();
+    if (trimmed.isEmpty) return '폴더가 비어 있어요.';
+    final dir = Directory(trimmed);
+    try {
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+      final probe = File('${dir.path}/.isle_backup_write_test');
+      await probe.writeAsString('ok', flush: true);
+      if (!await probe.exists()) {
+        return '이 폴더에는 파일을 쓸 수 없어요.';
+      }
+      await probe.delete();
+      return null;
+    } on PathAccessException catch (e) {
+      return _folderPickErrorMessage(trimmed, e);
+    } on FileSystemException catch (e) {
+      return _folderPickErrorMessage(trimmed, e);
+    } catch (e) {
+      return '백업 폴더를 사용할 수 없어요: $e';
+    }
+  }
+
+  static String _folderPickErrorMessage(String path, Object e) {
+    if (isRestrictedBackupPath(path) || path.toLowerCase().contains('icloud')) {
+      return 'iCloud에서는 「파일」앱 → iCloud Drive → Isle Backup 폴더를 '
+          '직접 만든 뒤 그 폴더를 선택해 주세요. (다른 앱 백업 폴더는 쓸 수 없어요)';
+    }
+    return '이 폴더에 쓸 수 없어요: $e';
+  }
+
+  static Future<bool> _probeSnapshotsWritable(String parentPath) async {
+    if (isRestrictedBackupPath(parentPath)) return false;
+    final snapDir = Directory('$parentPath/snapshots');
+    try {
+      if (!await snapDir.exists()) {
+        await snapDir.create(recursive: true);
+      }
+      final probe = File('${snapDir.path}/.isle_snap_probe');
+      await probe.writeAsString('1', flush: true);
+      await probe.delete();
+      return true;
+    } catch (e) {
+      IsleAppLogService.log(
+        'Survival snapshots off for $parentPath: $e',
+        level: IsleLogLevel.info,
+      );
+      return false;
     }
   }
 
@@ -135,18 +192,86 @@ class IsleSurvivalBackupService {
     return defaultBackupDirectory();
   }
 
+  /// 실제 sync·복원에 쓰는 경로 — File Provider/iCloud 등 쓰기 불가면 Documents fallback
+  static Future<Directory> writableBackupDirectory() async {
+    final custom = _prefs.get(_folderPrefKey)?.trim();
+    if (custom != null && custom.isNotEmpty) {
+      if (!isRestrictedBackupPath(custom)) {
+        final err = await validateWritableBackupFolder(custom);
+        if (err == null) return Directory(custom);
+        IsleAppLogService.log(
+          'Survival backup: custom folder unusable → Documents fallback ($err)',
+          level: IsleLogLevel.warn,
+        );
+      } else {
+        IsleAppLogService.log(
+          'Survival backup: File Provider path → Documents fallback',
+          level: IsleLogLevel.info,
+        );
+      }
+    }
+    final def = await defaultBackupDirectory();
+    try {
+      if (!await def.exists()) await def.create(recursive: true);
+    } catch (e) {
+      IsleAppLogService.log(
+        'Survival backup default dir create failed: $e',
+        level: IsleLogLevel.error,
+      );
+    }
+    return def;
+  }
+
+  static bool hasUserChosenBackupFolder() {
+    final custom = _prefs.get(_folderPrefKey)?.trim();
+    return custom != null && custom.isNotEmpty;
+  }
+
+  /// iPhone — 앱 삭제 시 샌드박스 백업은 사라짐 → iCloud 등 외부 폴더 권장
+  static bool needsIcloudFolderPrompt() {
+    if (!Platform.isIOS) return false;
+    return !hasUserChosenBackupFolder();
+  }
+
+  static bool isLikelyCloudOrExternalPath(String path) {
+    final p = path.toLowerCase();
+    return p.contains('icloud') ||
+        p.contains('mobile documents') ||
+        p.contains('/documents/isle backup');
+  }
+
   static Future<void> setBackupFolder(String path) async {
-    await _prefs.put(_folderPrefKey, path);
-    await ensureBootstrapped();
-    await syncNow();
+    final trimmed = path.trim();
+    final err = await validateWritableBackupFolder(trimmed);
+    if (err != null) {
+      throw StateError(err);
+    }
+    final prev = _prefs.get(_folderPrefKey);
+    await _prefs.put(_folderPrefKey, trimmed);
+    try {
+      await ensureBootstrapped();
+      await syncNow();
+    } catch (e) {
+      if (prev != null && prev.trim().isNotEmpty) {
+        await _prefs.put(_folderPrefKey, prev);
+      } else {
+        await _prefs.delete(_folderPrefKey);
+      }
+      rethrow;
+    }
   }
 
   static Future<String?> pickBackupFolder() async {
     final picked = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'Isle 백업 폴더 선택 (iCloud·외장 디스크 가능)',
+      dialogTitle: 'Isle 백업 폴더 선택 (iCloud Drive → Isle Backup 권장)',
     );
     if (picked == null || picked.isEmpty) return null;
-    await setBackupFolder(picked);
+    try {
+      await setBackupFolder(picked);
+    } on StateError catch (e) {
+      throw StateError(e.message);
+    }
+    await SetupJourneyService.markStepDone('icloud_backup');
     return picked;
   }
 
@@ -171,8 +296,10 @@ class IsleSurvivalBackupService {
           '앱 삭제 후에도 남기려면 「폴더 변경」으로 Downloads·Google Drive 등을 고르세요. '
           '시스템 자동 백업(설정)도 켜 두면 업데이트·재설치에 도움이 됩니다.';
     }
-    return 'iPhone: 앱 삭제·재설치 시 샌드박스는 지워지지만 Keychain 미러 백업에서 자동 복원을 시도합니다. '
-        '추가로 「폴더 변경」으로 iCloud Drive를 고르면 더 안전합니다.';
+    return 'iPhone: 앱 삭제·재설치 시 샌드박스는 지워집니다. '
+        '「파일」→ iCloud Drive → Isle Backup 폴더를 만든 뒤 '
+        '설정 → 데이터 백업 → 「폴더 변경」으로 그 폴더를 지정하세요. '
+        'Keychain 미러도 자동 복원을 시도합니다.';
   }
 
   /// true = Hive가 비어 있음(재설치·초기화). false = 기존 사용자 → 덮어쓰기·checkpoint replace 금지.
@@ -271,14 +398,14 @@ class IsleSurvivalBackupService {
   }
 
   static Future<File?> _currentFile() async {
-    final dir = await backupDirectory();
+    final dir = await writableBackupDirectory();
     final f = File('${dir.path}/$_currentFileName');
     if (await f.exists()) return f;
     return null;
   }
 
   static Future<Directory> _snapshotsDir() async {
-    final dir = await backupDirectory();
+    final dir = await writableBackupDirectory();
     return Directory('${dir.path}/snapshots');
   }
 
@@ -372,7 +499,7 @@ class IsleSurvivalBackupService {
     try {
       await ensureBootstrapped();
       final map = await buildSnapshotMap();
-      final dir = await backupDirectory();
+      final dir = await writableBackupDirectory();
       final current = File('${dir.path}/$_currentFileName');
       final tmp = File('${dir.path}/$_tmpFileName');
       final encoded = const JsonEncoder.withIndent('  ').convert(map);
@@ -409,13 +536,25 @@ class IsleSurvivalBackupService {
   }
 
   static Future<void> _writeDailySnapshotIfNeeded(String encoded) async {
-    final snapDir = await _snapshotsDir();
-    final day = DateTime.now();
-    final name =
-        'snapshot_${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}.json';
-    final file = File('${snapDir.path}/$name');
-    if (!await file.exists()) {
-      await file.writeAsString(encoded);
+    if (!_snapshotsEnabled) return;
+    try {
+      final snapDir = await _snapshotsDir();
+      if (!await snapDir.exists()) {
+        await snapDir.create(recursive: true);
+      }
+      final day = DateTime.now();
+      final name =
+          'snapshot_${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}.json';
+      final file = File('${snapDir.path}/$name');
+      if (!await file.exists()) {
+        await file.writeAsString(encoded);
+      }
+    } catch (e) {
+      _snapshotsEnabled = false;
+      IsleAppLogService.log(
+        'Survival daily snapshot skipped: $e',
+        level: IsleLogLevel.info,
+      );
     }
   }
 

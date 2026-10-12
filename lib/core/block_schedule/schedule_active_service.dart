@@ -3,6 +3,7 @@ import 'models/block_schedule.dart';
 import 'models/schedule_slot.dart';
 import 'quick_block_service.dart';
 import 'schedule_target_access_guard.dart';
+import '../services/trusted_time_guard.dart';
 
 /// §4 — 지금 활성인 스케줄 ID 목록
 class ScheduleActiveService {
@@ -19,6 +20,11 @@ class ScheduleActiveService {
 
   static bool isScheduleActiveNow(BlockSchedule schedule, [DateTime? at]) {
     if (!schedule.enabled) return false;
+    final deactivateAt = schedule.scheduledDeactivationAtMs;
+    if (deactivateAt != null) {
+      final checkAt = at ?? TrustedTimeGuard.effectiveNow();
+      if (checkAt.millisecondsSinceEpoch >= deactivateAt) return false;
+    }
     final now = at ?? DateTime.now();
     if (schedule.slots.isEmpty) return false;
     return schedule.slots.any((s) => _slotActive(s, now));
@@ -28,7 +34,9 @@ class ScheduleActiveService {
     if (!BlockScheduleStore.masterEnabled) return [];
     final now = at ?? DateTime.now();
     final base = BlockScheduleStore.loadAll()
-        .where((s) => s.id != QuickBlockService.presetScheduleId && isScheduleActiveNow(s, now))
+        .where((s) =>
+            s.id != QuickBlockService.presetScheduleId &&
+            isScheduleActiveNow(s, now))
         .toList();
     if (QuickBlockService.activeSessions(now).isNotEmpty) {
       final preset = BlockScheduleStore.loadAll()
@@ -54,6 +62,6 @@ class ScheduleActiveService {
 
   /// Isle WebView 유튜브 잠금 — 「Isle · YouTube 시청」 타깃을 켠 스케줄 슬롯에서만.
   static bool isYoutubeWebViewBlockedNow([DateTime? at]) {
-    return ScheduleTargetAccessGuard.isIsleYoutubeBlocked;
+    return ScheduleTargetAccessGuard.isTargetBlocked('isle_youtube', at);
   }
 }

@@ -7,6 +7,8 @@ class ScheduleRule {
   final String pattern;
   final String? rawInput;
   final int addedAtMs;
+  /// 프리셋 팩에서 추가된 규칙 — 해제 시 일괄 삭제용
+  final String? premadePackId;
 
   const ScheduleRule({
     required this.id,
@@ -15,6 +17,7 @@ class ScheduleRule {
     required this.pattern,
     this.rawInput,
     required this.addedAtMs,
+    this.premadePackId,
   });
 
   Map<String, dynamic> toJson() => {
@@ -24,6 +27,7 @@ class ScheduleRule {
         'pattern': pattern,
         if (rawInput != null) 'raw_input': rawInput,
         'added_at_ms': addedAtMs,
+        if (premadePackId != null) 'premade_pack_id': premadePackId,
       };
 
   factory ScheduleRule.fromJson(Map<String, dynamic> j) => ScheduleRule(
@@ -33,11 +37,13 @@ class ScheduleRule {
         pattern: (j['pattern'] as String? ?? '').toLowerCase().trim(),
         rawInput: j['raw_input'] as String?,
         addedAtMs: (j['added_at_ms'] as num?)?.toInt() ?? 0,
+        premadePackId: j['premade_pack_id'] as String?,
       );
 
   ScheduleRule copyWith({
     String? pattern,
     String? rawInput,
+    String? premadePackId,
   }) =>
       ScheduleRule(
         id: id,
@@ -46,5 +52,6 @@ class ScheduleRule {
         pattern: pattern ?? this.pattern,
         rawInput: rawInput ?? this.rawInput,
         addedAtMs: addedAtMs,
+        premadePackId: premadePackId ?? this.premadePackId,
       );
 }

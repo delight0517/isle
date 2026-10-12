@@ -7,7 +7,6 @@ import '../block/models/pending_rule_removal.dart';
 import '../block/rule_pending_removal_store.dart';
 import '../services/isle_local_data_sync.dart';
 import 'blocked_url_store.dart';
-import 'models/blocked_url.dart';
 import 'models/blocked_video.dart';
 import 'youtube_block_rules_sync.dart';
 import 'block_keyword_policy.dart';
@@ -146,11 +145,15 @@ class BlockedKeywordsNotifier extends StateNotifier<List<String>> {
   Future<void> add(String keyword) async {
     final t = keyword.trim().toLowerCase();
     if (t.isEmpty) return;
-    await RulePendingRemovalStore.cancelKind(PendingRuleRemovalKind.keyword, t);
+    // 저장이 성공한 뒤에만 제거예약(tombstone)을 취소한다.
+    // 예전엔 cancelKind를 먼저 호출해서, 뒤이은 setAll 이 실패하면
+    // "제거예약은 취소됐는데 키워드는 목록에 없는" 유령 상태가 남았다.
     final list = List<String>.from(state);
-    if (list.contains(t)) return;
-    list.add(t);
-    await setAll(list);
+    if (!list.contains(t)) {
+      list.add(t);
+      await setAll(list);
+    }
+    await RulePendingRemovalStore.cancelKind(PendingRuleRemovalKind.keyword, t);
   }
 
   Future<void> remove(String keyword) async {

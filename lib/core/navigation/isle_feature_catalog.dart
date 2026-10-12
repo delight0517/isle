@@ -42,7 +42,7 @@ class IsleFeatureCatalog {
     IsleFeatureEntry(
       id: 'pomodoro',
       title: '포모도로 휴식',
-      subtitle: '30분 보고 10분 쉬기 — 쇼츠·릴 과소비 끊기',
+      subtitle: '30분 보고 10분 쉬기 — 쇼츠·릴 사용 줄이기',
       route: '/home/block/pomodoro',
       emoji: '🍅',
       keywords: [
@@ -59,7 +59,7 @@ class IsleFeatureCatalog {
         '카카오',
         '카톡',
         '과소비',
-        '중독',
+        '습관',
         '짧은영상',
       ],
     ),

@@ -1,4 +1,5 @@
 import '../ai/ai_client.dart';
+import '../services/notification_service.dart';
 import 'ai_summarizer.dart';
 import 'interest_pipeline_store.dart';
 import 'models/interest_item.dart';
@@ -66,6 +67,10 @@ class InterestPipelineService {
       publishedAt: DateTime.now(),
     );
     await PersonalLibraryStore.upsertEntries([entry]);
+    await NotificationService.notifyContentReady(
+      title: '리포트가 도착했어요',
+      body: '「${item.title}」가 읽을 수 있는 글로 만들어졌어요',
+    );
   }
 
   /// 같은 mergeGroupId · 2개 이상 article_ready → 특별 기사 1개
@@ -121,6 +126,10 @@ class InterestPipelineService {
         publishedAt: DateTime.now(),
       );
       await PersonalLibraryStore.upsertEntries([merged]);
+      await NotificationService.notifyContentReady(
+        title: '뉴스처럼 모아 읽기가 도착했어요',
+        body: '관심 있었던 콘텐츠 ${group.length}건을 하나의 기사로 묶었어요',
+      );
 
       for (final item in group) {
         await InterestPipelineStore.update(

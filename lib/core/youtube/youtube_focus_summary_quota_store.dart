@@ -1,5 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../library/usage_day.dart';
+
 /// 무료 MVP — 하루 AI 요약 횟수 (기본 5회, BM 훅)
 class YoutubeFocusSummaryQuotaStore {
   YoutubeFocusSummaryQuotaStore._();
@@ -8,10 +10,7 @@ class YoutubeFocusSummaryQuotaStore {
 
   static Box<String> get _box => Hive.box<String>('isle_cache');
 
-  static String get _dayKey {
-    final n = DateTime.now();
-    return '${n.year}-${n.month.toString().padLeft(2, '0')}-${n.day.toString().padLeft(2, '0')}';
-  }
+  static String get _dayKey => UsageDay.key();
 
   static String _countKey(String day) => 'youtube_focus_summary_count_$day';
 

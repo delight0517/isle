@@ -9,5 +9,6 @@ class MainActivity : FlutterActivity() {
         flutterEngine.plugins.add(AppLimitPlugin())
         flutterEngine.plugins.add(BlockingPlugin())
         flutterEngine.plugins.add(KakaoUsagePlugin())
+        flutterEngine.plugins.add(WebSessionPlugin())
     }
 }

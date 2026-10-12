@@ -1,15 +1,14 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../library/usage_day.dart';
+
 /// 몰입 모드 — 오늘 아낀 시간(초) 누적
 class YoutubeFocusTimeStore {
   YoutubeFocusTimeStore._();
 
   static Box<String> get _box => Hive.box<String>('isle_cache');
 
-  static String get _dayKey {
-    final n = DateTime.now();
-    return '${n.year}-${n.month.toString().padLeft(2, '0')}-${n.day.toString().padLeft(2, '0')}';
-  }
+  static String get _dayKey => UsageDay.key();
 
   static String _storageKey(String day) => 'youtube_focus_saved_sec_$day';
 

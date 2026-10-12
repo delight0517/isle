@@ -12,6 +12,8 @@ import '../../../../core/share/shared_playlist_cc_service.dart';
 import '../../../../core/share/shared_playlist_store.dart';
 import '../../../home/presentation/cc_article_view_screen.dart';
 import '../../../insight/presentation/insight_compose_sheet.dart';
+import '../../../../core/youtube/youtube_content_open_guard.dart';
+import '../../../../core/youtube/youtube_url_redirect.dart';
 import '../../../../shared/widgets/isle_sheet.dart';
 
 /// YouTube 미니 플레이어 · 중앙 Isle 길게 누르기 — 큐 영상 + CC 기사
@@ -141,10 +143,27 @@ class _IsleYoutubeLibrarySheetState extends ConsumerState<_IsleYoutubeLibraryShe
                             isThreeLine: true,
                             onTap: () {
                               HapticFeedback.selectionClick();
+                              if (!YoutubeContentOpenGuard.showDenialOrAllow(
+                                context,
+                                url: e.url,
+                                channelName: e.channelName,
+                                videoTitle: e.title,
+                              )) {
+                                return;
+                              }
                               Navigator.pop(context);
-                              context.push(
-                                '/viewer?url=${Uri.encodeComponent(e.url)}&title=${Uri.encodeComponent(e.title)}',
-                              );
+                              final ytRoute = YoutubeUrlRedirect.inAppRoute(e.url);
+                              if (ytRoute != null) {
+                                context.push(ytRoute);
+                                return;
+                              }
+                              final q = [
+                                'url=${Uri.encodeComponent(e.url)}',
+                                'title=${Uri.encodeComponent(e.title)}',
+                                if (e.channelName.isNotEmpty)
+                                  'channelName=${Uri.encodeComponent(e.channelName)}',
+                              ].join('&');
+                              context.push('/viewer?$q');
                             },
                             trailing: PopupMenuButton<String>(
                               onSelected: (v) async {

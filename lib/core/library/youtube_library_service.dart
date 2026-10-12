@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -47,6 +49,8 @@ class YoutubeLibraryService {
   /// 설정 없이 네이티브 로그인 UI를 띄우면 iOS에서 크래시할 수 있음
   static bool get canAttemptSignIn => GoogleSignInConfig.isConfigured;
 
+  static const _signInTimeout = Duration(seconds: 90);
+
   static Future<YoutubeSignInResult> signIn() async {
     if (!canAttemptSignIn) {
       return YoutubeSignInResult(
@@ -56,7 +60,14 @@ class YoutubeLibraryService {
       );
     }
     try {
-      final account = await _signIn.signIn();
+      final account = await _signIn.signIn().timeout(
+        _signInTimeout,
+        onTimeout: () {
+          throw TimeoutException(
+            'Google 로그인 시간이 초과됐어요. 네트워크·OAuth 설정을 확인해 주세요.',
+          );
+        },
+      );
       if (account == null) {
         return const YoutubeSignInResult(success: false, message: '로그인이 취소되었어요.');
       }
@@ -69,7 +80,8 @@ class YoutubeLibraryService {
       );
     } catch (e, st) {
       IsleAppLogService.log('YouTube sign-in failed: $e', level: IsleLogLevel.error, stack: st);
-      return YoutubeSignInResult(success: false, message: e.toString());
+      final msg = e is TimeoutException ? e.message ?? e.toString() : e.toString();
+      return YoutubeSignInResult(success: false, message: msg);
     }
   }
 
@@ -85,12 +97,12 @@ class YoutubeLibraryService {
   /// 몰입 모드 검색 등 Data API용 (로그인 시)
   static Future<String?> accessTokenForApi() => _accessToken();
 
+  /// Data API 토큰 — 자동 UI 로그인 금지 (피드 로드가 signIn()을 띄우면 멈춤)
   static Future<String?> _accessToken() async {
     if (!canAttemptSignIn) return null;
     try {
       var account = _signIn.currentUser;
       account ??= await _signIn.signInSilently();
-      account ??= await _signIn.signIn();
       if (account == null) return null;
       final auth = await account.authentication;
       return auth.accessToken;
@@ -220,14 +232,13 @@ class YoutubeLibraryService {
       final subs = subsRes.data?['items'] as List? ?? [];
       final entries = <LibraryEntry>[];
 
-      for (final raw in subs) {
-        if (raw is! Map) continue;
+      Future<List<LibraryEntry>> fetchChannelVideos(dynamic raw) async {
+        if (raw is! Map) return [];
         final snippet = raw['snippet'] as Map?;
-        if (snippet == null) continue;
+        if (snippet == null) return [];
         final channelId = snippet['resourceId']?['channelId'] as String?;
-        if (channelId == null || channelId.isEmpty) continue;
+        if (channelId == null || channelId.isEmpty) return [];
         final channelTitle = snippet['title'] as String? ?? '';
-
         try {
           final searchRes = await _dio.get<Map<String, dynamic>>(
             'https://www.googleapis.com/youtube/v3/search',
@@ -240,13 +251,13 @@ class YoutubeLibraryService {
             },
             options: Options(headers: {'Authorization': 'Bearer $token'}),
           );
-          final items = searchRes.data?['items'] as List? ?? [];
-          for (final item in items) {
+          final out = <LibraryEntry>[];
+          for (final item in searchRes.data?['items'] as List? ?? []) {
             if (item is! Map) continue;
             final sn = item['snippet'] as Map?;
             final vid = item['id']?['videoId'] as String?;
             if (sn == null || vid == null || vid.length != 11) continue;
-            entries.add(
+            out.add(
               LibraryEntry(
                 id: 'yt_sub_$vid',
                 title: sn['title'] as String? ?? 'YouTube',
@@ -261,8 +272,18 @@ class YoutubeLibraryService {
               ),
             );
           }
+          return out;
         } catch (_) {
-          continue;
+          return [];
+        }
+      }
+
+      const batch = 4;
+      for (var i = 0; i < subs.length; i += batch) {
+        final chunk = subs.sublist(i, i + batch > subs.length ? subs.length : i + batch);
+        final batches = await Future.wait<List<LibraryEntry>>(chunk.map(fetchChannelVideos));
+        for (final list in batches) {
+          entries.addAll(list);
         }
       }
       return entries;

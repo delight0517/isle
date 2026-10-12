@@ -98,6 +98,20 @@ class BlockedUrlGuard {
     }
     return (urls: urls.toList(), videoIds: vids.toList());
   }
+
+  /// Google SERP·홈 — WebView JS payload 상한 (과대 시 evaluate JS 멈춤·로딩 ∞)
+  static const maxGoogleSurfaceInjectUrls = 160;
+
+  static List<String> googleSurfaceJsUrls(List<BlockedUrl> entries) {
+    return googleSurfaceJsUrlsFromCanonical(jsPayload(entries).urls);
+  }
+
+  static List<String> googleSurfaceJsUrlsFromCanonical(List<String> urls) {
+    if (urls.length <= maxGoogleSurfaceInjectUrls) return urls;
+    final sorted = List<String>.from(urls)
+      ..sort((a, b) => b.length.compareTo(a.length));
+    return sorted.take(maxGoogleSurfaceInjectUrls).toList();
+  }
 }
 
 class BlockedUrlHit {

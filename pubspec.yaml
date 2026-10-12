@@ -1,6 +1,6 @@
 name: isle
 description: Your island. Your algorithm.
-version: 1.6.0+205
+version: 1.6.0+380
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -43,6 +43,9 @@ dependencies:
   html: ^0.15.4
   url_launcher: ^6.2.0
   path_provider: ^2.1.0
+  http: ^1.2.0
+  package_info_plus: ^8.0.0
+  open_filex: ^4.5.0
   share_plus: ^7.2.0
   receive_sharing_intent: ^1.8.0
   google_sign_in: ^6.2.0
@@ -58,6 +61,7 @@ dependencies:
   firebase_core: ^4.10.0
   firebase_analytics: ^12.4.2
   flutter_secure_storage: ^10.3.1
+  mobile_scanner: ^7.2.0
 
 dev_dependencies:
   flutter_test:
@@ -74,16 +78,29 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/premade_block_packs/manifest.json
     - assets/premade_block_packs/premade_adult_youtube_200.json
     - assets/premade_block_packs/premade_adult_sites_200.json
+    - assets/premade_block_packs/premade_juso4_adult_board.json
+    - assets/premade_block_packs/premade_jusoland_adult_boards.json
+    - assets/premade_block_packs/premade_jusoland_illegal_sites.json
+    - assets/premade_block_packs/premade_naver_adult_photo_blogs.json
+    - assets/premade_block_packs/premade_yugiyu_adult.json
+    - assets/premade_block_packs/premade_jusoguide_adult.json
+    - assets/premade_block_packs/premade_link_aggregator_seo.json
     - assets/premade_block_packs/premade_gaming_400.json
+    - assets/premade_block_packs/premade_gambling_200.json
+    - assets/content/addiction_insights_ko.json
     - assets/branding/
 
 flutter_launcher_icons:
+  android: true
   ios: true
   macos:
     generate: true
   image_path: assets/branding/isle_app_icon_source.png
+  adaptive_icon_background: "#DDEAF7"
+  adaptive_icon_foreground: assets/branding/isle_app_icon_source.png
   remove_alpha_ios: true
 
 flutter_native_splash:

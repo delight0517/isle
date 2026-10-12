@@ -1,7 +1,7 @@
 import 'models/block_schedule.dart';
-import 'schedule_constants.dart';
 import 'schedule_lock_phase.dart';
 import 'block_schedule_store.dart';
+import '../services/trusted_time_guard.dart';
 
 /// §2-B per-schedule lock state machine
 class ScheduleLockService {
@@ -13,14 +13,17 @@ class ScheduleLockService {
     final startedMs = schedule.unlockStartedAtMs;
     if (startedMs == null) return ScheduleLockPhase.locked;
 
-    final now = at ?? DateTime.now();
+    final now = at ?? TrustedTimeGuard.effectiveNow();
     final started = DateTime.fromMillisecondsSinceEpoch(startedMs);
     final cooldownEnd = started.add(Duration(minutes: schedule.lockCooldownMinutes));
-    final editEnd = schedule.unlockUntilMs != null
-        ? DateTime.fromMillisecondsSinceEpoch(schedule.unlockUntilMs!)
-        : cooldownEnd.add(const Duration(minutes: ScheduleConstants.editWindowMinutes));
 
     if (now.isBefore(cooldownEnd)) return ScheduleLockPhase.countdown;
+
+    // unlockUntilMs == null → 대기 종료 후 편집 창 무기한 (사용자가 직접 잠글 때까지)
+    final untilMs = schedule.unlockUntilMs;
+    if (untilMs == null) return ScheduleLockPhase.editWindow;
+
+    final editEnd = DateTime.fromMillisecondsSinceEpoch(untilMs);
     if (now.isBefore(editEnd)) return ScheduleLockPhase.editWindow;
 
     return ScheduleLockPhase.locked;
@@ -38,7 +41,7 @@ class ScheduleLockService {
     if (phase(schedule, at) != ScheduleLockPhase.countdown) return null;
     final started = DateTime.fromMillisecondsSinceEpoch(schedule.unlockStartedAtMs!);
     final end = started.add(Duration(minutes: schedule.lockCooldownMinutes));
-    final left = end.difference(at ?? DateTime.now());
+    final left = end.difference(at ?? TrustedTimeGuard.effectiveNow());
     return left.isNegative ? Duration.zero : left;
   }
 
@@ -47,7 +50,7 @@ class ScheduleLockService {
     final untilMs = schedule.unlockUntilMs;
     if (untilMs == null) return null;
     final end = DateTime.fromMillisecondsSinceEpoch(untilMs);
-    final left = end.difference(at ?? DateTime.now());
+    final left = end.difference(at ?? TrustedTimeGuard.effectiveNow());
     return left.isNegative ? Duration.zero : left;
   }
 
@@ -59,13 +62,10 @@ class ScheduleLockService {
     final s = list[idx];
     if (!s.locked) return s;
 
-    final now = DateTime.now();
-    final editEnd = now.add(
-      Duration(minutes: s.lockCooldownMinutes + ScheduleConstants.editWindowMinutes),
-    );
+    final now = TrustedTimeGuard.effectiveNow();
     final updated = s.copyWith(
       unlockStartedAtMs: now.millisecondsSinceEpoch,
-      unlockUntilMs: editEnd.millisecondsSinceEpoch,
+      clearUnlockUntil: true,
     );
     list[idx] = updated;
     await BlockScheduleStore.saveAll(list);
@@ -80,19 +80,30 @@ class ScheduleLockService {
     await BlockScheduleStore.saveAll(list);
   }
 
+  /// 레거시(고정 편집 창)만 만료 처리 — unlockUntilMs 없으면 자동 재잠금 안 함
   static Future<void> finalizeExpiredLocks() async {
     final list = BlockScheduleStore.loadAll();
     var changed = false;
-    final now = DateTime.now();
+    final now = TrustedTimeGuard.effectiveNow();
     for (var i = 0; i < list.length; i++) {
       final s = list[i];
       if (s.unlockStartedAtMs == null) continue;
       final untilMs = s.unlockUntilMs;
-      if (untilMs != null && now.isAfter(DateTime.fromMillisecondsSinceEpoch(untilMs))) {
+      if (untilMs == null) continue;
+      if (now.isAfter(DateTime.fromMillisecondsSinceEpoch(untilMs))) {
         list[i] = s.copyWith(clearUnlock: true);
         changed = true;
       }
     }
     if (changed) await BlockScheduleStore.saveAll(list);
+  }
+
+  /// 편집 완료 — 사용자가 직접 잠금 복구
+  static Future<void> finishEditAndRelock(String scheduleId) async {
+    final list = BlockScheduleStore.loadAll();
+    final idx = list.indexWhere((s) => s.id == scheduleId);
+    if (idx < 0) return;
+    list[idx] = list[idx].copyWith(clearUnlock: true);
+    await BlockScheduleStore.saveAll(list);
   }
 }

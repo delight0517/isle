@@ -51,8 +51,9 @@
   },
   "isle": {
     "flutter_root_relative": "isle",
-    "bundle_id_standalone": "com.isle.app.isle.dev",
+    "bundle_id_standalone": "com.isle.app.moa.dev",
     "bundle_id_release": "com.isle.app.isle",
+    "app_group_id": "group.com.isle.app.moa",
     "xcode_scheme_standalone": "Runner-Profile-Dev",
     "profile_xcode_configuration": "Profile"
   }

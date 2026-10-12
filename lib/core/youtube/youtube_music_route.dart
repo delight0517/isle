@@ -30,6 +30,10 @@ class YoutubeMusicRoute {
     var url = raw.trim();
     if (url.isEmpty) return null;
     if (!url.startsWith('http')) url = 'https://$url';
+    // music.youtube.com 은 normalize 시 www.watch 로 바뀌어 음성 라우트가 누락됨
+    if (isMusicHost(url) || shouldOpenPodcast(url)) {
+      return '/youtube/podcast?url=${Uri.encodeComponent(url)}';
+    }
     final normalized = YoutubeClipboardWatch.normalizeUrl(url) ?? url;
     if (!shouldOpenPodcast(normalized)) return null;
     return '/youtube/podcast?url=${Uri.encodeComponent(normalized)}';

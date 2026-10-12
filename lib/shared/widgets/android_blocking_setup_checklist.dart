@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/blocking/android_blocking_setup_service.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_legal_info.dart';
 import '../../core/constants/app_typography.dart';
 
 /// Android — 접근성·배터리 예외 설정 체크리스트 (삼성/샤오미 백그라운드 킬 방지)
@@ -75,6 +75,7 @@ class _AndroidBlockingSetupChecklistState extends State<AndroidBlockingSetupChec
         _step(
           done: s.accessibilityOn,
           title: '접근성 → Isle 차단 서비스',
+          subtitle: AppLegalInfo.accessibilityPermissionNotice,
           onTap: () async {
             await AndroidBlockingSetupService.openAccessibilitySettings();
             await _reload();

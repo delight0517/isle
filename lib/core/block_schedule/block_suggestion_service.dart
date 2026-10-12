@@ -1,5 +1,4 @@
 import '../intervention/external_app_shield_store.dart';
-import '../library/engagement_tracker.dart';
 import '../library/platform_usage_stats.dart';
 import 'block_schedule_store.dart';
 
@@ -17,13 +16,13 @@ class BlockSuggestion {
     required this.actionKind,
   });
 
-  final String platform;          // 'youtube' | 'instagram' | 'brunch'
-  final String platformLabel;     // 'YouTube' 등
+  final String platform; // 'youtube' | 'instagram' | 'brunch'
+  final String platformLabel; // 'YouTube' 등
   final int avgMinutesPerDay;
   final String title;
   final String body;
   final String actionLabel;
-  final String actionKind;        // 'add_night_schedule' | 'pick_apps' | 'lower_limit'
+  final String actionKind; // 'add_night_schedule' | 'pick_apps' | 'lower_limit'
 }
 
 class BlockSuggestionService {
@@ -35,11 +34,7 @@ class BlockSuggestionService {
 
   /// 최근 7일 데이터에서 가장 가치 있는 추천 1개. 없으면 null.
   static Future<BlockSuggestion?> nextSuggestion() async {
-    await EngagementTracker.ensureOpen();
-    final daily = EngagementTracker.dailyByPlatform(
-      platforms: PlatformUsageStats.platforms,
-      days: 7,
-    );
+    final daily = await PlatformUsageStats.dailyByPlatform(days: 7);
     if (daily.isEmpty) return null;
 
     // 플랫폼별 평균 (분)
@@ -58,7 +53,8 @@ class BlockSuggestionService {
     if (avg.isEmpty) return null;
 
     // 가장 사용량 많은 플랫폼 우선
-    final sorted = avg.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final sorted = avg.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
     final top = sorted.first;
     if (top.value < _nightThresholdMinutes) return null;
 
@@ -101,7 +97,8 @@ class BlockSuggestionService {
         platformLabel: label,
         avgMinutesPerDay: top.value,
         title: '$label 사용이 많아요',
-        body: '평균 ${top.value}분/일 — 일일 한도 ${_recommendedLimit(top.value)}분을 설정해 보세요.',
+        body:
+            '평균 ${top.value}분/일 — 일일 한도 ${_recommendedLimit(top.value)}분을 설정해 보세요.',
         actionLabel: '일일 한도 설정',
         actionKind: 'lower_limit',
       );

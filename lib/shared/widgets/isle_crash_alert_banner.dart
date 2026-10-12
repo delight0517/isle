@@ -34,20 +34,28 @@ class _IsleCrashAlertBannerState extends State<IsleCrashAlertBanner> {
     super.dispose();
   }
 
-  void _onCrash(CrashReport c) {
+  /// 리스너·에러 핸들러 경로 — 항상 다음 프레임에만 setState
+  void _deferSetState(VoidCallback fn) {
     if (!mounted) return;
-    setState(() => _latest = c);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn);
+    });
+  }
+
+  void _onCrash(CrashReport c) {
+    _deferSetState(() => _latest = c);
   }
 
   void _syncLatest() {
     final list = IsleDebugLogService.crashHistory;
     if (list.isEmpty) {
-      setState(() => _latest = null);
+      _deferSetState(() => _latest = null);
       return;
     }
     final c = list.first;
     final ack = IsleUserDefaults.lastAcknowledgedCrashId;
-    setState(() => _latest = c.id == ack ? null : c);
+    _deferSetState(() => _latest = c.id == ack ? null : c);
   }
 
   Future<void> _copyCrash() async {
@@ -87,12 +95,17 @@ class _IsleCrashAlertBannerState extends State<IsleCrashAlertBanner> {
         elevation: 6,
         borderRadius: BorderRadius.circular(12),
         color: const Color(0xFF3D1515),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * 0.32,
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
               Row(
                 children: [
                   const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 20),
@@ -130,7 +143,9 @@ class _IsleCrashAlertBannerState extends State<IsleCrashAlertBanner> {
                   ),
                 ],
               ),
-            ],
+                ],
+              ),
+            ),
           ),
         ),
       ),

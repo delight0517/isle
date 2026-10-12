@@ -4,14 +4,33 @@ import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_typography.dart';
+import '../../core/block_schedule/schedule_active_service.dart';
+import '../../core/block_schedule/schedule_display_helper.dart';
 import '../../core/library/platform_watch_limit_store.dart';
 import '../../core/navigation/isle_routes.dart';
 import '../../core/navigation/isle_navigation.dart';
+import '../../core/navigation/schedule_overlay_navigation.dart';
+import '../../core/navigation/schedule_sheet_navigation.dart';
 import '../../core/social/instagram_usage_lock.dart';
 import '../../core/youtube/youtube_usage_lock.dart';
 import '../../core/youtube/youtube_watch_timer_store.dart';
 import '../../features/social/presentation/widgets/instagram_limit_controls.dart';
 import 'isle_sheet.dart';
+
+String _youtubeActiveScheduleText([DateTime? at]) {
+  final now = at ?? DateTime.now();
+  try {
+    final active = ScheduleActiveService.activeSchedulesNow(now);
+    if (active.isEmpty) return '';
+    final safety = active.where((s) => s.isSafetyBaseline).toList();
+    final schedule = safety.isNotEmpty ? safety.first : active.first;
+    final ends = ScheduleDisplayHelper.activeSlotEndsLabel(schedule, at: now);
+    final head = ScheduleDisplayHelper.todayStatusLine(schedule, at: now);
+    return ends == null ? head : '$head\n$ends';
+  } catch (_) {
+    return '';
+  }
+}
 
 /// WebView 상단 — 플랫폼별 남은 시간 (YouTube는 조회만 · 변경은 설정)
 class PlatformTimeLimitChip extends StatelessWidget {
@@ -30,8 +49,48 @@ class PlatformTimeLimitChip extends StatelessWidget {
 
   bool get _isYoutube => platform == PlatformWatchId.youtube;
 
+  String _youtubeLockLabel() {
+    final now = DateTime.now();
+    try {
+      final active = ScheduleActiveService.activeSchedulesNow(now);
+      if (active.isEmpty) return '스케줄';
+      final safety = active.where((s) => s.isSafetyBaseline).toList();
+      final schedule = safety.isNotEmpty ? safety.first : active.first;
+      return ScheduleDisplayHelper.activeScheduleChipLabel(schedule, at: now);
+    } catch (_) {
+      return '스케줄';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final youtubeScheduleLabel = _isYoutube ? _youtubeLockLabel() : '스케줄';
+
+    if (_isYoutube && youtubeScheduleLabel != '스케줄') {
+      return Material(
+        color: Colors.red.shade700.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? 10 : 12,
+            vertical: compact ? 6 : 8,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.phonelink_lock, size: compact ? 16 : 18, color: fg),
+              const SizedBox(width: 6),
+              Text(
+                youtubeScheduleLabel,
+                style: IsleText.caption(color: fg)
+                    .copyWith(fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final enabled = PlatformWatchLimitStore.isEnabled(platform);
     final reached = PlatformWatchLimitStore.isLimitReached(platform);
     final label = PlatformWatchLimitStore.formatRemainChip(platform);
@@ -60,14 +119,17 @@ class PlatformTimeLimitChip extends StatelessWidget {
               Icon(
                 _isYoutube
                     ? Icons.lock_clock
-                    : (enabled ? Icons.timer_outlined : Icons.timer_off_outlined),
+                    : (enabled
+                        ? Icons.timer_outlined
+                        : Icons.timer_off_outlined),
                 size: compact ? 16 : 18,
                 color: fg,
               ),
               const SizedBox(width: 6),
               Text(
                 label,
-                style: IsleText.caption(color: fg).copyWith(fontWeight: FontWeight.w600),
+                style: IsleText.caption(color: fg)
+                    .copyWith(fontWeight: FontWeight.w600),
               ),
               if (!compact) ...[
                 const SizedBox(width: 4),
@@ -86,26 +148,34 @@ class PlatformTimeLimitChip extends StatelessWidget {
   void _openSheet(BuildContext context) {
     showIsleModalSheet<void>(
       context: context,
-      builder: (ctx) => _PlatformLimitSheet(platform: platform),
+      builder: (ctx) => _PlatformLimitSheet(
+        platform: platform,
+        hostContext: context,
+      ),
     );
   }
 
   void _openSettings(BuildContext context) {
     HapticFeedback.selectionClick();
     if (platform == PlatformWatchId.instagram) {
-      IsleNavigation.push('/settings/instagram-limits?scope=feed', from: context);
+      IsleNavigation.push('/settings/instagram-limits?scope=feed',
+          from: context);
     } else if (platform == PlatformWatchId.instagramDm) {
       IsleNavigation.push('/settings/instagram-limits?scope=dm', from: context);
     } else {
-      IsleNavigation.push(IsleRoutes.blockSchedules, from: context);
+      pushBlockScheduleList(context);
     }
   }
 }
 
 class _PlatformLimitSheet extends StatefulWidget {
-  const _PlatformLimitSheet({required this.platform});
+  const _PlatformLimitSheet({
+    required this.platform,
+    required this.hostContext,
+  });
 
   final PlatformWatchId platform;
+  final BuildContext hostContext;
 
   @override
   State<_PlatformLimitSheet> createState() => _PlatformLimitSheetState();
@@ -127,8 +197,11 @@ class _PlatformLimitSheetState extends State<_PlatformLimitSheet> {
     if (widget.platform == PlatformWatchId.youtube) {
       return _YoutubeLimitStatusSheet(
         onOpenSettings: () {
-          Navigator.pop(context);
-          IsleNavigation.push(IsleRoutes.youtubeLimits, from: context);
+          dismissSheetThenPush(
+            context,
+            widget.hostContext,
+            IsleRoutes.youtubeLimits,
+          );
         },
       );
     }
@@ -187,10 +260,10 @@ class _PlatformLimitSheetState extends State<_PlatformLimitSheet> {
             if (igScope != null)
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
-                  IsleNavigation.push(
+                  dismissSheetThenPush(
+                    context,
+                    widget.hostContext,
                     '/settings/instagram-limits?scope=${igScope.name}',
-                    from: context,
                   );
                 },
                 child: const Text('상세 설정'),
@@ -217,14 +290,24 @@ class _YoutubeLimitStatusSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reached = PlatformWatchLimitStore.isLimitReached(PlatformWatchId.youtube);
-    final used = PlatformWatchLimitStore.secondsUsedToday(PlatformWatchId.youtube);
+    final reached =
+        PlatformWatchLimitStore.isLimitReached(PlatformWatchId.youtube);
+    final used =
+        PlatformWatchLimitStore.secondsUsedToday(PlatformWatchId.youtube);
     final limit = PlatformWatchLimitStore.limitSeconds(PlatformWatchId.youtube);
     final reset = YoutubeWatchTimerStore.timeUntilReset();
     final h = reset.inHours;
     final m = reset.inMinutes.remainder(60);
+    final usesBudget = YoutubeWatchTimerStore.usesBudget;
     final interval = YoutubeWatchTimerStore.usesInterval;
     final timelockOn = YoutubeUsageLock.raiseLockEnabled;
+    final scheduleNow = ScheduleActiveService.activeSchedulesNow();
+    final activeSafety = scheduleNow.where((s) => s.isSafetyBaseline).toList();
+    final activeSchedule = activeSafety.isNotEmpty
+        ? activeSafety.first
+        : scheduleNow.isNotEmpty
+            ? scheduleNow.first
+            : null;
 
     return SafeArea(
       child: Padding(
@@ -255,12 +338,38 @@ class _YoutubeLimitStatusSheet extends StatelessWidget {
                   border: Border.all(color: Colors.red.shade200),
                 ),
                 child: Text(
-                  interval
-                      ? '이번 주기 한도 소진 — 다음 주기까지 $h시간 $m분\n여기서는 한도를 바꿀 수 없어요.'
-                      : '오늘 한도 소진 — 자정까지 $h시간 $m분\n여기서는 한도를 바꿀 수 없어요.',
+                  usesBudget
+                      ? '지금 쓸 수 있는 시간 소진 — 다시 볼 수 있을 때까지 $h시간 $m분\n여기서는 한도를 바꿀 수 없어요.'
+                      : interval
+                          ? '이번 주기 한도 소진 — 다음 주기까지 $h시간 $m분\n여기서는 한도를 바꿀 수 없어요.'
+                          : '오늘 한도 소진 — 자정까지 $h시간 $m분\n여기서는 한도를 바꿀 수 없어요.',
                   style: IsleText.caption(color: Colors.red.shade900),
                 ),
               )
+            else if (activeSchedule != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: activeSchedule.isSafetyBaseline
+                      ? Colors.red.shade50
+                      : IsleColors.ocean100.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: activeSchedule.isSafetyBaseline
+                        ? Colors.red.shade200
+                        : IsleColors.ocean100,
+                  ),
+                ),
+                child: Text(
+                  _youtubeActiveScheduleText(),
+                  style: IsleText.caption(
+                    color: activeSchedule.isSafetyBaseline
+                        ? Colors.red.shade900
+                        : IsleColors.ocean900,
+                  ),
+                ),
+              ),
+            ]
             else
               Text(
                 '시청 중: 줄이기는 설정에서 저장으로 바로 적용돼요.\n'

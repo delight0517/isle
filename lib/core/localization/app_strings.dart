@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_locale_policy.dart';
 
 class AppStrings {
   final Locale locale;
@@ -6,21 +7,8 @@ class AppStrings {
 
   static AppStrings of(BuildContext context) => AppStrings(Localizations.localeOf(context));
 
-  static const supportedLocales = <Locale>[
-    Locale('en'),
-    Locale('ja'),
-    Locale('zh'),
-    Locale('ko'),
-    Locale('he'),
-  ];
-
-  static const languageOptions = <String, String>{
-    'en': 'English',
-    'ja': '日本語',
-    'zh': '中文',
-    'ko': '한국어',
-    'he': 'עברית',
-  };
+  static const supportedLocales = AppLocalePolicy.supportedLocales;
+  static const languageOptions = AppLocalePolicy.languageOptions;
 
   static const _values = <String, Map<String, String>>{
     'en': {
@@ -38,7 +26,7 @@ class AppStrings {
       'language': 'Language',
       'language_desc': 'Choose app language',
       'language_scope_note':
-          'Settings and schedules are fully translated. Feed and YouTube stay in your content language for now.',
+          'App language and website language are separate. Some subpages still use Korean. Posts and messages keep their original language.',
       'explore': 'Explore',
       'public_islands': 'Public Islands',
       'similar_interests': 'Similar Interests',
@@ -79,7 +67,7 @@ class AppStrings {
       'privacy_soon': '公開設定は準備中です。',
       'language': '言語',
       'language_desc': 'アプリの言語を選択',
-      'language_scope_note': '設定とスケジュールは翻訳済みです。フィードとYouTubeは引き続きコンテンツ言語中心です。',
+      'language_scope_note': 'アプリとウェブサイトの表示言語は別です。一部の画面は韓国語です。投稿とメッセージは原文を表示します。',
       'explore': '探索',
       'public_islands': '公開アイランド',
       'similar_interests': '似ている関心',
@@ -120,7 +108,7 @@ class AppStrings {
       'privacy_soon': '隐私设置正在准备中。',
       'language': '语言',
       'language_desc': '选择应用语言',
-      'language_scope_note': '设置与日程已完整翻译。动态与 YouTube 仍以内容语言为主。',
+      'language_scope_note': '应用与网站的显示语言分别设置。部分页面仍使用韩语。帖子和消息保留原文。',
       'explore': '探索',
       'public_islands': '公开岛屿',
       'similar_interests': '相似兴趣',
@@ -161,7 +149,7 @@ class AppStrings {
       'privacy_soon': '공개 범위 설정은 준비 중이에요.',
       'language': '언어',
       'language_desc': '앱에서 사용할 언어 선택',
-      'language_scope_note': '설정·앱 스케줄은 5개 언어로 번역됩니다. 피드·유튜브 본문은 콘텐츠 언어를 유지합니다.',
+      'language_scope_note': '앱과 웹사이트의 표시 언어는 별개예요. 일부 하위 화면은 한국어로 표시되며, 게시물과 메시지는 원문을 유지해요.',
       'explore': '탐색',
       'public_islands': '공개 섬',
       'similar_interests': '비슷한 관심사',
@@ -202,7 +190,7 @@ class AppStrings {
       'privacy_soon': 'הגדרות פרטיות יתווספו בקרוב.',
       'language': 'שפה',
       'language_desc': 'בחירת שפת האפליקציה',
-      'language_scope_note': 'הגדרות ולוחות זמנים מתורגמים במלואם. הפיד ו-YouTube נשארים בשפת התוכן.',
+      'language_scope_note': 'שפת האפליקציה ושפת האתר נפרדות. חלק מהמסכים עדיין בקוריאנית. פוסטים והודעות נשארים בשפת המקור.',
       'explore': 'גילוי',
       'public_islands': 'איים ציבוריים',
       'similar_interests': 'תחומי עניין דומים',
@@ -232,13 +220,6 @@ class AppStrings {
   };
 
   String t(String key, {Map<String, String>? args}) {
-    final lang = _values[locale.languageCode] ?? _values['en']!;
-    var v = lang[key] ?? _values['en']![key] ?? key;
-    if (args != null) {
-      args.forEach((k, val) {
-        v = v.replaceAll('{$k}', val);
-      });
-    }
-    return v;
+    return AppLocalePolicy.translate(_values, locale.languageCode, key, args: args);
   }
 }

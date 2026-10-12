@@ -110,6 +110,23 @@ class _DebuggerScreenState extends State<DebuggerScreen> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+            child: Material(
+              color: IsleColors.ocean100,
+              borderRadius: BorderRadius.circular(12),
+              child: ListTile(
+                leading: const Icon(Icons.receipt_long, color: IsleColors.ocean700),
+                title: Text('차단 AI 챗 로그 · 최근 24시간 변경', style: IsleText.body()),
+                subtitle: Text(
+                  '전체 백업 대신 변경분만 — 명령·적용 요약 복사',
+                  style: IsleText.caption(color: IsleColors.muted),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/block/audit-log'),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
             child: Row(
               children: [
                 _TabChip(label: '로그', selected: _tab == 0, onTap: () => setState(() => _tab = 0)),

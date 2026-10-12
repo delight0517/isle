@@ -14,6 +14,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_typography.dart';
 import '../../../../core/platform/ios_rules_export_service.dart';
 import 'smart_rule_input_section.dart';
+import 'schedule_premade_pack_section.dart';
 
 /// 스케줄 편집 — URL 규칙 목록·스마트 입력·일괄 붙여넣기
 class ScheduleRulesSection extends StatefulWidget {
@@ -139,6 +140,12 @@ class ScheduleRulesSectionState extends State<ScheduleRulesSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SchedulePremadePackSection(
+          scheduleId: widget.scheduleId,
+          canEdit: widget.canEdit,
+          onChanged: _afterChange,
+        ),
+        const SizedBox(height: 16),
         SmartRuleInputSection(
           enabled: widget.canEdit && !_busy,
           onSubmit: _insert,
@@ -149,9 +156,17 @@ class ScheduleRulesSectionState extends State<ScheduleRulesSection> {
           _RuleAddFeedbackBanner(message: _lastFeedback!),
         ],
         const SizedBox(height: 8),
-        Text(
-          '키워드는 피드·검색 숨김 · host는 Safari·DNS · 포함: 은 유사 URL',
-          style: IsleText.badge(color: IsleColors.muted),
+        Tooltip(
+          message: '키워드는 피드·검색 숨김 · host는 Safari·DNS · 포함: 은 유사 URL',
+          triggerMode: TooltipTriggerMode.tap,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.info_outline, size: 14, color: IsleColors.muted),
+              const SizedBox(width: 4),
+              Text('규칙 종류 안내', style: IsleText.badge(color: IsleColors.muted)),
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         TextField(
@@ -257,7 +272,12 @@ class _RuleTile extends StatelessWidget {
       dense: true,
       leading: Icon(_iconFor(rule.kind), size: 18, color: IsleColors.ocean500),
       title: Text(rule.pattern, style: IsleText.body()),
-      subtitle: Text(rule.kind.labelKo, style: IsleText.badge(color: IsleColors.muted)),
+      subtitle: Text(
+        rule.premadePackId != null
+            ? '${rule.kind.labelKo} · 프리셋'
+            : rule.kind.labelKo,
+        style: IsleText.badge(color: IsleColors.muted),
+      ),
       trailing: canEdit
           ? IconButton(
               icon: const Icon(Icons.close, size: 18),

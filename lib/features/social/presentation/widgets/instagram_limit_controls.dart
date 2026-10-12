@@ -141,6 +141,10 @@ class _InstagramLimitControlsState extends State<InstagramLimitControls> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.scope == InstagramUsageScope.dm) {
+      return _UnlimitedDmNotice(compact: widget.compact);
+    }
+
     final used = PlatformWatchLimitStore.secondsUsedToday(_watchId);
     final limit = PlatformWatchLimitStore.limitSeconds(_watchId);
     final frozen = _freezeLeft != null;
@@ -243,6 +247,47 @@ class _InstagramLimitControlsState extends State<InstagramLimitControls> {
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// DM은 시간 한도 없음 — 피드·릴스만 [InstagramUsageScope.feed] 설정
+class _UnlimitedDmNotice extends StatelessWidget {
+  const _UnlimitedDmNotice({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    if (compact) {
+      return Text(
+        'DM · 무제한',
+        style: IsleText.caption(color: IsleColors.muted),
+      );
+    }
+    return Card(
+      color: const Color(0xFFE8F5E9),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.forum_outlined, color: Color(0xFF2E7D32)),
+                const SizedBox(width: 8),
+                Text('Instagram DM', style: IsleText.body().copyWith(fontWeight: FontWeight.w600)),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '메시지·대화는 시간 한도가 없어요.\n'
+              '홈 피드·릴스·탐색은 「피드」 한도가 따로 적용됩니다.',
+              style: IsleText.caption(color: IsleColors.muted).copyWith(height: 1.4),
+            ),
           ],
         ),
       ),

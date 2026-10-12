@@ -7,8 +7,10 @@ class RuleRemovalLock {
 
   static bool get lockEnabled => IsleUserDefaults.ruleRemovalLockEnabled;
 
-  static Future<void> setLockEnabled(bool v) =>
-      IsleUserDefaults.setRuleRemovalLockEnabled(v);
+  static Future<void> setLockEnabled(bool v) async {
+    await IsleUserDefaults.setRuleRemovalLockEnabled(v);
+    if (!v) await clearUnlockCountdown();
+  }
 
   static int get freezeMinutes => IsleUserDefaults.ruleRemovalFreezeMinutes;
 

@@ -9,10 +9,15 @@ void main() {
     );
   });
 
-  test('youtube.com removed from website block domains', () {
+  test('youtube.com allowed but subdomains removed from website block domains', () {
+    // youtube.com 자체는 Safari Content Blocker 전용 경로라 허용한다(§8) —
+    // 서브도메인 접미사 매칭으로 m.youtube.com 등도 자동 커버되므로, 개별
+    // 서브도메인·googlevideo.com·youtu.be는 계속 걸러낸다.
     expect(
-      BlockKeywordPolicy.sanitizeStoredWebsiteDomains(['mingky.net', 'youtube.com']),
-      ['mingky.net'],
+      BlockKeywordPolicy.sanitizeStoredWebsiteDomains(
+        ['mingky.net', 'youtube.com', 'm.youtube.com', 'youtu.be', 'googlevideo.com'],
+      ),
+      ['mingky.net', 'youtube.com'],
     );
   });
 

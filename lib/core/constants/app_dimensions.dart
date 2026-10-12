@@ -19,6 +19,11 @@ class IsleSize {
   /// [AppVersionBadge] + FAB 여유 — ListView 하단 패딩
   static const double versionBadgeClearance = 140.0;
 
+  /// sticky 저장 바(한도 UI 등) 높이 — 배지 lift와 동기화
+  static const double stickySaveBarHeight = 140.0;
+
+  static const double versionBadgeBottomBase = 128.0;
+
   static double scrollBottomPadding(BuildContext context, {double extra = 16}) {
     return MediaQuery.paddingOf(context).bottom + versionBadgeClearance + extra;
   }

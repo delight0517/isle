@@ -6,6 +6,7 @@ import '../core/youtube/models/youtube_focus_video.dart';
 import '../features/settings/presentation/app_log_screen.dart';
 import '../features/settings/presentation/block_schedule_edit_screen.dart';
 import '../features/settings/presentation/block_schedules_screen.dart';
+import '../features/settings/presentation/schedule_calendar_screen.dart';
 import '../features/settings/presentation/data_backup_screen.dart';
 import '../features/settings/presentation/debugger_screen.dart';
 import '../features/settings/presentation/focus_controls_settings_screens.dart';
@@ -71,6 +72,10 @@ final goRouterYoutubeFocusProvider = Provider<GoRouter>((ref) {
                 ),
               ),
             ],
+          ),
+          GoRoute(
+            path: 'schedule-calendar',
+            builder: (_, __) => const ScheduleCalendarScreen(),
           ),
           GoRoute(
             path: 'youtube-limits',

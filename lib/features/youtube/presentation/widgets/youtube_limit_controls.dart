@@ -50,15 +50,26 @@ class _YoutubeLimitControlsState extends State<YoutubeLimitControls> {
     _unlockLeft = YoutubeUsageLock.unlockRemaining;
   }
 
+  Future<void> _refreshPendingDisable() async {
+    final changed = await YoutubeUsageLock.processPendingDisable();
+    if (!mounted) return;
+    setState(_sync);
+    _scheduleWake();
+    if (changed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('한도 설정 타임락이 꺼졌어요')),
+      );
+    }
+  }
+
   void _scheduleWake() {
     _wake?.cancel();
     final left = _unlockLeft;
     if (left == null) return;
-    final sec = left.inSeconds.clamp(1, 60);
+    final sec = left.inSeconds.clamp(1, 60).toInt();
     _wake = Timer(Duration(seconds: sec), () {
       if (!mounted) return;
-      setState(_sync);
-      _scheduleWake();
+      unawaited(_refreshPendingDisable());
     });
   }
 
@@ -76,7 +87,7 @@ class _YoutubeLimitControlsState extends State<YoutubeLimitControls> {
       builder: (ctx) => AlertDialog(
         title: const Text('한도 해제 대기를 시작할까요?'),
         content: Text(
-          '$_freezeMinutes분 동안 기다린 뒤에만 한도를 늘리거나 끌 수 있어요.\n'
+          '$_freezeMinutes분 동안 기다린 뒤에만 한도 방식·총량·충전 규칙을 느슨하게 바꿀 수 있어요.\n'
           '시작 후에도 「대기 취소」로 잠금을 유지할 수 있어요.',
         ),
         actions: [
@@ -99,13 +110,17 @@ class _YoutubeLimitControlsState extends State<YoutubeLimitControls> {
     _scheduleWake();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$_freezeMinutes분 후 한도를 늘리거나 끌 수 있어요'),
+        content: Text('$_freezeMinutes분 후 한도 설정을 느슨하게 바꿀 수 있어요'),
       ),
     );
   }
 
   Future<void> _cancelUnlock({required String reason}) async {
-    await YoutubeUsageLock.clearUnlockCountdown();
+    if (YoutubeUsageLock.disablePending) {
+      await YoutubeUsageLock.cancelDisableRequest();
+    } else {
+      await YoutubeUsageLock.clearUnlockCountdown();
+    }
     if (!mounted) return;
     setState(_sync);
     _scheduleWake();
@@ -138,39 +153,72 @@ class _YoutubeLimitControlsState extends State<YoutubeLimitControls> {
   }
 
   Future<void> _setRaiseLock(bool v) async {
-    if (!v && _raiseLock && !YoutubeUsageLock.canDisableRaiseLock) {
+    if (!v && _raiseLock) {
+      await YoutubeUsageLock.requestDisableRaiseLock();
       if (!mounted) return;
+      setState(_sync);
+      _scheduleWake();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('타임락을 끄려면 먼저 아래에서 대기를 완료하세요'),
+        SnackBar(
+          content: Text(
+            _raiseLock
+                ? '타임락 끄기 대기를 시작했어요 — 완료 전에는 취소할 수 있어요'
+                : '한도 설정 타임락이 꺼졌어요',
+          ),
         ),
       );
       return;
-    }
-    if (!v && _raiseLock) {
-      final ok = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('타임락을 끌까요?'),
-          content: const Text(
-            '꺼두면 한도를 바로 늘리거나 끌 수 있어요.\n'
-            '실수로 끈 경우 다시 켜면 됩니다.',
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('유지')),
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('타임락 끄기'),
-            ),
-          ],
-        ),
-      );
-      if (ok != true) return;
     }
     await YoutubeUsageLock.setRaiseLockEnabled(v);
     if (!mounted) return;
     setState(_sync);
     _scheduleWake();
+  }
+
+  Future<void> _pickFreezeMinutes(int minutes) async {
+    if (minutes == _freezeMinutes) return;
+    if (!YoutubeUsageLock.canSetUnlockFreezeMinutes(minutes)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('타임락 시간 줄이기는 대기 완료 후 가능해요')),
+      );
+      return;
+    }
+    final increasing = minutes > _freezeMinutes;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(increasing ? '타임락 시간을 늘릴까요?' : '타임락 시간을 줄일까요?'),
+        content: Text(
+          increasing
+              ? '$_freezeMinutes분에서 $minutes분으로 늘립니다. 더 긴 타임락은 바로 적용할 수 있어요.'
+              : '대기 완료 상태라 $minutes분으로 줄일 수 있어요.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('적용'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    final applied = await YoutubeUsageLock.setUnlockFreezeMinutes(minutes);
+    if (!mounted) return;
+    if (!applied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('타임락 시간 줄이기는 대기 완료 후 가능해요')),
+      );
+      return;
+    }
+    setState(_sync);
+    _scheduleWake();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('타임락 시간을 $minutes분으로 저장했어요')),
+    );
   }
 
   @override
@@ -229,7 +277,7 @@ class _YoutubeLimitControlsState extends State<YoutubeLimitControls> {
                         style: IsleText.body().copyWith(fontWeight: FontWeight.w600),
                       ),
                       Text(
-                        '한도 늘리기·끄기 전에 기다리기',
+                        '방식·총량·충전 규칙 변경 전에 기다리기',
                         style: IsleText.caption(color: IsleColors.muted),
                       ),
                     ],
@@ -256,10 +304,10 @@ class _YoutubeLimitControlsState extends State<YoutubeLimitControls> {
                   ? (waiting
                       ? '⏳ 해제까지 ${_formatDuration(_unlockLeft!)}'
                       : canRaise
-                          ? '✓ 대기 완료 — 지금 한도를 늘리거나 끌 수 있어요'
+                          ? '✓ 대기 완료 — 지금 설정을 느슨하게 바꿀 수 있어요'
                           : blocked
-                              ? '한도를 늘리거나 끄려면 아래에서 대기를 시작하세요'
-                              : '줄이기는 저장으로 바로 · 늘리기/끄기는 대기 후')
+                              ? '방식·총량·충전 규칙 변경은 대기 후 가능해요'
+                              : '더 엄격한 변경은 바로 · 느슨한 변경은 대기 후')
                   : '꺼짐 — 한도를 바로 바꿀 수 있어요',
               style: IsleText.caption(
                 color: waiting ? Colors.orange.shade900 : IsleColors.muted,
@@ -283,15 +331,11 @@ class _YoutubeLimitControlsState extends State<YoutubeLimitControls> {
               const SizedBox(height: 4),
               Wrap(
                 spacing: 8,
-                children: [15, 30, 60, 120].map((m) {
+                children: YoutubeUsageLock.freezeChoices.map((m) {
                   return ChoiceChip(
                     label: Text('$m분'),
                     selected: _freezeMinutes == m,
-                    onSelected: (_) async {
-                      await YoutubeUsageLock.setUnlockFreezeMinutes(m);
-                      if (!mounted) return;
-                      setState(() => _freezeMinutes = m);
-                    },
+                    onSelected: (_) => unawaited(_pickFreezeMinutes(m)),
                   );
                 }).toList(),
               ),

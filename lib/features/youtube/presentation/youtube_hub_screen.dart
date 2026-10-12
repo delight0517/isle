@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/navigation/schedule_overlay_navigation.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_typography.dart';
@@ -171,7 +172,7 @@ class _YoutubeHubScreenState extends ConsumerState<YoutubeHubScreen> {
                 color: Colors.red.shade700,
                 title: '차단 스케줄',
                 subtitle: '요일·시간',
-                onTap: () => context.push('/settings/block-schedules'),
+                onTap: () => pushBlockScheduleList(context),
               ),
               const SizedBox(height: 12),
               _HubCard(

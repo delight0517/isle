@@ -1,6 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../library/personal_library_store.dart';
+import 'isle_survival_backup_service.dart';
+import 'isle_user_defaults.dart';
 /// 첫 사용·피드 셋업 진행도 — 로컬 Hive만 사용
 class SetupJourneyService {
   SetupJourneyService._();
@@ -25,6 +27,7 @@ class SetupJourneyService {
 
   static const _allStepIds = [
     'tour',
+    'icloud_backup',
     'interests',
     'system_apps_lock',
     'browser_youtube_tracking',
@@ -48,6 +51,11 @@ class SetupJourneyService {
   static bool stepDone(String id) {
     if (id == 'import_content') {
       return isStepDone(id) || hasRealLibraryContent;
+    }
+    if (id == 'icloud_backup') {
+      return isStepDone(id) ||
+          IsleUserDefaults.survivalBackupGuideDismissed ||
+          !IsleSurvivalBackupService.needsIcloudFolderPrompt();
     }
     return isStepDone(id);
   }

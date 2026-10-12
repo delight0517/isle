@@ -27,6 +27,14 @@ class IsleColors {
   static const grassDark = Color(0xFF2D6B42);
   static const grassDeep = Color(0xFF235C38);
 
+  // Moa Brand — Purple (SNS 허브 앱 아이덴티티)
+  static const purple900 = Color(0xFF4C1D95);
+  static const purple700 = Color(0xFF7C3AED);
+  static const purple500 = Color(0xFFA855F7);
+  static const purple200 = Color(0xFFDDD6FE);
+  static const purple100 = Color(0xFFF4F2FF);
+  static const purple50  = Color(0xFFFAF9FF);
+
   // Semantic
   static const success = Color(0xFF2ECC71);
   static const danger = Color(0xFFE74C3C);

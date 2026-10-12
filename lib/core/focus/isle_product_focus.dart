@@ -1,6 +1,6 @@
 import '../services/isle_user_defaults.dart';
 
-/// 3탭 홈 UI — (1) 차단 (2) 유튜브 (3) 받기·소통 · 하단 네비
+/// 3탭 홈 UI — (1) SNS (2) 나의 Isle (3) 시간관리 · 하단 네비
 class IsleProductFocus {
   IsleProductFocus._();
 

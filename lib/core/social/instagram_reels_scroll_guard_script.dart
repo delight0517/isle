@@ -20,8 +20,8 @@ class InstagramReelsScrollGuardScript {
   var threshold = BASE;
   var count = 0;
   var continues = 0;
-  var lastEl = null;
-  var lastAt = 0;
+  var seenSources = new Set();
+  var seenElements = new WeakSet();
 
   function pauseAll() {
     var vs = document.querySelectorAll('video');
@@ -88,14 +88,24 @@ class InstagramReelsScrollGuardScript {
     (document.body || document.documentElement).appendChild(ov);
   }
 
-  // 스크롤로 새 영상이 재생될 때마다 +1 (같은 영상 짧은 재생 반복은 1.5초 디바운스).
+  // 같은 영상의 자동 재생 재시도와 화면 밖 영상을 새 열람으로 세지 않는다.
   document.addEventListener('play', function(e) {
     var t = e.target;
     if (!t || t.tagName !== 'VIDEO') return;
-    var now = Date.now();
-    if (t === lastEl && now - lastAt < 1500) return;
-    lastEl = t;
-    lastAt = now;
+    if (document.getElementById('isle-ig-nudge')) { pauseAll(); return; }
+    var rect = t.getBoundingClientRect();
+    var vh = window.innerHeight || 800;
+    var vw = window.innerWidth || 400;
+    if (rect.width <= 0 || rect.height <= 0 || rect.bottom <= 0 ||
+        rect.top >= vh || rect.right <= 0 || rect.left >= vw) return;
+    var source = t.currentSrc || t.src;
+    if (source) {
+      if (seenSources.has(source)) return;
+      seenSources.add(source);
+    } else {
+      if (seenElements.has(t)) return;
+      seenElements.add(t);
+    }
     count++;
     if (count >= threshold) showNudge();
   }, true);

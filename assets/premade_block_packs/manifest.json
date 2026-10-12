@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "description": "4VPN · Isle Blocker 공통 프리셋 JSON — Single Source of Truth",
+  "updatedAt": "2026-06-30T00:00:00Z",
+  "packFiles": [
+    "premade_adult_sites_200.json",
+    "premade_adult_youtube_200.json",
+    "premade_juso4_adult_board.json",
+    "premade_jusoland_adult_boards.json",
+    "premade_naver_adult_photo_blogs.json",
+    "premade_yugiyu_adult.json",
+    "premade_jusoguide_adult.json",
+    "premade_link_aggregator_seo.json",
+    "premade_jusoland_illegal_sites.json",
+    "premade_gaming_400.json",
+    "premade_gambling_200.json"
+  ],
+  "adultCombinedMergeOrder": [
+    "premade_adult_sites_200.json",
+    "premade_adult_youtube_200.json",
+    "premade_juso4_adult_board.json",
+    "premade_jusoland_adult_boards.json",
+    "premade_naver_adult_photo_blogs.json",
+    "premade_yugiyu_adult.json",
+    "premade_jusoguide_adult.json",
+    "premade_link_aggregator_seo.json"
+  ],
+  "catalogPackIds": [
+    "premade_adult_combined",
+    "premade_jusoland_illegal_sites",
+    "premade_gaming_400",
+    "premade_gambling_200"
+  ],
+  "syncTargets": {
+    "4vpn": "4vpnBlocker/VeliMac/VeliMac/Resources/PremadeBlockPacks",
+    "isle": "11-1Isle_the_Blocker/isle/assets/premade_block_packs"
+  },
+  "source": "4vpn-blocker",
+  "packs": [
+    {
+      "packId": "premade_adult_combined",
+      "kind": "merge",
+      "category": "adult",
+      "uiMode": "adult_protection",
+      "scheduleEligible": false,
+      "displayName": "성인 콘텐츠 필터 팩 (웹·YouTube)",
+      "description": "성인·캠·게시판·네이버·여기여·URL·검색·YouTube 통합",
+      "mergeSources": [
+        "premade_adult_sites_200.json",
+        "premade_adult_youtube_200.json",
+        "premade_juso4_adult_board.json",
+        "premade_jusoland_adult_boards.json",
+        "premade_naver_adult_photo_blogs.json",
+        "premade_yugiyu_adult.json",
+        "premade_jusoguide_adult.json",
+        "premade_link_aggregator_seo.json"
+      ],
+      "legacyIds": [
+        "premade_adult_sites_200",
+        "premade_adult_youtube_200"
+      ],
+      "retiredStandaloneIds": [
+        "premade_link_aggregator_seo"
+      ]
+    },
+    {
+      "packId": "premade_jusoland_illegal_sites",
+      "kind": "single",
+      "category": "illegal",
+      "uiMode": "toggle",
+      "scheduleEligible": true,
+      "source": "premade_jusoland_illegal_sites.json",
+      "sensitive": true
+    },
+    {
+      "packId": "premade_gaming_400",
+      "kind": "single",
+      "category": "gaming",
+      "uiMode": "toggle",
+      "scheduleEligible": true,
+      "source": "premade_gaming_400.json"
+    },
+    {
+      "packId": "premade_gambling_200",
+      "kind": "single",
+      "category": "gambling",
+      "uiMode": "toggle",
+      "scheduleEligible": false,
+      "source": "premade_gambling_200.json",
+      "sensitive": true
+    }
+  ]
+}

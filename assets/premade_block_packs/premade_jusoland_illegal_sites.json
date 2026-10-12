@@ -1,0 +1,415 @@
+{
+  "packId": "premade_jusoland_illegal_sites",
+  "displayName": "불법 사이트 (웹툰)",
+  "description": "무료웹툰 게시판·주소모음 SEO 스팸 랜딩·검색 키워드 숨김 (Firefox 확장)",
+  "version": "1.0.1",
+  "generatedAt": "2026-06-27T12:00:00Z",
+  "entryCount": 81,
+  "entries": [
+    {
+      "pattern": "11toon144.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 일일툰 (webtoon)"
+    },
+    {
+      "pattern": "ani.ohli24.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 애니 24 (webtoon)"
+    },
+    {
+      "pattern": "aniwolf.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 애니울프 (webtoon)"
+    },
+    {
+      "pattern": "anytoon.co.kr",
+      "kind": "host",
+      "note": "illegal webtoon board · 애니툰 (webtoon)"
+    },
+    {
+      "pattern": "b18.toon-bro.xyz",
+      "kind": "host",
+      "note": "illegal webtoon board · 툰브로 (webtoon)"
+    },
+    {
+      "pattern": "bookto13.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 북토끼 (webtoon)"
+    },
+    {
+      "pattern": "bpt113.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 빅픽쳐 (webtoon)"
+    },
+    {
+      "pattern": "cookmana51.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 쿡마나 (webtoon)"
+    },
+    {
+      "pattern": "foc113.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 무료툰 (webtoon)"
+    },
+    {
+      "pattern": "funbe644.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 펀비 (webtoon)"
+    },
+    {
+      "pattern": "fxfx327.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 여우코믹스 (webtoon)"
+    },
+    {
+      "pattern": "happytoon02.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 해피툰 (webtoon)"
+    },
+    {
+      "pattern": "hdhd504.net",
+      "kind": "host",
+      "note": "illegal webtoon board · 호두코믹스시즌2 (webtoon)"
+    },
+    {
+      "pattern": "hellkaiv.net",
+      "kind": "host",
+      "note": "illegal webtoon board · 헬븐넷 (webtoon)"
+    },
+    {
+      "pattern": "joatoon-oh.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 조아툰 (webtoon)"
+    },
+    {
+      "pattern": "juso-nara.com",
+      "kind": "host",
+      "note": "illegal webtoon board · address aggregator (aggregator)"
+    },
+    {
+      "pattern": "juso4.com",
+      "kind": "host",
+      "note": "illegal webtoon board · address aggregator (aggregator)"
+    },
+    {
+      "pattern": "jusoland1.com",
+      "kind": "host",
+      "note": "illegal webtoon board · address aggregator (aggregator)"
+    },
+    {
+      "pattern": "linkbbg.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 애니365 (webtoon)"
+    },
+    {
+      "pattern": "linkkf.net",
+      "kind": "host",
+      "note": "illegal webtoon board · 애니TV (webtoon)"
+    },
+    {
+      "pattern": "manaboza84.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 마나보자 (webtoon)"
+    },
+    {
+      "pattern": "manga24.net",
+      "kind": "host",
+      "note": "illegal webtoon board · 망가툰 (webtoon)"
+    },
+    {
+      "pattern": "manhwabang.org",
+      "kind": "host",
+      "note": "illegal webtoon board · 만화방 (webtoon)"
+    },
+    {
+      "pattern": "mato13.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 마나토끼 (webtoon)"
+    },
+    {
+      "pattern": "mcomics.co.kr",
+      "kind": "host",
+      "note": "illegal webtoon board · 마녀코믹스 (webtoon)"
+    },
+    {
+      "pattern": "metoon.co.kr",
+      "kind": "host",
+      "note": "illegal webtoon board · 미툰 (webtoon)"
+    },
+    {
+      "pattern": "mootoon.co.kr",
+      "kind": "host",
+      "note": "illegal webtoon board · 무툰 (webtoon)"
+    },
+    {
+      "pattern": "mrblue.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 미스터블루 (webtoon)"
+    },
+    {
+      "pattern": "mtoon139.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 머니툰 (webtoon)"
+    },
+    {
+      "pattern": "namee100.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 나미툰 (webtoon)"
+    },
+    {
+      "pattern": "newtoki.biz",
+      "kind": "host",
+      "note": "illegal webtoon board · 뉴토끼시즌2 (webtoon)"
+    },
+    {
+      "pattern": "newtoon295.asia",
+      "kind": "host",
+      "note": "illegal webtoon board · 뉴툰 (webtoon)"
+    },
+    {
+      "pattern": "qtoon.co.kr",
+      "kind": "host",
+      "note": "illegal webtoon board · 큐툰 (webtoon)"
+    },
+    {
+      "pattern": "t.me",
+      "kind": "host",
+      "note": "illegal webtoon board · 블랙툰 (webtoon)"
+    },
+    {
+      "pattern": "telegram.org",
+      "kind": "host",
+      "note": "illegal webtoon board · 뉴토끼 (webtoon)"
+    },
+    {
+      "pattern": "tkor126.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 툰코 (webtoon)"
+    },
+    {
+      "pattern": "toptoon.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 탑툰 (webtoon)"
+    },
+    {
+      "pattern": "webtoonguide.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 웹툰가이드 (webtoon)"
+    },
+    {
+      "pattern": "wfwf466.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 늑대닷컴 (webtoon)"
+    },
+    {
+      "pattern": "wtwt330.com",
+      "kind": "host",
+      "note": "illegal webtoon board · W툰 (webtoon)"
+    },
+    {
+      "pattern": "yatoon229.com",
+      "kind": "host",
+      "note": "illegal webtoon board · 프릭툰 (webtoon)"
+    },
+    {
+      "pattern": "tavuksokagi.com",
+      "kind": "host",
+      "note": "SEO spam · 주소모음·링크모음 랜딩 (무관 도메인)"
+    },
+    {
+      "pattern": "atlasbackgroundchecks.com",
+      "kind": "host",
+      "note": "SEO spam · 링크모음 2026 가이드 랜딩"
+    },
+    {
+      "pattern": "hana-digital.co.kr",
+      "kind": "host",
+      "note": "SEO spam · 여기여 주소모음 랜딩"
+    },
+    {
+      "pattern": "russian-school.ru",
+      "kind": "host",
+      "note": "SEO spam · 여기여 최신주소 랜딩"
+    },
+    {
+      "pattern": "linksmap.org",
+      "kind": "host",
+      "note": "SEO spam · 링크모음 TOP10 큐레이션"
+    },
+    {
+      "pattern": "labscribbles.com",
+      "kind": "host",
+      "note": "SEO spam · 여기여 링크모음 가이드"
+    },
+    {
+      "pattern": "popoysbatchoys.com",
+      "kind": "host",
+      "note": "SEO spam · 주소마켓·링크모음 분석"
+    },
+    {
+      "pattern": "permantis.biz",
+      "kind": "host",
+      "note": "SEO spam · 주소모음 가이드"
+    },
+    {
+      "pattern": "yeogiyeo.uriweb.kr",
+      "kind": "host",
+      "note": "SEO spam · 여기여 주소모음 허브"
+    },
+    {
+      "pattern": "yugiyu.com",
+      "kind": "host",
+      "note": "link aggregator · 여기여 계열 바로가기"
+    },
+    {
+      "pattern": "주소모음",
+      "kind": "keyword",
+      "note": "Google·Bing SERP · 검색어·결과 제목 숨김"
+    },
+    {
+      "pattern": "주소 모음",
+      "kind": "keyword",
+      "note": "Google SERP · 띄어쓰기 검색어"
+    },
+    {
+      "pattern": "링크모음",
+      "kind": "keyword",
+      "note": "Google·Bing SERP"
+    },
+    {
+      "pattern": "링크 모음",
+      "kind": "keyword",
+      "note": "Google SERP · 띄어쓰기 검색어"
+    },
+    {
+      "pattern": "여기여",
+      "kind": "keyword",
+      "note": "1세대 주소모음 브랜드 · SERP"
+    },
+    {
+      "pattern": "주소요",
+      "kind": "keyword",
+      "note": "주소모음 SEO 브랜드"
+    },
+    {
+      "pattern": "주소모아",
+      "kind": "keyword",
+      "note": "주소모음 SEO"
+    },
+    {
+      "pattern": "링크모아",
+      "kind": "keyword",
+      "note": "링크모음 SEO"
+    },
+    {
+      "pattern": "최신주소",
+      "kind": "keyword",
+      "note": "변동 주소 SEO 스팸"
+    },
+    {
+      "pattern": "최신 주소",
+      "kind": "keyword",
+      "note": "변동 주소 SEO"
+    },
+    {
+      "pattern": "실시간 주소",
+      "kind": "keyword",
+      "note": "주소모음 SEO 문구"
+    },
+    {
+      "pattern": "바로가기 주소",
+      "kind": "keyword",
+      "note": "주소모음 SEO 문구"
+    },
+    {
+      "pattern": "검증된 주소모음",
+      "kind": "keyword",
+      "note": "Google 스팸 제목 패턴"
+    },
+    {
+      "pattern": "주소몬",
+      "kind": "keyword",
+      "note": "주소모음 SEO 브랜드"
+    },
+    {
+      "pattern": "주소월드",
+      "kind": "keyword",
+      "note": "주소모음 SEO 브랜드"
+    },
+    {
+      "pattern": "주소파크",
+      "kind": "keyword",
+      "note": "주소모음 SEO 브랜드"
+    },
+    {
+      "pattern": "주소킹",
+      "kind": "keyword",
+      "note": "주소모음 SEO (juso4 수집 목록)"
+    },
+    {
+      "pattern": "링크킹",
+      "kind": "keyword",
+      "note": "링크모음 SEO"
+    },
+    {
+      "pattern": "주소랜드",
+      "kind": "keyword",
+      "note": "주소모음 SEO"
+    },
+    {
+      "pattern": "도박사이트",
+      "kind": "keyword",
+      "note": "도박 주소모음 SERP"
+    },
+    {
+      "pattern": "카지노주소",
+      "kind": "keyword",
+      "note": "도박 주소모음"
+    },
+    {
+      "pattern": "토토주소",
+      "kind": "keyword",
+      "note": "도박 주소모음"
+    },
+    {
+      "pattern": "바카라주소",
+      "kind": "keyword",
+      "note": "도박 주소모음"
+    },
+    {
+      "pattern": "카지노 주소",
+      "kind": "keyword",
+      "note": "도박 주소모음 SERP"
+    },
+    {
+      "pattern": "도박 주소",
+      "kind": "keyword",
+      "note": "도박 주소모음 SERP"
+    },
+    {
+      "pattern": "야동주소",
+      "kind": "keyword",
+      "note": "성인 주소모음 SERP"
+    },
+    {
+      "pattern": "야동 주소",
+      "kind": "keyword",
+      "note": "성인 주소모음 SERP"
+    },
+    {
+      "pattern": "성인주소",
+      "kind": "keyword",
+      "note": "성인 주소모음 SERP"
+    },
+    {
+      "pattern": "웹툰주소",
+      "kind": "keyword",
+      "note": "불법 웹툰 주소모음 SERP"
+    },
+    {
+      "pattern": "무료웹툰 주소",
+      "kind": "keyword",
+      "note": "불법 웹툰 주소모음"
+    }
+  ]
+}

@@ -7,10 +7,11 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import '../safety/content_safety_guard.dart';
 import '../safety/youtube_restricted_mode_script.dart';
 import '../services/isle_user_defaults.dart';
+import '../localization/locale_controller.dart';
+import '../localization/web_locale_policy.dart';
 import 'models/blocked_channel.dart';
 import 'youtube_channel_block_script.dart';
 import 'youtube_shorts_hide_script.dart';
-import '../services/isle_user_defaults.dart';
 import 'youtube_open_app_hide_script.dart';
 
 /// Safari 유사 UA — Google 로그인 차단 완화.
@@ -87,7 +88,10 @@ class YoutubeWebviewFactory {
       ),
     );
 
-    controller.loadRequest(Uri.parse(initialUrl ?? homeUrl()));
+    final language = AppLocaleController.savedCodeOrDefault;
+    final initialUri = WebLocalePolicy.initialUri(initialUrl ?? homeUrl(), language);
+    controller.loadRequest(initialUri,
+        headers: WebLocalePolicy.headers(initialUri, language));
     return controller;
   }
 

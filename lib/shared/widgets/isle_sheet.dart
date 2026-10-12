@@ -7,12 +7,14 @@ Future<T?> showIsleModalSheet<T>({
   bool isScrollControlled = true,
   bool showDragHandle = true,
   bool useSafeArea = true,
+  bool useRootNavigator = true,
 }) {
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: isScrollControlled,
     showDragHandle: showDragHandle,
     useSafeArea: useSafeArea,
+    useRootNavigator: useRootNavigator,
     builder: (ctx) {
       return _SheetKeyboardDismiss(child: Builder(builder: builder));
     },

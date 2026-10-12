@@ -10,6 +10,7 @@ class EngagementTracker {
   static const _opensKey = 'content_opens_v1';
   static const _screensKey = 'screen_seconds_v1';
   static const _dailyKey = 'daily_seconds_v1';
+  static const _hourlyKey = 'hourly_seconds_v1';
   static const dailyRetentionDays = 30;
 
   static Box<String>? _box;
@@ -21,7 +22,9 @@ class EngagementTracker {
 
   static Box<String> get box {
     final b = _box;
-    if (b == null || !b.isOpen) throw StateError('EngagementTracker not initialized');
+    if (b == null || !b.isOpen) {
+      throw StateError('EngagementTracker not initialized');
+    }
     return b;
   }
 
@@ -47,7 +50,8 @@ class EngagementTracker {
     }
   }
 
-  static Future<void> recordContentOpen(String url, {String sourceType = 'article'}) async {
+  static Future<void> recordContentOpen(String url,
+      {String sourceType = 'article'}) async {
     final key = '$sourceType::$url';
     final opens = _loadOpens();
     opens[key] = (opens[key] ?? 0) + 1;
@@ -61,6 +65,7 @@ class EngagementTracker {
     await box.put(_screensKey, jsonEncode(screens));
     // 일별 버킷 누적 — 그래프·추천 데이터 소스
     await _recordDaily(screenId, seconds);
+    await _recordHourly(screenId, seconds);
   }
 
   /// `YYYY-MM-DD::platformOrScreen` 키로 일별 누적
@@ -73,6 +78,17 @@ class EngagementTracker {
     await box.put(_dailyKey, jsonEncode(daily));
   }
 
+  /// `YYYY-MM-DD::HH::platformOrScreen` 키로 시간대별 누적.
+  static Future<void> _recordHourly(String screenId, int seconds) async {
+    final day = _todayKey();
+    final hour = DateTime.now().toLocal().hour.toString().padLeft(2, '0');
+    final hourly = _loadHourly();
+    final key = '$day::$hour::$screenId';
+    hourly[key] = (hourly[key] ?? 0) + seconds;
+    _pruneOldDays(hourly);
+    await box.put(_hourlyKey, jsonEncode(hourly));
+  }
+
   static String _todayKey({DateTime? at}) {
     final d = (at ?? DateTime.now()).toLocal();
     final m = d.month.toString().padLeft(2, '0');
@@ -81,7 +97,8 @@ class EngagementTracker {
   }
 
   static void _pruneOldDays(Map<String, int> daily) {
-    final cutoff = DateTime.now().subtract(Duration(days: dailyRetentionDays));
+    final cutoff =
+        DateTime.now().subtract(const Duration(days: dailyRetentionDays));
     daily.removeWhere((key, _) {
       final parts = key.split('::');
       if (parts.length < 2) return true;
@@ -106,7 +123,18 @@ class EngagementTracker {
     }
   }
 
-  /// 최근 N일 × 플랫폼별 초. 결과: `{'2026-05-27': {'youtube': 1820, 'instagram': 600}, ...}`
+  static Map<String, int> _loadHourly() {
+    final raw = box.get(_hourlyKey);
+    if (raw == null) return {};
+    try {
+      final m = jsonDecode(raw) as Map<String, dynamic>;
+      return m.map((k, v) => MapEntry(k, (v as num).toInt()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  /// 최근 N일 × 플랫폼별 초. 결과: `{'2026-[REDACTED]': {'youtube': 1820, 'instagram': 600}, ...}`
   /// platforms 인자는 substring 매칭 — screenId가 그 문자열을 포함하면 합산.
   static Map<String, Map<String, int>> dailyByPlatform({
     required List<String> platforms,
@@ -128,6 +156,36 @@ class EngagementTracker {
       for (final p in platforms) {
         if (id.contains(p)) {
           out[day]![p] = (out[day]![p] ?? 0) + e.value;
+        }
+      }
+    }
+    return out;
+  }
+
+  /// 최근 N일 × 24시간 × 플랫폼별 초.
+  /// 결과: `{0: {'youtube': 120}, 21: {'instagram': 900}}`
+  static Map<int, Map<String, int>> hourlyByPlatform({
+    required List<String> platforms,
+    int days = 7,
+  }) {
+    final hourly = _loadHourly();
+    final out = {
+      for (var h = 0; h < 24; h++) h: {for (final p in platforms) p: 0},
+    };
+    final allowedDays = <String>{};
+    final now = DateTime.now();
+    for (var i = 0; i < days; i++) {
+      allowedDays.add(_todayKey(at: now.subtract(Duration(days: i))));
+    }
+    for (final e in hourly.entries) {
+      final parts = e.key.split('::');
+      if (parts.length < 3 || !allowedDays.contains(parts[0])) continue;
+      final hour = int.tryParse(parts[1]);
+      if (hour == null || hour < 0 || hour > 23) continue;
+      final id = parts.sublist(2).join('::').toLowerCase();
+      for (final p in platforms) {
+        if (id.contains(p)) {
+          out[hour]![p] = (out[hour]![p] ?? 0) + e.value;
         }
       }
     }
@@ -162,12 +220,14 @@ class EngagementTracker {
 
   static List<String> topScreenIds({int limit = 5}) {
     final screens = _loadScreens();
-    final sorted = screens.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final sorted = screens.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
     return sorted.take(limit).map((e) => e.key).toList();
   }
 
   /// 플랫폼 통계 화면용 — screenId → 누적 초
-  static Map<String, int> screenSecondsRaw() => Map<String, int>.from(_loadScreens());
+  static Map<String, int> screenSecondsRaw() =>
+      Map<String, int>.from(_loadScreens());
 
   static Map<String, double> buildUrlBoostMap(Iterable<String> urls) {
     return {for (final u in urls) u: boostForUrl(u)};
